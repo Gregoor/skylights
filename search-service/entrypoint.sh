@@ -13,8 +13,9 @@ if [ ! -f "$MARKER_FILE" ]; then
   quickwit index create --index-config /open-library-index.yml
 
   curl -O https://open-library-uploads.s3.eu-north-1.amazonaws.com/index.ndjson.gz
-  quickwit index ingest --index open-library --input-path index.ndjson.gz --force
-  rm index.ndjson.gz
+  gunzip index.ndjson.gz
+  quickwit index ingest --index open-library --input-path index.ndjson --force
+  rm index.ndjson*
 
   touch "$MARKER_FILE"
 else
