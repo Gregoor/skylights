@@ -16,6 +16,10 @@ doc_mapping:
       type: text
       indexed: false
       stored: true
+    - name: rating
+      type: f64
+      indexed: false
+      stored: true
 
 search_settings:
   default_search_fields: [title, authors]
