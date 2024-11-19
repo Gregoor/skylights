@@ -6,6 +6,7 @@ WORKDIR /quickwit
 
 COPY entrypoint.sh /entrypoint.sh
 COPY open-library-index.yml /open-library-index.yml
+COPY index.ndjson.gz /quickwit/index.ndjson.gz
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
