@@ -8,18 +8,18 @@ doc_mapping:
       type: text
       tokenizer: default
       record: position
+      fieldnorms: true
     - name: authors
       type: array<text>
       tokenizer: default
       record: position
+      fieldnorms: true
     - name: edition_key
       type: text
       indexed: false
-      stored: true
     - name: rating
       type: f64
-      indexed: false
-      stored: true
+      fast: true
 
 search_settings:
   default_search_fields: [title, authors]
