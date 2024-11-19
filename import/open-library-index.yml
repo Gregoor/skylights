@@ -1,0 +1,24 @@
+version: 0.7
+
+index_id: open-library
+
+doc_mapping:
+  field_mappings:
+    - name: title
+      type: text
+      tokenizer: default
+      record: position
+    - name: authors
+      type: array<text>
+      tokenizer: default
+      record: position
+    - name: edition_key
+      type: text
+      indexed: false
+      stored: true
+
+search_settings:
+  default_search_fields: [title, authors]
+
+indexing_settings:
+  commit_timeout_secs: 30

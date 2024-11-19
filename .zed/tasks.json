@@ -1,0 +1,16 @@
+[
+  {
+    "label": "Dev",
+    "command": "pnpm run dev"
+  },
+  {
+    "label": "Import",
+    "cwd": "/Users/gregor/code/skylighz/import/",
+    "command": "rm -f ol.sqlite* && diesel migration run && diesel print-schema > src/schema.rs && time cargo run --release ~/Downloads",
+    "use_new_terminal": false,
+    "allow_concurrent_runs": true,
+    "reveal": "always",
+    "hide": "never",
+    "shell": { "program": "bash" }
+  }
+]

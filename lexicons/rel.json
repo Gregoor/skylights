@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "love.media.rel",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "item": { "type": "union", "refs": ["#refItem", "#urlItem"] },
+          "rating": { "type": "integer", "minimum": 0, "maximum": 10 },
+          "comment": { "type": "string" },
+          "finishedAt": {
+            "type": "array",
+            "items": { "type": "string", "format": "datetime" }
+          }
+        },
+        "required": ["item"]
+      }
+    },
+    "refItem": {
+      "type": "object",
+      "properties": {
+        "ref": { "type": "string" },
+        "value": { "type": "string" }
+      },
+      "required": ["ref", "value"]
+    },
+    "urlItem": {
+      "type": "object",
+      "properties": { "value": { "type": "string" } },
+      "required": ["value"]
+    }
+  }
+}
