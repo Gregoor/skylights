@@ -5,9 +5,10 @@ RUN gunzip index.ndjson.gz
 
 WORKDIR /quickwit
 
-COPY entrypoint.sh /entrypoint.sh
-COPY open-library-index.yml /open-library-index.yml
-RUN chmod +x /entrypoint.sh
+COPY open-library-index.yml .
+COPY setup-index.sh .
+RUN chmod +x setup-index.sh
+RUN ./setup-index.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["quickwit"]
 CMD ["run"]
