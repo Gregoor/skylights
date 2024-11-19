@@ -1,7 +1,6 @@
 FROM quickwit/quickwit
 
 RUN curl -O https://open-library-uploads.s3.eu-north-1.amazonaws.com/index.ndjson.gz
-COPY index.ndjson.gz /index.ndjson.gz
 
 WORKDIR /quickwit
 
