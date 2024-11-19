@@ -11,11 +11,8 @@ if [ ! -f "$MARKER_FILE" ]; then
   echo "First run detected. Running setup..."
 
   quickwit index create --index-config /open-library-index.yml
-
-  curl -O https://open-library-uploads.s3.eu-north-1.amazonaws.com/index.ndjson.gz
-  gunzip index.ndjson.gz
-  quickwit index ingest --index open-library --input-path index.ndjson --force
-  rm index.ndjson*
+  quickwit index ingest --index open-library --input-path index.ndjson.gz --force
+  rm index.ndjson.gz
 
   touch "$MARKER_FILE"
 else
