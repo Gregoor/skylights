@@ -6,13 +6,15 @@ quickwit "$@" &
 QUICKWIT_PID=$!
 
 if [ ! -f "$MARKER_FILE" ]; then
-  sleep 5
+  while ! curl -s http://0.0.0.0:7280 > /dev/null; do
+    sleep 0.5
+  done
 
   echo "First run detected. Running setup..."
 
   quickwit index create --index-config /open-library-index.yml
-  quickwit index ingest --index open-library --input-path index.ndjson --force
-  rm index.ndjson*
+  quickwit index ingest --index open-library --input-path /index.ndjson.gz --force
+  rm /index.ndjson.gz
 
   touch "$MARKER_FILE"
 else
