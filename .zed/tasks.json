@@ -5,7 +5,7 @@
   },
   {
     "label": "Import",
-    "command": "echo Enter to override last import && cd import && read && rm -f ol.sqlite* && diesel migration run && diesel print-schema > src/schema.rs && time cargo run --release ~/Downloads",
+    "command": "cd search && time cargo run --release ~/Downloads",
     "use_new_terminal": false,
     "allow_concurrent_runs": true,
     "reveal": "always",

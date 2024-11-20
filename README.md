@@ -4,7 +4,7 @@
 
 ```sh
 cd search
-docker build --progress=plain -t my-quickwit . && docker run -p 7280:7280
+docker build --progress=plain . && docker run -p 7280:7280 .
 ```
 
 ## Web
