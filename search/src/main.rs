@@ -1,15 +1,11 @@
-mod schema;
 mod utils;
 
-use std::{collections::HashMap, fs, io::BufRead};
+use std::{collections::HashMap, fs, io::BufRead, time::Duration};
 
-use serde::Deserialize;
-use tantivy::{doc, tokenizer::NgramTokenizer, Index, IndexWriter, TantivyDocument};
+use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 
-use crate::{
-    schema::get_schema_with_fields,
-    utils::{get_ol_dump_reader, process_file},
-};
+use crate::utils::{get_ol_dump_reader, process_file};
 
 #[derive(Debug, Deserialize)]
 struct Author {
@@ -130,48 +126,136 @@ fn process_ratings() -> HashMap<String, f32> {
         .collect::<HashMap<_, _>>()
 }
 
-fn main() {
+#[tokio::main(flavor = "current_thread")]
+async fn main() {
     let work_authors = process_work_authors();
     let ratings = process_ratings();
 
-    let (schema, fields) = get_schema_with_fields();
-
-    if fs::metadata("index").is_ok() {
-        fs::remove_dir_all("index").unwrap();
+    let client = meilisearch_sdk::client::Client::new(
+        "http://0.0.0.0:7700",
+        Some("e4aff46be7573a52e6c7869e8504396a8fe9a6a3869d7838a9ea88a893ef0bbe"),
+    )
+    .unwrap();
+    if let Some(index) = client
+        .list_all_indexes()
+        .await
+        .unwrap()
+        .results
+        .iter()
+        .find(|index| index.uid == "open-library")
+        .cloned()
+    {
+        index
+            .delete()
+            .await
+            .unwrap()
+            .wait_for_completion(&client, None, None)
+            .await
+            .unwrap();
     }
-    fs::create_dir_all("index").unwrap();
-    let index = Index::create_in_dir("index", schema).unwrap();
+    let index_task = client
+        .create_index("open-library", None)
+        .await
+        .unwrap()
+        .wait_for_completion(&client, None, None)
+        .await
+        .unwrap();
+    let index = index_task.try_make_index(&client).unwrap();
     index
-        .tokenizers()
-        .register("ngram3", NgramTokenizer::new(3, 3, false).unwrap());
+        .set_sortable_attributes(["rating"])
+        .await
+        .unwrap()
+        .wait_for_completion(&client, None, None)
+        .await
+        .unwrap();
+    index
+        .set_filterable_attributes(["edition_key", "work_key", "isbn_10", "isbn_13"])
+        .await
+        .unwrap()
+        .wait_for_completion(&client, None, None)
+        .await
+        .unwrap();
+    index
+        .set_searchable_attributes(["title", "authors"])
+        .await
+        .unwrap()
+        .wait_for_completion(&client, None, None)
+        .await
+        .unwrap();
 
-    let mut index_writer: IndexWriter = index.writer(1_000_000_000).unwrap();
+    // at 500k
+    // batched
+    // 25k/25k => 9.5k/s
+    // 50k/25k => 10k/s
+    // 50k/50k => 13k/s
+    // 100k/100k => 16k/s
+    // not batched
+    // 50k => 13k/s
+    // 100k => 18k/s
+    // 250k => 19k/s
+    for editions in &process_file::<Edition>("editions").chunks(250_000) {
+        #[derive(Debug, Serialize)]
+        struct Book {
+            edition_key: String,
+            title: String,
+            work_key: Option<String>,
+            authors: Vec<String>,
+            rating: Option<f32>,
+            isbn_10: Vec<String>,
+            isbn_13: Vec<String>,
+        }
+        let editions: Vec<Book> = editions
+            .into_iter()
+            .filter_map(|edition| {
+                let Some(title) = edition.title.as_ref() else {
+                    return None;
+                };
+                let work_key = edition
+                    .works
+                    .as_ref()
+                    .and_then(|works| works.first().map(|key| key.key.clone()));
+                Some(Book {
+                    edition_key: edition.key.split("/").last().unwrap().to_string(),
+                    title: title.into(),
+                    work_key: work_key
+                        .clone()
+                        .map(|k| k.split("/").last().map(str::to_string))
+                        .flatten(),
+                    authors: work_key
+                        .as_ref()
+                        .map(|key| work_authors.get(key))
+                        .flatten()
+                        .unwrap_or(&vec![])
+                        .clone(),
+                    rating: work_key.and_then(|key| ratings.get(&key).cloned()),
+                    isbn_10: edition.isbn_10.clone().unwrap_or_default(),
+                    isbn_13: edition.isbn_13.clone().unwrap_or_default(),
+                })
+            })
+            .collect();
 
-    for edition in process_file::<Edition>("editions") {
-        let Some(title) = edition.title.as_ref() else {
-            continue;
-        };
-
-        let mut doc = TantivyDocument::new();
-        if let Some(work_key) = edition.works.as_ref().and_then(|works| works.first()) {
-            doc.add_text(fields.work_key, &work_key.key);
-            for author in work_authors.get(&work_key.key).unwrap_or(&vec![]) {
-                doc.add_text(fields.authors, author);
-            }
-        }
-        doc.add_text(fields.edition_key, &edition.key);
-        doc.add_text(fields.title, title);
-        if let Some(rating) = ratings.get(&edition.key) {
-            doc.add_f64(fields.rating, *rating as f64);
-        }
-        for isbn in edition.isbn_10.as_ref().unwrap_or(&vec![]) {
-            doc.add_text(fields.isbn_10, isbn);
-        }
-        for isbn in edition.isbn_13.as_ref().unwrap_or(&vec![]) {
-            doc.add_text(fields.isbn_13, isbn);
-        }
-
-        index_writer.add_document(doc).unwrap();
+        index
+            .add_documents(editions.as_slice(), Some("edition_key"))
+            .await
+            .unwrap()
+            .wait_for_completion(
+                &client,
+                Some(Duration::from_millis(500)),
+                Some(Duration::from_secs(3600)),
+            )
+            .await
+            .unwrap();
+        // futures::future::join_all(tasks.into_iter().map(|t| {
+        //     t.wait_for_completion(
+        //         &client,
+        //         Some(Duration::from_secs(1)),
+        //         Some(Duration::from_secs(360)),
+        //     )
+        // }))
+        // .await
+        // .into_iter()
+        // .for_each(|r| {
+        //     r.unwrap();
+        // });
     }
-    index_writer.commit().unwrap();
 }

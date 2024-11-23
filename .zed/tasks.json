@@ -6,7 +6,7 @@
   {
     "label": "Import",
     "command": "cd search && time cargo run --release ~/Downloads",
-    "use_new_terminal": false,
+    "use_new_ter  minal": true,
     "allow_concurrent_runs": true,
     "reveal": "always",
     "hide": "never",
