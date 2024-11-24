@@ -27,19 +27,18 @@ export async function decrypt<Payload>(session: string | undefined = "") {
   }
 }
 
-export class EncryptedCookie<D> {
+export class EncryptedCookie<D extends JWTPayload> {
   constructor(public readonly key: string) {}
 
   async create(data: D) {
-    const expiresAt = getExpiryFromNow();
-    const session = await encrypt({ expiresAt, data });
+    const session = await encrypt(data);
     (await cookies()).set(this.key, session, {
       httpOnly: true,
       secure: true,
-      expires: expiresAt,
+      expires: getExpiryFromNow(),
       sameSite: "lax",
-      path: "/",
     });
+    console.log("look at my cookies", (await cookies()).getAll());
   }
 
   async update() {
@@ -47,7 +46,7 @@ export class EncryptedCookie<D> {
     const payload = await decrypt(session);
 
     if (!session || !payload) {
-      return null;
+      return;
     }
 
     const cookieStore = await cookies();
@@ -56,13 +55,14 @@ export class EncryptedCookie<D> {
       secure: true,
       expires: getExpiryFromNow(),
       sameSite: "lax",
-      path: "/",
     });
   }
 
   async get(): Promise<D | undefined> {
-    const value = await decrypt((await cookies()).get(this.key)?.value);
-    return value?.data as D;
+    const cookie = (await cookies()).get(this.key);
+    if (!cookie) return;
+    const value = await decrypt(cookie?.value);
+    return value as D | undefined;
   }
 
   async delete() {

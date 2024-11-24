@@ -8,7 +8,11 @@
       "record": {
         "type": "object",
         "properties": {
-          "item": { "type": "union", "refs": ["#refItem", "#urlItem"] },
+          "item": {
+            "type": "union",
+            "refs": ["#refItem", "#urlItem"],
+            "closed": true
+          },
           "rating": { "type": "integer", "minimum": 0, "maximum": 10 },
           "comment": { "type": "string" },
           "finishedAt": {

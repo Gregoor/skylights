@@ -1,3 +1,4 @@
+import { Agent } from "@atproto/api";
 import {
   NodeOAuthClient,
   NodeSavedSession,
@@ -6,10 +7,11 @@ import {
 
 import { EncryptedCookie } from "./encrypted-cookie";
 
-const sessionCookie = new EncryptedCookie<{
+export const sessionCookie = new EncryptedCookie<{
   sub: string;
   session: NodeSavedSession;
 }>("session");
+
 const authStateCookie = new EncryptedCookie<{
   key: string;
   state: NodeSavedState;
@@ -26,9 +28,9 @@ export const authClient = new NodeOAuthClient({
       : abs("client-metadata.json"),
     client_name: "Skylights",
     client_uri: ORIGIN,
-    logo_uri: abs("logo.png"),
-    tos_uri: abs("tos"),
-    policy_uri: abs("policy"),
+    // logo_uri: abs("logo.png"),
+    // tos_uri: abs("tos"),
+    // policy_uri: abs("policy"),
     redirect_uris: [abs("atproto-oauth-callback")],
     grant_types: ["authorization_code", "refresh_token"],
     response_types: ["code"],
@@ -52,7 +54,8 @@ export const authClient = new NodeOAuthClient({
       const cookie = await authStateCookie.get();
       return cookie?.key == key ? cookie.state : undefined;
     },
-    del: () => authStateCookie.delete(),
+    // TODO: not possible to delete cookies in RSCs, unsure how to solve for this one
+    del: () => {}, //authStateCookie.delete(key),
   },
 
   sessionStore: {
@@ -63,7 +66,7 @@ export const authClient = new NodeOAuthClient({
         return payload.session;
       }
     },
-    del: () => sessionCookie.delete(),
+    del: () => {}, //sessionCookie.delete(key),
   },
 });
 
@@ -83,3 +86,11 @@ export const authClient = new NodeOAuthClient({
 //   const profile = await agent.getProfile({ actor: agent.did });
 //   console.log("Bsky profile:", profile.data);
 // }
+
+export async function getSessionAgent(refresh?: boolean | "auto") {
+  const cookie = await sessionCookie.get();
+  if (!cookie) return null;
+  const session = await authClient.restore(cookie.sub, refresh);
+  if ((await session.getTokenInfo(refresh)).expired) return null;
+  return new Agent(session);
+}

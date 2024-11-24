@@ -8,6 +8,8 @@ export async function GET(request: NextRequest) {
   if (!handle) {
     return { status: 400, body: "Missing handle" };
   }
-  const url = await authClient.authorize(handle, { ui_locales: "en" });
+  const url = await authClient.authorize(handle.toString(), {
+    ui_locales: "en",
+  });
   redirect(url.toString());
 }
