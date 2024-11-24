@@ -6,7 +6,7 @@ import { NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   const handle = request.nextUrl.searchParams.get("handle");
   if (!handle) {
-    return { status: 400, body: "Missing handle" };
+    return new Response("Missing handle", { status: 400 });
   }
   const url = await authClient.authorize(handle.toString(), {
     ui_locales: "en",
