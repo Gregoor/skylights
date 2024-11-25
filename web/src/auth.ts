@@ -28,7 +28,9 @@ const REDIRECT_URI = abs("atproto-oauth-callback");
 
 export const authClient = new NodeOAuthClient({
   clientMetadata: {
-    client_id: `${IS_DEV ? "http://localhost" : ORIGIN}?redirect_uri=${enc(REDIRECT_URI)}&scope=${enc(SCOPE)}`,
+    client_id: IS_DEV
+      ? `http://localhost?redirect_uri=${enc(REDIRECT_URI)}&scope=${enc(SCOPE)}`
+      : `${ORIGIN}/client-metadata.json`,
     client_name: "Skylights",
     client_uri: ORIGIN,
     // logo_uri: abs("logo.png"),
