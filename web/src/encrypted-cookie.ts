@@ -38,7 +38,6 @@ export class EncryptedCookie<D extends JWTPayload> {
       expires: getExpiryFromNow(),
       sameSite: "lax",
     });
-    console.log("look at my cookies", (await cookies()).getAll());
   }
 
   async update() {
