@@ -224,18 +224,33 @@ export function Stars() {
 
           update();
 
+          const spawnMeteor = (x: number, y: number) => {
+            meteorsRef.current.push(new Meteor(x, y));
+          };
           const intervalId = setInterval(
-            () => {
-              meteorsRef.current.push(
-                new Meteor(rand(0, width), rand(0, height)),
-              );
-            },
+            () => spawnMeteor(rand(0, width), rand(0, height)),
             rand(METEOR_EMIT_INTERVAL_MS, METEOR_EMIT_INTERVAL_MS * 2),
           );
+
+          const handleClick = (event: MouseEvent) => {
+            const target = event.target as HTMLElement;
+            const isStar =
+              target.classList.contains("star-svg") ||
+              target.parentElement?.classList.contains("star-svg");
+            if (
+              isStar ||
+              target instanceof HTMLButtonElement ||
+              target instanceof HTMLAnchorElement
+            ) {
+              spawnMeteor(event.clientX, event.clientY);
+            }
+          };
+          document.addEventListener("click", handleClick);
 
           return () => {
             cancelAnimationFrame(animationFrameId!);
             clearInterval(intervalId);
+            document.removeEventListener("click", handleClick);
           };
         }}
         width={width}

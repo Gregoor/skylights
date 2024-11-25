@@ -17,22 +17,22 @@ const authStateCookie = new EncryptedCookie<{
   state: NodeSavedState;
 }>("auth_state");
 
-const IS_DEV = process.env.NODE_ENV == "development";
-const ORIGIN = IS_DEV ? "http://127.0.0.1:3000" : "https://skylights.my";
+const isDev = process.env.NODE_ENV == "development";
+const origin = isDev ? "http://127.0.0.1:3000" : "https://skylights.my";
 
-const abs = (s: string) => `${ORIGIN}/${s}`;
+const abs = (s: string) => `${origin}/${s}`;
 const enc = encodeURIComponent;
 
 const SCOPE = "atproto transition:generic";
-const REDIRECT_URI = abs("atproto-oauth-callback");
+const REDIRECT_URI = abs("oauth/atproto-callback");
 
 export const authClient = new NodeOAuthClient({
   clientMetadata: {
-    client_id: IS_DEV
+    client_id: isDev
       ? `http://localhost?redirect_uri=${enc(REDIRECT_URI)}&scope=${enc(SCOPE)}`
-      : `${ORIGIN}/client-metadata.json`,
+      : abs("oauth/client-metadata.json"),
     client_name: "Skylights",
-    client_uri: ORIGIN,
+    client_uri: origin,
     // logo_uri: abs("logo.png"),
     tos_uri: abs("tos"),
     policy_uri: abs("policy"),
@@ -45,7 +45,7 @@ export const authClient = new NodeOAuthClient({
     // token_endpoint_auth_method: "private_key_jwt",
     // token_endpoint_auth_signing_alg: "RS256",
     dpop_bound_access_tokens: true,
-    // jwks_uri: abs("/jwks.json"),
+    // jwks_uri: abs("oauth/jwks.json"),
   },
 
   // keyset: await Promise.all([
