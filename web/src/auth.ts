@@ -33,7 +33,7 @@ export const authClient = new NodeOAuthClient({
       : `${ORIGIN}/client-metadata.json`,
     client_name: "Skylights",
     client_uri: ORIGIN,
-    logo_uri: abs("logo.png"),
+    // logo_uri: abs("logo.png"),
     tos_uri: abs("tos"),
     policy_uri: abs("policy"),
     redirect_uris: [REDIRECT_URI],
