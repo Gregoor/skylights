@@ -29,6 +29,9 @@ importers:
       '@meilisearch/instant-meilisearch':
         specifier: ^0.22.0
         version: 0.22.0
+      cid:
+        specifier: github:multiformats/cid
+        version: https://codeload.github.com/multiformats/cid/tar.gz/603f4570ba051192224dd1a3b131a6ebdd486b4f
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
@@ -952,6 +955,10 @@ packages:
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
     engines: {node: '>= 8.10.0'}
+
+  cid@https://codeload.github.com/multiformats/cid/tar.gz/603f4570ba051192224dd1a3b131a6ebdd486b4f:
+    resolution: {tarball: https://codeload.github.com/multiformats/cid/tar.gz/603f4570ba051192224dd1a3b131a6ebdd486b4f}
+    version: 0.0.0
 
   client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
@@ -3436,6 +3443,8 @@ snapshots:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.3
+
+  cid@https://codeload.github.com/multiformats/cid/tar.gz/603f4570ba051192224dd1a3b131a6ebdd486b4f: {}
 
   client-only@0.0.1: {}
 
