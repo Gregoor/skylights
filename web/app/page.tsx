@@ -8,7 +8,7 @@ async function login(formData: FormData) {
   "use server";
   const handle = formData.get("handle");
   if (!handle) {
-    return { status: 400, body: "Missing handle" };
+    throw new Error("Handle is required");
   }
   const url = await authClient.authorize(handle.toString(), {
     ui_locales: "en",
