@@ -25,7 +25,7 @@ export const authClient = new NodeOAuthClient({
   clientMetadata: {
     client_id: IS_DEV
       ? `http://localhost?redirect_uri=${enc(abs("atproto-oauth-callback"))}&scope=${enc("atproto transition:generic")}`
-      : abs("client-metadata.json"),
+      : `${ORIGIN}?redirect_uri=${enc(abs("atproto-oauth-callback"))}&scope=${enc("atproto transition:generic")}`,
     client_name: "Skylights",
     client_uri: ORIGIN,
     // logo_uri: abs("logo.png"),
@@ -69,23 +69,6 @@ export const authClient = new NodeOAuthClient({
     del: () => {}, //sessionCookie.delete(key),
   },
 });
-
-// // Whenever needed, restore a user's session
-// async function worker() {
-//   const userDid = "did:plc:123";
-
-//   const oauthSession = await client.restore(userDid);
-
-//   // Note: If the current access_token is expired, the session will automatically
-//   // (and transparently) refresh it. The new token set will be saved though
-//   // the client's session store.
-
-//   const agent = new Agent(oauthSession);
-
-//   // Make Authenticated API calls
-//   const profile = await agent.getProfile({ actor: agent.did });
-//   console.log("Bsky profile:", profile.data);
-// }
 
 export async function getSessionAgent(refresh?: boolean | "auto") {
   const cookie = await sessionCookie.get();
