@@ -224,11 +224,14 @@ export function Stars() {
 
           update();
 
-          const intervalId = setInterval(() => {
-            meteorsRef.current.push(
-              new Meteor(rand(0, width), rand(0, height)),
-            );
-          }, METEOR_EMIT_INTERVAL_MS);
+          const intervalId = setInterval(
+            () => {
+              meteorsRef.current.push(
+                new Meteor(rand(0, width), rand(0, height)),
+              );
+            },
+            rand(METEOR_EMIT_INTERVAL_MS, METEOR_EMIT_INTERVAL_MS * 2),
+          );
 
           return () => {
             cancelAnimationFrame(animationFrameId!);
