@@ -19,23 +19,26 @@ const authStateCookie = new EncryptedCookie<{
 
 const IS_DEV = process.env.NODE_ENV == "development";
 const ORIGIN = IS_DEV ? "http://127.0.0.1:3000" : "https://skylights.my";
+
 const abs = (s: string) => `${ORIGIN}/${s}`;
 const enc = encodeURIComponent;
+
+const SCOPE = "atproto transition:generic";
+const REDIRECT_URI = abs("atproto-oauth-callback");
+
 export const authClient = new NodeOAuthClient({
   clientMetadata: {
-    client_id: IS_DEV
-      ? `http://localhost?redirect_uri=${enc(abs("atproto-oauth-callback"))}&scope=${enc("atproto transition:generic")}`
-      : `${ORIGIN}?redirect_uri=${enc(abs("atproto-oauth-callback"))}&scope=${enc("atproto transition:generic")}`,
+    client_id: `${IS_DEV ? "http://localhost" : ORIGIN}?redirect_uri=${enc(REDIRECT_URI)}&scope=${enc(SCOPE)}`,
     client_name: "Skylights",
     client_uri: ORIGIN,
     // logo_uri: abs("logo.png"),
     // tos_uri: abs("tos"),
     // policy_uri: abs("policy"),
-    redirect_uris: [abs("atproto-oauth-callback")],
+    redirect_uris: [REDIRECT_URI],
     grant_types: ["authorization_code", "refresh_token"],
     response_types: ["code"],
     application_type: "web",
-    scope: "atproto transition:generic",
+    scope: SCOPE,
     token_endpoint_auth_method: "none",
     // token_endpoint_auth_method: "private_key_jwt",
     // token_endpoint_auth_signing_alg: "RS256",
