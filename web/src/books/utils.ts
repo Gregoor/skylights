@@ -1,6 +1,6 @@
 import { Agent } from "@atproto/api";
 
-import { Record as RelRecord } from "@/lexicon/types/my/skylights/rel";
+import { Rating, Record as RelRecord } from "@/lexicon/types/my/skylights/rel";
 
 import { Book } from "./BookItem";
 
@@ -34,7 +34,6 @@ export async function fetchRatedBooks(repo: string) {
     ),
   );
   return items.filter(
-    (i): i is { book: Book; rating: number } =>
-      !!i.book && typeof i.rating === "number",
+    (i): i is { book: Book; rating: Rating } => !!i.book && !!i.rating,
   );
 }

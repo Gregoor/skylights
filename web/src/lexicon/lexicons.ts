@@ -23,12 +23,12 @@ export const schemaDict = {
               closed: true,
             },
             rating: {
-              type: 'integer',
-              minimum: 0,
-              maximum: 10,
+              type: 'ref',
+              ref: 'lex:my.skylights.rel#rating',
             },
-            comment: {
-              type: 'string',
+            note: {
+              type: 'ref',
+              ref: 'lex:my.skylights.rel#note',
             },
             finishedAt: {
               type: 'array',
@@ -61,6 +61,38 @@ export const schemaDict = {
           },
         },
         required: ['value'],
+      },
+      rating: {
+        type: 'object',
+        properties: {
+          value: {
+            type: 'integer',
+            minimum: 1,
+            maximum: 10,
+          },
+          createdAt: {
+            type: 'string',
+            format: 'datetime',
+          },
+        },
+        required: ['value', 'createdAt'],
+      },
+      note: {
+        type: 'object',
+        properties: {
+          value: {
+            type: 'string',
+          },
+          createdAt: {
+            type: 'string',
+            format: 'datetime',
+          },
+          updatedAt: {
+            type: 'string',
+            format: 'datetime',
+          },
+        },
+        required: ['value', 'createdAt', 'updatedAt'],
       },
     },
   },

@@ -17,7 +17,7 @@ export async function rate(key: string, rating: number) {
 
   const newRecord: RelRecord = {
     item: { ref: "open-library", value: key },
-    rating,
+    rating: { value: rating, createdAt: new Date().toISOString() },
   };
 
   const response = await agent.com.atproto.repo.listRecords({

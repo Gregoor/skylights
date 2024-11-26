@@ -10,7 +10,7 @@ export default async function SearchPage() {
   return (
     <ClientSearchPage
       defaultRatings={Object.fromEntries(
-        ratedBooks.map((i) => [i.book.work_key, i.rating]),
+        ratedBooks.map((i) => [i.book.work_key, i.rating.value]),
       )}
     />
   );

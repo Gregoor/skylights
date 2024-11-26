@@ -61,6 +61,7 @@ export function BookItem({ value }: { value: Book }) {
 
         <Rating
           key={rating}
+          fillColor="#f8f1d3"
           allowFraction
           size={26}
           initialValue={typeof rating == "number" ? rating / 2 : undefined}

@@ -13,8 +13,8 @@
             "refs": ["#refItem", "#urlItem"],
             "closed": true
           },
-          "rating": { "type": "integer", "minimum": 0, "maximum": 10 },
-          "comment": { "type": "string" },
+          "rating": { "type": "ref", "ref": "#rating" },
+          "note": { "type": "ref", "ref": "#note" },
           "finishedAt": {
             "type": "array",
             "items": { "type": "string", "format": "datetime" }
@@ -35,6 +35,23 @@
       "type": "object",
       "properties": { "value": { "type": "string" } },
       "required": ["value"]
+    },
+    "rating": {
+      "type": "object",
+      "properties": {
+        "value": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "createdAt": { "type": "string", "format": "datetime" }
+      },
+      "required": ["value", "createdAt"]
+    },
+    "note": {
+      "type": "object",
+      "properties": {
+        "value": { "type": "string" },
+        "createdAt": { "type": "string", "format": "datetime" },
+        "updatedAt": { "type": "string", "format": "datetime" }
+      },
+      "required": ["value", "createdAt", "updatedAt"]
     }
   }
 }
