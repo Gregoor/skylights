@@ -1,4 +1,5 @@
 import { Agent } from "@atproto/api";
+import { JoseKey } from "@atproto/jwk-jose";
 import {
   NodeOAuthClient,
   NodeSavedSession,
@@ -16,6 +17,12 @@ const authStateCookie = new EncryptedCookie<{
   key: string;
   state: NodeSavedState;
 }>("auth_state");
+
+const privateKeyPKCS8 = Buffer.from(
+  process.env.PRIVATE_KEY_ES256_B64 as string,
+  "base64",
+).toString();
+const privateKey = await JoseKey.fromImportable(privateKeyPKCS8, "key1");
 
 const isDev = process.env.NODE_ENV == "development";
 const origin = isDev ? "http://127.0.0.1:3000" : "https://skylights.my";
@@ -41,17 +48,13 @@ export const authClient = new NodeOAuthClient({
     response_types: ["code"],
     application_type: "web",
     scope: SCOPE,
-    token_endpoint_auth_method: "none",
-    // token_endpoint_auth_method: "private_key_jwt",
-    // token_endpoint_auth_signing_alg: "RS256",
+    token_endpoint_auth_method: "private_key_jwt",
+    token_endpoint_auth_signing_alg: "ES256",
     dpop_bound_access_tokens: true,
-    // jwks_uri: abs("oauth/jwks.json"),
+    jwks_uri: abs("oauth/jwks.json"),
   },
 
-  // keyset: await Promise.all([
-  //   // JoseKey.fromKeyLike(new TextEncoder().encode(process.env.PRIVATE_KEY!)),
-  //   JoseKey.fromKeyLike(scrt.privateKey),
-  // ]),
+  keyset: [privateKey],
 
   stateStore: {
     set: (key, state) => authStateCookie.create({ key, state }),
@@ -59,8 +62,7 @@ export const authClient = new NodeOAuthClient({
       const cookie = await authStateCookie.get();
       return cookie?.key == key ? cookie.state : undefined;
     },
-    // TODO: not possible to delete cookies in RSCs, unsure how to solve for this one
-    del: () => {}, //authStateCookie.delete(key),
+    del: () => authStateCookie.delete(),
   },
 
   sessionStore: {
@@ -71,7 +73,7 @@ export const authClient = new NodeOAuthClient({
         return payload.session;
       }
     },
-    del: () => {}, //sessionCookie.delete(key),
+    del: () => sessionCookie.delete(),
   },
 });
 
