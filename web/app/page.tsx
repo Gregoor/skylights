@@ -20,7 +20,7 @@ async function login(formData: FormData) {
       "authorize errror ✨",
       error,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (error as any)?.constructor?.name,
+      (error as any)?.name,
     );
     throw error;
   }
