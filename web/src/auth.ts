@@ -41,7 +41,7 @@ export const authClient = new NodeOAuthClient({
     client_name: "Skylights",
     client_uri: origin,
     redirect_uris: [REDIRECT_URI],
-    grant_types: ["authorization_code"],
+    grant_types: ["authorization_code", "refresh_token"],
     response_types: ["code"],
     application_type: "web",
     scope: SCOPE,
