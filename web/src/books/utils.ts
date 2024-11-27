@@ -1,10 +1,8 @@
-import { Agent } from "@atproto/api";
-
-import { Rating, Record as RelRecord } from "@/lexicon/types/my/skylights/rel";
-
+import { Record as RelRecord } from "@/lexicon/types/my/skylights/rel";
+import { getBskyAgent } from "@/utils";
 import { Book } from "./BookItem";
 
-async function fetchBook(workKey: string) {
+export async function fetchBook(workKey: string) {
   const response = await fetch(
     "https://ol.index.skylights.my/indexes/open-library/search",
     {
@@ -19,21 +17,11 @@ async function fetchBook(workKey: string) {
   return ((await response.json()) as { hits: Book[] }).hits.at(0);
 }
 
-export async function fetchRatedBooks(repo: string) {
-  const agent = new Agent("https://bsky.social/xrpc");
-  const response = await agent.com.atproto.repo.listRecords({
+export async function listRels(repo: string) {
+  const response = await getBskyAgent().com.atproto.repo.listRecords({
     repo,
     collection: "my.skylights.rel",
+    limit: 100,
   });
-  const items = await Promise.all(
-    (response.data.records.map((record) => record.value) as RelRecord[]).map(
-      async ({ item, rating }) => ({
-        book: await fetchBook(item.value),
-        rating,
-      }),
-    ),
-  );
-  return items.filter(
-    (i): i is { book: Book; rating: Rating } => !!i.book && !!i.rating,
-  );
+  return response.data.records;
 }
