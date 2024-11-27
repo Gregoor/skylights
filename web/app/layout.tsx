@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 
-import { getSessionAgent } from "@/auth";
+import { authClient, getSessionAgent } from "@/auth";
 import { AvatarLink } from "@/AvatarLink";
 import { ClientOnly } from "@/ClientOnly";
 import { Stars } from "@/Stars";
@@ -46,6 +46,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log("auth client", authClient.clientMetadata);
   return (
     <html lang="en">
       <body

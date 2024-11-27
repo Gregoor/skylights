@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "gen-pk": "echo PRIVATE_KEY_ES256_B64=\"$(openssl ecparam -name prime256v1 -genkey | openssl pkcs8 -topk8 -nocrypt | openssl base64 -A$PRIVATE_KEY_ES256_B64)\" >> .env",
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -19,7 +19,6 @@
     "@atproto/oauth-provider": "^0.2.8",
     "@atproto/xrpc-server": "^0.7.3",
     "@meilisearch/instant-meilisearch": "^0.22.0",
-    "@sentry/nextjs": "^8.40.0",
     "cid": "github:multiformats/cid",
     "dotenv": "^16.4.5",
     "instantsearch.css": "^8.5.1",

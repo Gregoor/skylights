@@ -22,7 +22,7 @@ export default async function LandingPage() {
     redirect("/search");
   }
   return (
-    <Card className="flex flex-col gap-2">
+    <Card className="mx-auto w-full max-w-sm flex flex-col gap-2">
       <h1 className="text-lg">Sign-in with Bluesky</h1>
       <form className="flex flex-row gap-2" action={login}>
         <input
