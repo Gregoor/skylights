@@ -16,7 +16,8 @@ async function login(formData: FormData) {
     });
     redirect(url.toString());
   } catch (error: unknown) {
-    console.log("authorize errror ✨", error, Object.keys(error as never));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    console.log("authorize errror ✨", error, (error as any).payload);
     throw error;
   }
 }
