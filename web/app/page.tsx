@@ -10,10 +10,15 @@ async function login(formData: FormData) {
   if (!handle) {
     throw new Error("Handle is required");
   }
-  const url = await authClient.authorize(handle.toString(), {
-    ui_locales: "en",
-  });
-  redirect(url.toString());
+  try {
+    const url = await authClient.authorize(handle.toString(), {
+      ui_locales: "en",
+    });
+    redirect(url.toString());
+  } catch (error: unknown) {
+    console.log("authorize errror ✨", error);
+    throw error;
+  }
 }
 
 export default async function LandingPage() {
