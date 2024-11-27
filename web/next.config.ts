@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
     }
     return config;
   },
+  experimental: {
+    serverSourceMaps: true,
+  },
 };
 
 export default nextConfig;
