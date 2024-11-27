@@ -36,9 +36,24 @@ export const Button = ({
   <button
     type="button"
     className={
-      "px-2 py-1 border text-sm transition-all outline-white hover:outline-dashed focus:outline-dashed " +
+      "px-2 py-1 border text-sm transition-all outline-gray-400 hover:opacity-80 focus:outline-dashed cursor-pointer " +
       (className ?? "")
     }
+    {...props}
+  />
+);
+
+export const Input = ({
+  className,
+  ...props
+}: React.ComponentProps<"input">) => (
+  <input
+    type="text"
+    className={[
+      "outline-none border rounded-lg border-gray-400",
+      "focus:border-white transition-all p-2 w-full bg-black",
+      className,
+    ].join(" ")}
     {...props}
   />
 );

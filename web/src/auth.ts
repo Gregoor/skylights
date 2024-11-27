@@ -18,6 +18,7 @@ export const authClient = new BrowserOAuthClient({
     application_type: "web",
     scope: SCOPE,
     token_endpoint_auth_method: "none",
+    dpop_bound_access_tokens: true,
   },
 });
 
