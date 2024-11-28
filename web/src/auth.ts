@@ -25,7 +25,7 @@ const privateKeyPKCS8 = Buffer.from(
 const privateKey = await JoseKey.fromImportable(privateKeyPKCS8, "key1");
 
 const isDev = process.env.NODE_ENV == "development";
-const origin = isDev ? "http://127.0.0.1:3000" : "https://www.skylights.my";
+const origin = isDev ? "http://127.0.0.1:3000" : "https://skylights.my";
 
 const abs = (s: string) => `${origin}/${s}`;
 const enc = encodeURIComponent;
