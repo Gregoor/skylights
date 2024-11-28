@@ -81,3 +81,9 @@ export async function getSessionAgent(refresh?: boolean | "auto") {
   if ((await session.getTokenInfo(refresh)).expired) return null;
   return new Agent(session);
 }
+
+export async function assertSessionAgent() {
+  const agent = await getSessionAgent();
+  if (!agent) throw new Error("Missing session");
+  return agent;
+}

@@ -229,7 +229,7 @@ export function Stars() {
           };
           const intervalId = setInterval(
             () => spawnMeteor(rand(0, width), rand(0, height)),
-            rand(METEOR_EMIT_INTERVAL_MS, METEOR_EMIT_INTERVAL_MS * 2),
+            rand(METEOR_EMIT_INTERVAL_MS, METEOR_EMIT_INTERVAL_MS ** 2),
           );
 
           const handleClick = (event: MouseEvent) => {
@@ -245,12 +245,18 @@ export function Stars() {
               spawnMeteor(event.clientX, event.clientY);
             }
           };
+          const handleSubmit = () => {
+            spawnMeteor(rand(0, width), rand(0, height));
+          };
+
           document.addEventListener("click", handleClick);
+          document.addEventListener("submit", handleSubmit);
 
           return () => {
             cancelAnimationFrame(animationFrameId!);
             clearInterval(intervalId);
             document.removeEventListener("click", handleClick);
+            document.removeEventListener("submit", handleSubmit);
           };
         }}
         width={width}

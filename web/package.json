@@ -13,17 +13,19 @@
   "dependencies": {
     "@atproto/api": "^0.13.18",
     "@atproto/common": "^0.4.4",
+    "@atproto/common-web": "^0.3.1",
     "@atproto/jwk-jose": "^0.1.2",
     "@atproto/lexicon": "^0.4.3",
-    "@atproto/oauth-client-node": "^0.2.1",
+    "@atproto/oauth-client-node": "^0.2.2",
     "@atproto/oauth-provider": "^0.2.8",
     "@atproto/xrpc-server": "^0.7.3",
     "@meilisearch/instant-meilisearch": "^0.22.0",
     "cid": "github:multiformats/cid",
+    "classix": "^2.2.0",
     "dotenv": "^16.4.5",
     "instantsearch.css": "^8.5.1",
     "jose": "^5.9.6",
-    "jotai": "^2.10.3",
+    "motion": "12.0.0-alpha.2",
     "multiformats": "^13.3.1",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
@@ -31,24 +33,21 @@
     "react-instantsearch": "^7.13.8",
     "react-simple-star-rating": "^5.1.7",
     "react-textarea-autosize": "^8.5.5",
-    "remeda": "^2.17.3",
+    "remeda": "^2.17.4",
     "valibot": "1.0.0-beta.8"
   },
   "devDependencies": {
     "@atproto/lex-cli": "^0.5.2",
-    "@types/node": "^22.9.3",
+    "@ianvs/prettier-plugin-sort-imports": "^4.4.0",
+    "@types/node": "^22.10.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
     "postcss": "^8.4.49",
+    "prettier": "^3.4.1",
     "tailwindcss": "^3.4.15",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "@atproto/oauth-provider": "patches/@atproto__oauth-provider.patch"
-    }
   }
 }

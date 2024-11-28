@@ -3,32 +3,37 @@
 @tailwind utilities;
 
 :root {
-    --background: #0e1734;
-    --foreground: white;
+  --background: #0e1734;
+  --foreground: white;
+}
+
+html {
+  overflow-y: scroll !important;
 }
 
 body {
-    color: var(--foreground);
-    background: linear-gradient(black, var(--background) 100vh);
-    background-attachment: fixed;
+  color: var(--foreground);
+  background: linear-gradient(black, var(--background) 100vh);
+  background-attachment: fixed;
 
-    font-family: Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 ::-webkit-scrollbar {
-    -webkit-appearance: none;
-    width: 15px;
-    background-color: var(--background);
+  -webkit-appearance: none;
+  width: 8px;
+  height: 8px;
+  background-color: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: color-mix(in srgb, var(--background), black 50%);
-    opacity: 0.5;
+  background-color: color-mix(in srgb, var(--background), white 10%);
+  opacity: 0.5;
 }
 
 input[type="search"]::-webkit-search-decoration,
 input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-results-button,
 input[type="search"]::-webkit-search-results-decoration {
-    -webkit-appearance: none;
+  -webkit-appearance: none;
 }

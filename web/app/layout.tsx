@@ -19,9 +19,7 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  title: "Skylights",
-};
+export const metadata: Metadata = { title: "Skylights" };
 
 async function Header() {
   const agent = await getSessionAgent(false);

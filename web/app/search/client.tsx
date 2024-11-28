@@ -1,11 +1,11 @@
 "use client";
+
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
-import { useHydrateAtoms } from "jotai/utils";
+import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { InfiniteHits, InstantSearch, SearchBox } from "react-instantsearch";
 
-import { ratingsAtom } from "@/books/atoms";
-import { Book, BookItem } from "@/books/BookItem";
+import { Book, BookCard } from "@/rels/BookItem";
 import { Card } from "@/ui";
 
 const { searchClient } = instantMeiliSearch(
@@ -14,17 +14,16 @@ const { searchClient } = instantMeiliSearch(
   { placeholderSearch: false },
 );
 
-const Hit = ({ hit }: { hit: Book }) => <BookItem value={hit} />;
+const Hit = ({ hit }: { hit: Book }) => (
+  <AnimatePresence key={hit.edition_key}>
+    <motion.div initial={{ y: -16, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+      <BookCard book={hit} />
+    </motion.div>
+  </AnimatePresence>
+);
 
-export function ClientSearchPage({
-  defaultRatings,
-}: {
-  defaultRatings: Record<string, number>;
-}) {
+export function ClientSearchPage() {
   const [query, setQuery] = useState("");
-
-  useHydrateAtoms([[ratingsAtom, defaultRatings]]);
-
   return (
     <div className="flex flex-col gap-4">
       <InstantSearch

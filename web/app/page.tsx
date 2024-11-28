@@ -1,3 +1,4 @@
+import cx from "classix";
 import { redirect } from "next/navigation";
 
 import { authClient, getSessionAgent } from "@/auth";
@@ -31,15 +32,30 @@ export default async function LandingPage() {
     <Card className="mx-auto w-full max-w-sm flex flex-col gap-2">
       <h1 className="text-lg">Sign-in with Bluesky</h1>
       <form className="flex flex-row gap-2" action={login}>
-        <input
-          type="text"
-          name="handle"
-          placeholder="Handle"
-          className={[
-            "outline-none border rounded-lg border-gray-400",
-            "focus:border-white transition-all p-2 w-full bg-black",
-          ].join(" ")}
-        />
+        <label
+          className={cx(
+            "group border rounded-lg border-gray-400 focus-within:border-white",
+            "transition-all w-full flex flex-row bg-black",
+          )}
+        >
+          <div
+            className={cx(
+              "border-r border-gray-400 px-2 flex items-center text-gray-400",
+              "group-focus-within:border-white group-focus-within:text-white",
+              "transition-all text-sm",
+            )}
+          >
+            @
+          </div>
+          <input
+            type="text"
+            name="handle"
+            placeholder="Handle"
+            autoCorrect="off"
+            autoComplete="off"
+            className={cx("outline-none", "p-2 w-full bg-transparent")}
+          />
+        </label>
         <SubmitButton />
       </form>
     </Card>
