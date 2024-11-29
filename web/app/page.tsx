@@ -12,11 +12,21 @@ async function login(formData: FormData) {
   if (!handle) {
     return;
   }
-  const url = await authClient.authorize(handle.toString(), {
-    ui_locales: "en",
-  });
-  console.log("redirecting to", url);
-  redirect(url.toString());
+  let url: string | undefined;
+  try {
+    url = (
+      await authClient.authorize(handle.toString(), {
+        ui_locales: "en",
+      })
+    ).toString();
+    console.log("redirecting to", url);
+  } catch (error: unknown) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    console.error("authorize errror ✨", error, (error as any).payload);
+  }
+  if (url) {
+    redirect(url);
+  }
 }
 
 export default async function LandingPage() {
