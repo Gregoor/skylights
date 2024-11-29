@@ -68,9 +68,6 @@ importers:
       react-instantsearch:
         specifier: ^7.13.8
         version: 7.13.8(algoliasearch@5.15.0)(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
-      react-simple-star-rating:
-        specifier: ^5.1.7
-        version: 5.1.7(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
       react-textarea-autosize:
         specifier: ^8.5.5
         version: 8.5.5(@types/react@18.3.12)(react@19.0.0-rc-66855b96-20241106)
@@ -2234,13 +2231,6 @@ packages:
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
-
-  react-simple-star-rating@5.1.7:
-    resolution: {integrity: sha512-NTFkW8W3uwvI82Fv7JW5i7gmDjEZKxJmj+Z9vn+BjYIXT6ILdnU9qnSUP2cWrWN/WAUlue81f9SgM4CQcenltQ==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      react: '>=18.0.0'
-      react-dom: '>=18.0.0'
 
   react-textarea-autosize@8.5.5:
     resolution: {integrity: sha512-CVA94zmfp8m4bSHtWwmANaBR8EPsKy2aZ7KwqhoS4Ftib87F9Kvi7XQhOixypPLMc6kVYgOXvKFuuzZDpHGRPg==}
@@ -5072,11 +5062,6 @@ snapshots:
       react-instantsearch-core: 7.13.8(algoliasearch@5.15.0)(react@19.0.0-rc-66855b96-20241106)
 
   react-is@16.13.1: {}
-
-  react-simple-star-rating@5.1.7(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106):
-    dependencies:
-      react: 19.0.0-rc-66855b96-20241106
-      react-dom: 19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106)
 
   react-textarea-autosize@8.5.5(@types/react@18.3.12)(react@19.0.0-rc-66855b96-20241106):
     dependencies:

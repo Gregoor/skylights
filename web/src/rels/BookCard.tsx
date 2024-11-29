@@ -2,13 +2,13 @@
 
 import cx from "classix";
 import { useEffect, useMemo, useState } from "react";
-import { Rating } from "react-simple-star-rating";
 import TextareaAutosize from "react-textarea-autosize";
 import { entries } from "remeda";
 
 import { Button, CardSection, SectionedCard } from "@/ui";
 import { now } from "@/utils";
 
+import { RatingSlider } from "./RatingSlider";
 import { getNextTID, useRels } from "./RelsCtx";
 import { RelRecordValue } from "./utils";
 
@@ -110,27 +110,16 @@ export function BookCard({
           </div>
 
           <div className="flex flex-row flex-wrap justify-between gap-2">
-            <Rating
-              key={ratingValue}
-              fillColor="#f8f1d3"
-              allowFraction
-              size={26}
+            <RatingSlider
               readonly={readonly}
-              initialValue={
-                typeof ratingValue == "number" ? ratingValue / 2 : undefined
-              }
-              onClick={(value) => {
-                value = value * 2;
+              value={ratingValue}
+              onChange={(value) => {
                 if (ratingValue == value) {
                   patch({ rating: undefined });
                 } else {
                   patch({ rating: { value, createdAt: now() } });
                 }
               }}
-              emptyStyle={{ display: "flex" }}
-              emptyClassName="opacity-10"
-              SVGstyle={{ display: "inline-block", marginBottom: 10 }}
-              style={{ marginBottom: -10 }}
             />
             {!readonly && noteDraft == null && (
               <Button onClick={() => setNoteDraft(rel?.note?.value ?? "")}>

@@ -5,6 +5,7 @@ import {
   NodeSavedSession,
   NodeSavedState,
 } from "@atproto/oauth-client-node";
+import { cache } from "react";
 
 import { EncryptedCookie } from "./encrypted-cookie";
 
@@ -74,16 +75,16 @@ export const authClient = new NodeOAuthClient({
   },
 });
 
-export async function getSessionAgent(refresh?: boolean | "auto") {
+export const getSessionAgent = cache(async (refresh?: boolean | "auto") => {
   const cookie = await sessionCookie.get();
   if (!cookie) return null;
   const session = await authClient.restore(cookie.sub, refresh);
   if ((await session.getTokenInfo(refresh)).expired) return null;
   return new Agent(session);
-}
+});
 
-export async function assertSessionAgent() {
+export const assertSessionAgent = cache(async () => {
   const agent = await getSessionAgent();
   if (!agent) throw new Error("Missing session");
   return agent;
-}
+});

@@ -31,7 +31,6 @@
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-instantsearch": "^7.13.8",
-    "react-simple-star-rating": "^5.1.7",
     "react-textarea-autosize": "^8.5.5",
     "remeda": "^2.17.4",
     "valibot": "1.0.0-beta.8"

@@ -28,7 +28,27 @@ export function ClientSearchPage() {
     <div className="flex flex-col gap-4">
       <InstantSearch
         indexName="open-library:rating:desc"
-        searchClient={searchClient}
+        searchClient={{
+          search(requests) {
+            const nonDashQuery = (requests.at(0)?.params.query ?? "")
+              .replaceAll("-", "")
+              .trim();
+            if (
+              nonDashQuery == Number(nonDashQuery).toString() &&
+              (nonDashQuery.length == 10 || nonDashQuery.length == 13)
+            ) {
+              return searchClient.search([
+                {
+                  indexName: "open-library:rating:desc",
+                  params: {
+                    filters: `isbn_13 = ${nonDashQuery} OR isbn_10 = ${nonDashQuery}`,
+                  },
+                },
+              ]);
+            }
+            return searchClient.search(requests);
+          },
+        }}
       >
         <SearchBox
           classNames={{

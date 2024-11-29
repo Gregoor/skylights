@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { Record as _RelRecord } from "@/lexicon/types/my/skylights/rel";
 import { getXRPC_Agent } from "@/utils";
 
@@ -28,7 +30,7 @@ export async function fetchBooks(editionKeys: string[]) {
   return (await response.json()).hits as Book[];
 }
 
-export async function listRels(repo: string) {
+export const listRels = cache(async (repo: string) => {
   const {
     data: { records },
   } = await getXRPC_Agent().com.atproto.repo.listRecords({
@@ -37,4 +39,4 @@ export async function listRels(repo: string) {
     limit: 100,
   });
   return records as unknown as RelRecord[];
-}
+});

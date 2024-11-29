@@ -21,6 +21,7 @@ export function RelList({
   return sortBy(
     entries(initialRels),
     ([, rel]) => -(rel?.rating?.value ?? Infinity),
+    ([, rel]) => -(rel?.note?.value.length ?? -Infinity),
   ).map(([uri]) => {
     const editionKey = rels[uri]?.item.value;
     const book = editionKey ? booksByEditionKey[editionKey]?.at(0) : undefined;

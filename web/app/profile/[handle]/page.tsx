@@ -1,5 +1,7 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { fromEntries, groupBy, prop } from "remeda";
 
 import { getSessionAgent } from "@/auth";
@@ -11,18 +13,37 @@ import { getPublicAgent } from "@/utils";
 import { Avatar } from "./client";
 import { RelList } from "./RelList";
 
-export default async function ProfilePage({
+type Params = Promise<{
+  handle: string;
+}>;
+
+const getProfile = cache(async (handle: string) =>
+  getPublicAgent()
+    .getProfile({ actor: handle })
+    .then((r) => r.data),
+);
+
+export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ handle: string }>;
-}) {
+  params: Params;
+}): Promise<Metadata> {
+  const { handle } = await params;
+  const profile = await getProfile(handle);
+  const rels = await listRels(handle);
+  return {
+    title: `${profile.displayName ?? profile.handle}'s reviews`,
+    openGraph: {
+      description: `Visit Skylights to see their ${rels.length} reviews`,
+    },
+  };
+}
+
+export default async function ProfilePage({ params }: { params: Params }) {
   let { handle } = await params;
   handle = decodeURIComponent(handle);
 
-  console.log({ handle });
-  const { data: profile } = await getPublicAgent().getProfile({
-    actor: handle,
-  });
+  const profile = await getProfile(handle);
 
   if (profile.handle != handle) {
     redirect(`/profile/${profile.handle}`);
@@ -59,17 +80,25 @@ export default async function ProfilePage({
           </Link>
         )}
         <Card sectionClassName="flex flex-row items-center gap-2">
-          {profile?.avatar && <Avatar src={profile.avatar} />}
+          {profile.avatar && (
+            <a
+              className="hover:opacity-80"
+              href={`https://bsky.app/profile/${handle}`}
+              target="_blank"
+            >
+              <Avatar src={profile.avatar} />
+            </a>
+          )}
           <div>
-            Books reviewed by {isOwnProfile && "you ("}
             <a
               className="underline hover:opacity-80"
               href={`https://bsky.app/profile/${handle}`}
               target="_blank"
             >
-              {handle}
-            </a>
-            {isOwnProfile && ")"}
+              {isOwnProfile ? "You" : (profile.displayName ?? profile.handle)}
+            </a>{" "}
+            {isOwnProfile ? "have" : "has"} reviewed{" "}
+            <span className="font-semibold">{rels.length}</span> books:
           </div>
         </Card>
         <RelList

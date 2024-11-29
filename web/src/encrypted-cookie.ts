@@ -1,5 +1,6 @@
 import "server-only";
-import { JWTPayload, SignJWT, jwtVerify } from "jose";
+
+import { JWTPayload, jwtVerify, SignJWT } from "jose";
 import { cookies } from "next/headers";
 
 const secretKey = process.env.SESSION_SECRET;
@@ -23,7 +24,7 @@ export async function decrypt<Payload>(session: string | undefined = "") {
     });
     return payload;
   } catch (error) {
-    console.log("Failed to verify session", error);
+    console.error("Failed to verify session", error);
   }
 }
 
