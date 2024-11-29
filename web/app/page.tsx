@@ -10,7 +10,7 @@ async function login(formData: FormData) {
   "use server";
   const handle = formData.get("handle");
   if (!handle) {
-    throw new Error("Handle is required");
+    return;
   }
   try {
     const url = await authClient.authorize(handle.toString(), {
@@ -19,8 +19,7 @@ async function login(formData: FormData) {
     redirect(url.toString());
   } catch (error: unknown) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    console.log("authorize errror ✨", error, (error as any).payload);
-    throw error;
+    console.error("authorize errror ✨", error, (error as any).payload);
   }
 }
 
