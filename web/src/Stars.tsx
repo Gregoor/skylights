@@ -27,6 +27,8 @@ function useWindowSize() {
     height: window.innerHeight,
   });
   useEffect(() => {
+    // TODO: ios resizes when scrolling the address bar away
+    return;
     const handleResize = () => {
       setSize({
         width: window.innerWidth,
