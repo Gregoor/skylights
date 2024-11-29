@@ -9,7 +9,7 @@ import type { RelRecordValue } from "./utils";
 
 const noop = () => {};
 
-type Rels = Record<string, RelRecordValue>;
+type Rels = Partial<Record<string, RelRecordValue>>;
 
 const RelsCtx = React.createContext<{
   rels: Rels;
@@ -36,9 +36,13 @@ export function RelsProvider({
     <RelsCtx.Provider
       value={{
         rels,
-        putRel(rkey, record) {
-          putRecord({ collection: COLLECTION_REL_KEY, rkey, record });
-          setRels((rels) => ({ ...rels, [rkey]: record }));
+        putRel(uri, record) {
+          putRecord({
+            collection: COLLECTION_REL_KEY,
+            rkey: uri.split("/").pop()!,
+            record,
+          });
+          setRels((rels) => ({ ...rels, [uri]: record }));
         },
         deleteRel(uri) {
           deleteRecord({

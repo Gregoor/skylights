@@ -5,9 +5,7 @@ export const SectionedCard = ({
   ...props
 }: React.ComponentProps<"div">) => (
   <div
-    className={
-      "border border-gray-700 w-full bg-gray-800/70 " + (className ?? "")
-    }
+    className={"border border-gray-700 bg-gray-800/70 " + (className ?? "")}
     {...props}
   />
 );
@@ -24,10 +22,13 @@ export const CardSection = ({
 
 export const Card = ({
   className,
+  sectionClassName,
   ...props
-}: React.ComponentProps<typeof CardSection>) => (
-  <SectionedCard>
-    <CardSection className={className} {...props} />
+}: { sectionClassName?: string } & React.ComponentProps<
+  typeof CardSection
+>) => (
+  <SectionedCard className={className}>
+    <CardSection className={sectionClassName} {...props} />
   </SectionedCard>
 );
 

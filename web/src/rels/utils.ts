@@ -1,5 +1,5 @@
-import { assertSessionAgent } from "@/auth";
 import { Record as _RelRecord } from "@/lexicon/types/my/skylights/rel";
+import { getXRPC_Agent } from "@/utils";
 
 import { Book } from "./BookItem";
 
@@ -28,12 +28,11 @@ export async function fetchBooks(editionKeys: string[]) {
   return (await response.json()).hits as Book[];
 }
 
-export async function listRels() {
-  const agent = await assertSessionAgent();
+export async function listRels(repo: string) {
   const {
     data: { records },
-  } = await agent.com.atproto.repo.listRecords({
-    repo: agent.assertDid,
+  } = await getXRPC_Agent().com.atproto.repo.listRecords({
+    repo,
     collection: "my.skylights.rel",
     limit: 100,
   });

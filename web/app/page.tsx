@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { authClient, getSessionAgent } from "@/auth";
 import { Card } from "@/ui";
+
 import { SubmitButton } from "./client";
 
 async function login(formData: FormData) {
@@ -26,10 +27,13 @@ async function login(formData: FormData) {
 export default async function LandingPage() {
   const agent = await getSessionAgent(false);
   if (agent) {
-    redirect("/search");
+    redirect(agent.did ? "/profile/" + agent.did : "/search");
   }
   return (
-    <Card className="mx-auto w-full max-w-sm flex flex-col gap-2">
+    <Card
+      className="mx-auto w-full max-w-sm"
+      sectionClassName="flex flex-col gap-2"
+    >
       <h1 className="text-lg">Sign-in with Bluesky</h1>
       <form className="flex flex-row gap-2" action={login}>
         <label

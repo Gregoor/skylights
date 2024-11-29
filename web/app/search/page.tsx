@@ -10,7 +10,7 @@ import { ClientSearchPage } from "./client";
 export default async function SearchPage() {
   const sessionAgent = await getSessionAgent(false);
   if (!sessionAgent) redirect("/");
-  const rels = await listRels();
+  const rels = await listRels(sessionAgent.assertDid);
   return (
     <RelsProvider initialRels={fromEntries(rels.map((r) => [r.uri, r.value]))}>
       <ClientSearchPage />
