@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 import { InfiniteHits, InstantSearch, SearchBox } from "react-instantsearch";
 
-import { Book, BookCard } from "@/rels/BookItem";
+import { Book, BookCard } from "@/rels/BookCard";
 import { Card } from "@/ui";
 
 const { searchClient } = instantMeiliSearch(

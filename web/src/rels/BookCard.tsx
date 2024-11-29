@@ -109,7 +109,7 @@ export function BookCard({
             <div className="text-gray-400">{book.authors?.join(", ")}</div>
           </div>
 
-          <div className="flex flex-row justify-between">
+          <div className="flex flex-row flex-wrap justify-between gap-2">
             <Rating
               key={ratingValue}
               fillColor="#f8f1d3"

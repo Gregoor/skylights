@@ -1,7 +1,7 @@
 import { Record as _RelRecord } from "@/lexicon/types/my/skylights/rel";
 import { getXRPC_Agent } from "@/utils";
 
-import { Book } from "./BookItem";
+import type { Book } from "./BookCard";
 
 export type RelRecordValue = _RelRecord;
 export type RelRecord = {

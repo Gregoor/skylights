@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { entries, sortBy } from "remeda";
 
-import { Book, BookCard } from "@/rels/BookItem";
+import { Book, BookCard } from "@/rels/BookCard";
 import { useRels } from "@/rels/RelsCtx";
 import { UnknownCard } from "@/rels/UnknownCard";
 
@@ -27,7 +27,7 @@ export function RelList({
     return book ? (
       <BookCard key={uri} {...{ book, readonly }} />
     ) : (
-      <UnknownCard key={uri} uri={uri} rel={rels[uri]} />
+      <UnknownCard key={uri} {...{ readonly, uri }} rel={rels[uri]} />
     );
   });
 }
