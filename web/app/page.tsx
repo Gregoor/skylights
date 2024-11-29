@@ -12,15 +12,11 @@ async function login(formData: FormData) {
   if (!handle) {
     return;
   }
-  try {
-    const url = await authClient.authorize(handle.toString(), {
-      ui_locales: "en",
-    });
-    redirect(url.toString());
-  } catch (error: unknown) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    console.error("authorize errror ✨", error, (error as any).payload);
-  }
+  const url = await authClient.authorize(handle.toString(), {
+    ui_locales: "en",
+  });
+  console.log("redirecting to", url);
+  redirect(url.toString());
 }
 
 export default async function LandingPage() {
