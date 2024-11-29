@@ -78,9 +78,14 @@ export const authClient = new NodeOAuthClient({
 export const getSessionAgent = cache(async (refresh?: boolean | "auto") => {
   const cookie = await sessionCookie.get();
   if (!cookie) return null;
-  const session = await authClient.restore(cookie.sub, refresh);
-  if ((await session.getTokenInfo(refresh)).expired) return null;
-  return new Agent(session);
+  try {
+    const session = await authClient.restore(cookie.sub, refresh);
+    if ((await session.getTokenInfo(refresh)).expired) return null;
+    return new Agent(session);
+  } catch (error) {
+    console.error("Failed to restore session", error);
+    return null;
+  }
 });
 
 export const assertSessionAgent = cache(async () => {
