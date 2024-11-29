@@ -14,6 +14,7 @@
     "@atproto/api": "^0.13.18",
     "@atproto/common": "^0.4.4",
     "@atproto/common-web": "^0.3.1",
+    "@atproto/identity": "^0.4.3",
     "@atproto/jwk-jose": "^0.1.2",
     "@atproto/lexicon": "^0.4.3",
     "@atproto/oauth-client-node": "^0.2.2",

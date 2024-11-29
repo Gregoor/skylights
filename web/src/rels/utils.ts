@@ -1,4 +1,5 @@
 import { Agent } from "@atproto/api";
+import { DidResolver } from "@atproto/identity";
 import { cache } from "react";
 
 import { Record as _RelRecord } from "@/lexicon/types/my/skylights/rel";
@@ -36,9 +37,9 @@ export const listRels = cache(async (did: string) => {
     const { data } = await getPublicAgent().resolveHandle({ handle: did });
     did = data.did;
   }
-  const out = await fetch(`https://plc.directory/${did}`).then((r) => r.json());
-  const endpoint = out.service.find(
-    (s: { id: string }) => s.id == "#atproto_pds",
+  const out = await new DidResolver({}).resolve(did);
+  const endpoint = out?.service?.find(
+    (s) => s.id == "#atproto_pds",
   )?.serviceEndpoint;
   const {
     data: { records },
