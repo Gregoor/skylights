@@ -11,6 +11,4 @@ const [privateKey, publicKey] = await Promise.all(
   ),
 );
 
-console.log(
-  `PRIVATE_JWK='${JSON.stringify(privateKey)}'\nPUBLIC_JWK='${JSON.stringify(publicKey)}'`,
-);
+console.log(`PRIVATE_KEY_ES256_B64='${btoa(JSON.stringify(privateKey))}'`);
