@@ -1,7 +1,9 @@
+import { Agent } from "@atproto/api";
+import { DidResolver } from "@atproto/identity";
 import { cache } from "react";
 
 import { Record as _RelRecord } from "@/lexicon/types/my/skylights/rel";
-import { getXRPC_Agent } from "@/utils";
+import { getPublicAgent } from "@/utils";
 
 import type { Book } from "./BookCard";
 
@@ -30,11 +32,21 @@ export async function fetchBooks(editionKeys: string[]) {
   return (await response.json()).hits as Book[];
 }
 
-export const listRels = cache(async (repo: string) => {
+export const listRels = cache(async (did: string) => {
+  if (!did.startsWith("did:plc")) {
+    const { data } = await getPublicAgent().resolveHandle({ handle: did });
+    did = data.did;
+  }
+  const out = await new DidResolver({}).resolve(did);
+  const endpoint = out?.service?.find(
+    (s) => s.id == "#atproto_pds",
+  )?.serviceEndpoint;
   const {
     data: { records },
-  } = await getXRPC_Agent().com.atproto.repo.listRecords({
-    repo,
+  } = await new Agent(
+    `${endpoint ?? "https://bsky.social"}/xrpc`,
+  ).com.atproto.repo.listRecords({
+    repo: did,
     collection: "my.skylights.rel",
     limit: 100,
   });
