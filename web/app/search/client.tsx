@@ -33,8 +33,11 @@ export function ClientSearchPage() {
             const nonDashQuery = (requests.at(0)?.params.query ?? "")
               .replaceAll("-", "")
               .trim();
+            const isNumeric = nonDashQuery
+              .split("")
+              .every((char) => Number(char).toString() == char);
             if (
-              nonDashQuery == Number(nonDashQuery).toString() &&
+              isNumeric &&
               (nonDashQuery.length == 10 || nonDashQuery.length == 13)
             ) {
               return searchClient.search([
