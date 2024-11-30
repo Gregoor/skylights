@@ -1,10 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
-const Star = ({ full }: { full?: boolean }) => (
-  <span style={{ opacity: full ? 1 : 0.1 }}>★</span>
-);
+const Star = ({
+  fill: fill,
+  className,
+}: {
+  fill?: boolean | "half";
+  className?: string;
+}) => {
+  const id = useId();
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 260 245"
+      className={className}
+      width={28}
+      height={28}
+    >
+      <defs>
+        <linearGradient id={"grad" + id}>
+          {fill && (
+            <stop
+              offset={fill == "half" ? "50%" : "100%"}
+              stopColor="#fffae5"
+            />
+          )}
+          {fill != true && <stop offset="50%" stopColor="#fffae520" />}
+        </linearGradient>
+      </defs>
+      <path fill={`url(#grad${id})`} d="m56,237 74-228 74,228L10,96h240" />
+    </svg>
+  );
+};
 
 export function RatingSlider({
   value,
@@ -17,24 +45,19 @@ export function RatingSlider({
 }) {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   return (
-    <div className="relative text-2xl" style={{ color: "#fffae5" }}>
+    <div className="relative flex flex-row">
       {Array.from({ length: 5 }).map((_, i) => {
         const fullValue = (i + 1) * 2;
         const v = hoverValue ?? value;
         if (typeof v != "number" || v < fullValue - 1) {
           return <Star key={i} />;
         }
-        if (v >= fullValue) return <Star key={i} full />;
-        return (
-          <span key={i} className="relative">
-            <Star />
-            <span className="absolute left-0 w-1/2 overflow-hidden">★</span>
-          </span>
-        );
+        if (v >= fullValue) return <Star key={i} fill />;
+        return <Star key={i} fill="half" />;
       })}
       <input
         type="range"
-        className="absolute left-0 top-0 w-full h-full opacity-0"
+        className="absolute left-0 top-0 w-full h-full opacity-0 cursor-pointer"
         min={1}
         max={10}
         value={value}
@@ -44,9 +67,16 @@ export function RatingSlider({
           const el = event.target as HTMLElement;
           const { left, width } = el.getBoundingClientRect();
           const x = event.clientX - left;
-          setHoverValue(1 + Math.round((9 * x) / width));
+          setHoverValue(1 + Math.round(9 * (x / width)));
         }}
         onMouseLeave={() => setHoverValue(null)}
+        onClick={(event) => {
+          if (readonly) return;
+          event.preventDefault();
+          if (typeof hoverValue == "number" && hoverValue != value) {
+            onChange(hoverValue);
+          }
+        }}
       />
     </div>
   );
