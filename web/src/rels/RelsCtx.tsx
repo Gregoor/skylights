@@ -13,9 +13,10 @@ type Rels = Partial<Record<string, RelRecordValue>>;
 
 const RelsCtx = React.createContext<{
   rels: Rels;
+  setRels: React.Dispatch<React.SetStateAction<Rels>>;
   putRel: (rkey: string, record: RelRecordValue) => void;
   deleteRel: (rkey: string) => void;
-}>({ rels: {}, putRel: noop, deleteRel: noop });
+}>({ rels: {}, setRels: noop, putRel: noop, deleteRel: noop });
 
 export const getNextTID = (() => {
   let lastTID: string | undefined;
@@ -25,10 +26,10 @@ export const getNextTID = (() => {
 const COLLECTION_REL_KEY = "my.skylights.rel";
 
 export function RelsProvider({
-  initialRels,
+  initialRels = {},
   children,
 }: {
-  initialRels: Rels;
+  initialRels?: Rels;
   children: React.ReactNode;
 }) {
   const [rels, setRels] = useState(initialRels);
@@ -36,6 +37,7 @@ export function RelsProvider({
     <RelsCtx.Provider
       value={{
         rels,
+        setRels,
         putRel(uri, record) {
           putRecord({
             collection: COLLECTION_REL_KEY,

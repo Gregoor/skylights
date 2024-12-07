@@ -7,6 +7,7 @@ import {
 } from "@atproto/oauth-client-node";
 import { cache } from "react";
 
+import { buildMutex } from "./db";
 import { EncryptedCookie } from "./encrypted-cookie";
 
 export const sessionCookie = new EncryptedCookie<{
@@ -72,6 +73,14 @@ export const authClient = new NodeOAuthClient({
       }
     },
     del: () => sessionCookie.delete(),
+  },
+
+  async requestLock(name, fn) {
+    let result: ReturnType<typeof fn>;
+    await buildMutex(`request-lock-${name}`).withLock(async () => {
+      result = await fn();
+    });
+    return result!;
   },
 });
 

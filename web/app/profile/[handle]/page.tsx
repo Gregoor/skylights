@@ -1,3 +1,4 @@
+import { count, desc, eq, sql } from "drizzle-orm";
 import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -5,13 +6,17 @@ import { cache } from "react";
 import { fromEntries, groupBy, prop } from "remeda";
 
 import { getSessionAgent } from "@/auth";
+import { db } from "@/db";
+import { relsT } from "@/db/schema";
 import { RelsProvider } from "@/rels/RelsCtx";
-import { fetchBooks, listRels } from "@/rels/utils";
+import { importRepo, resolveHandle } from "@/rels/utils";
 import { Card } from "@/ui";
 import { getPublicAgent } from "@/utils";
 
+import { findRelsWithBooks } from "./actions";
 import { Avatar } from "./client";
 import { RelList } from "./RelList";
+import { PAGE_SIZE } from "./share";
 
 type Params = Promise<{
   handle: string;
@@ -30,11 +35,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { handle } = await params;
   const profile = await getProfile(handle);
-  const rels = await listRels(handle);
+  const name = profile.displayName ?? profile.handle;
   return {
-    title: `${profile.displayName ?? profile.handle}'s reviews`,
+    title: `${name}'s reviews`,
     openGraph: {
-      description: `Visit Skylights to see their ${rels.length} reviews`,
+      description: `Visit Skylights to see ${name}'s reviews`,
     },
   };
 }
@@ -50,19 +55,22 @@ export default async function ProfilePage({ params }: { params: Params }) {
   }
 
   const agent = await getSessionAgent();
-  const rels = await listRels(handle);
-  const books = await fetchBooks(
-    rels
-      .filter((r) => r.value.item.ref == "open-library")
-      .map((r) => r.value.item.value),
-  );
-  const booksByEditionKey = groupBy(books, prop("edition_key"));
+  const did = await resolveHandle(handle);
+
+  await importRepo(did);
+
+  const [[{ count: totalRels }], { rels, booksByEditionKey }] =
+    await Promise.all([
+      db.select({ count: count() }).from(relsT).where(eq(relsT.did, did)),
+      findRelsWithBooks(did, { limit: PAGE_SIZE, offset: 0 }),
+    ]);
+
   const isOwnProfile =
     agent &&
     (await agent.getProfile({ actor: agent.assertDid })).data.handle == handle;
 
   return (
-    <RelsProvider initialRels={fromEntries(rels.map((r) => [r.uri, r.value]))}>
+    <RelsProvider initialRels={fromEntries(rels.map((r) => [r.key, r.value]))}>
       <div className="flex flex-col gap-4">
         {agent ? (
           <Link
@@ -98,12 +106,14 @@ export default async function ProfilePage({ params }: { params: Params }) {
               {isOwnProfile ? "You" : (profile.displayName ?? profile.handle)}
             </a>{" "}
             {isOwnProfile ? "have" : "has"} reviewed{" "}
-            <span className="font-semibold">{rels.length}</span> books:
+            <span className="font-semibold">{totalRels}</span> books.
           </div>
         </Card>
         <RelList
+          did={did}
           readonly={!isOwnProfile}
           booksByEditionKey={booksByEditionKey}
+          total={totalRels}
         />
       </div>
     </RelsProvider>

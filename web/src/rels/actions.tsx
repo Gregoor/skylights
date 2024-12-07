@@ -4,8 +4,11 @@ import {
   ComAtprotoRepoDeleteRecord,
   ComAtprotoRepoPutRecord,
 } from "@atproto/api";
+import { and, eq } from "drizzle-orm";
 
 import { assertSessionAgent } from "@/auth";
+import { db } from "@/db";
+import { relsT } from "@/db/schema";
 
 export async function putRecord(
   data: Pick<
@@ -14,7 +17,8 @@ export async function putRecord(
   >,
 ) {
   const agent = await assertSessionAgent();
-  const inputData = { repo: agent.assertDid, ...data };
+  const did = agent.assertDid;
+  const inputData = { repo: did, ...data };
   const result = await agent.com.atproto.repo.putRecord(inputData);
   if (!result.success) {
     throw new Error(
@@ -22,13 +26,21 @@ export async function putRecord(
       { cause: result.data },
     );
   }
+  await db
+    .insert(relsT)
+    .values({ did, key: data.rkey, value: data.record })
+    .onConflictDoUpdate({
+      target: [relsT.did, relsT.key],
+      set: { value: data.record },
+    });
 }
 
 export async function deleteRecord(
   data: Pick<ComAtprotoRepoDeleteRecord.InputSchema, "collection" | "rkey">,
 ) {
   const agent = await assertSessionAgent();
-  const inputData = { repo: agent.assertDid, ...data };
+  const did = agent.assertDid;
+  const inputData = { repo: did, ...data };
   const result = await agent.com.atproto.repo.deleteRecord(inputData);
   if (!result.success) {
     throw new Error(
@@ -36,4 +48,7 @@ export async function deleteRecord(
       { cause: result.data },
     );
   }
+  await db
+    .delete(relsT)
+    .where(and(eq(relsT.did, did), eq(relsT.key, data.rkey)));
 }

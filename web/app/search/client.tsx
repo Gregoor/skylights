@@ -30,22 +30,18 @@ export function ClientSearchPage() {
         indexName="open-library:rating:desc"
         searchClient={{
           search(requests) {
-            const nonDashQuery = (requests.at(0)?.params.query ?? "")
+            // non-dash query
+            const ndq = (requests.at(0)?.params.query ?? "")
               .replaceAll("-", "")
               .trim();
-            const isNumeric = nonDashQuery
+            const isNumeric = ndq
               .split("")
               .every((char) => Number(char).toString() == char);
-            if (
-              isNumeric &&
-              (nonDashQuery.length == 10 || nonDashQuery.length == 13)
-            ) {
+            if (isNumeric && (ndq.length == 10 || ndq.length == 13)) {
               return searchClient.search([
                 {
                   indexName: "open-library:rating:desc",
-                  params: {
-                    filters: `isbn_13 = ${nonDashQuery} OR isbn_10 = ${nonDashQuery}`,
-                  },
+                  params: { filters: `isbn_13 = ${ndq} OR isbn_10 = ${ndq}` },
                 },
               ]);
             }

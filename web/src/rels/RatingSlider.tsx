@@ -1,5 +1,6 @@
 "use client";
 
+import cx from "classix";
 import { useId, useState } from "react";
 
 const Star = ({
@@ -57,9 +58,13 @@ export function RatingSlider({
       })}
       <input
         type="range"
-        className="absolute left-0 top-0 w-full h-full opacity-0 cursor-pointer"
+        className={cx(
+          "absolute left-0 top-0 w-full h-full opacity-0",
+          !readonly && "cursor-pointer",
+        )}
         min={1}
         max={10}
+        disabled={readonly}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         onMouseMove={(event) => {
