@@ -1,9 +1,9 @@
-import { count, desc, eq, sql } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { fromEntries, groupBy, prop } from "remeda";
+import { fromEntries } from "remeda";
 
 import { getSessionAgent } from "@/auth";
 import { db } from "@/db";

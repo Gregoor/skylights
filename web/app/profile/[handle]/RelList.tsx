@@ -57,6 +57,7 @@ function VisibilityIndicator({
 
 // The useEvent API has not yet been added to React,
 // so this is a temporary shim.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function useEvent<F extends (...args: any[]) => any>(fn: F) {
   const ref = useRef<F>(null);
   useInsertionEffect(() => {
