@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import useInfiniteScroll from "react-infinite-scroll-hook";
 
 import { Book, BookCard } from "@/rels/BookCard";
@@ -27,15 +27,16 @@ export function RelList({
     initialBooksByEditionKey,
   );
 
-  const [page, setPage] = useState(0);
+  const pageRef = useRef(0);
   const [loading, setLoading] = useState(false);
   const loadMore = async () => {
     setLoading(true);
-    const newPage = page + 1;
+    const newPage = pageRef.current + 1;
     const result = await findRelsWithBooks(did, {
       limit: PAGE_SIZE,
       offset: newPage * PAGE_SIZE,
     });
+    setLoading(false);
     setRels((rels) => ({
       ...rels,
       ...Object.fromEntries(result.rels.map((r) => [r.key, r.value])),
@@ -44,7 +45,7 @@ export function RelList({
       ...booksByEditionKey,
       ...result.booksByEditionKey,
     }));
-    setPage(newPage);
+    pageRef.current = newPage;
   };
 
   const hasNextPage = Object.keys(rels).length < total;
@@ -52,7 +53,7 @@ export function RelList({
     loading,
     hasNextPage,
     onLoadMore: loadMore,
-    rootMargin: "0px 0px 400px 0px",
+    // rootMargin: "0px 0px 400px 0px",
   });
 
   return (
