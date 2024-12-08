@@ -36,9 +36,12 @@
     "next": "15.0.4",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "react-infinite-scroll-hook": "^5.0.1",
     "react-instantsearch": "^7.13.8",
+    "react-instantsearch-nextjs": "^0.3.18",
     "react-textarea-autosize": "^8.5.5",
     "remeda": "^2.17.4",
+    "ts-debounce": "^4.0.0",
     "valibot": "1.0.0-beta.8"
   },
   "devDependencies": {

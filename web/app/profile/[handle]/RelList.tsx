@@ -1,70 +1,15 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import React, {
-  useCallback,
-  useEffect,
-  useInsertionEffect,
-  useRef,
-  useState,
-} from "react";
+import { useState } from "react";
+import useInfiniteScroll from "react-infinite-scroll-hook";
 
 import { Book, BookCard } from "@/rels/BookCard";
-import { useRels } from "@/rels/RelsCtx";
+import { useRels } from "@/rels/ctx";
 import { UnknownCard } from "@/rels/UnknownCard";
 
 import { findRelsWithBooks } from "./actions";
 import { PAGE_SIZE } from "./share";
-
-interface VisibilityProps {
-  onChangeVisibility: (visibility: boolean) => void;
-  options?: IntersectionObserverInit;
-}
-
-function useVisibility(args: VisibilityProps) {
-  const ref = useRef(null);
-  const handleIntersectionObserver: IntersectionObserverCallback = ([
-    entry,
-  ]) => {
-    args.onChangeVisibility(entry.isIntersecting);
-  };
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      handleIntersectionObserver,
-      args?.options,
-    );
-    const el = ref.current;
-    if (el) {
-      observer.observe(el);
-      return () => {
-        observer.unobserve(el);
-      };
-    }
-  }, [ref, handleIntersectionObserver]);
-
-  return ref;
-}
-
-function VisibilityIndicator({
-  onChangeVisibility,
-  options,
-  ...props
-}: React.ComponentProps<"div"> & VisibilityProps) {
-  const ref = useVisibility({ onChangeVisibility, options });
-  return <div ref={ref} {...props} />;
-}
-
-// The useEvent API has not yet been added to React,
-// so this is a temporary shim.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function useEvent<F extends (...args: any[]) => any>(fn: F) {
-  const ref = useRef<F>(null);
-  useInsertionEffect(() => {
-    ref.current = fn;
-  }, [fn]);
-  return useCallback((...args: Parameters<F>) => ref.current!(...args), []);
-}
 
 export function RelList({
   did,
@@ -83,12 +28,10 @@ export function RelList({
   );
 
   const [page, setPage] = useState(0);
-  const currentlyFetchingRef = useRef<number | null>(null);
-  const fetchMore = useEvent(async () => {
+  const [loading, setLoading] = useState(false);
+  const loadMore = async () => {
+    setLoading(true);
     const newPage = page + 1;
-    if (currentlyFetchingRef.current === newPage) return;
-    currentlyFetchingRef.current = newPage;
-
     const result = await findRelsWithBooks(did, {
       limit: PAGE_SIZE,
       offset: newPage * PAGE_SIZE,
@@ -102,6 +45,14 @@ export function RelList({
       ...result.booksByEditionKey,
     }));
     setPage(newPage);
+  };
+
+  const hasNextPage = Object.keys(rels).length < total;
+  const [sentryRef] = useInfiniteScroll({
+    loading,
+    hasNextPage,
+    onLoadMore: loadMore,
+    rootMargin: "0px 0px 400px 0px",
   });
 
   return (
@@ -124,18 +75,7 @@ export function RelList({
           </AnimatePresence>
         );
       })}
-      {Object.keys(rels).length < total && (
-        <VisibilityIndicator
-          className="h-32"
-          onChangeVisibility={(visible) => {
-            if (visible) {
-              fetchMore();
-            }
-          }}
-        >
-          Loading...
-        </VisibilityIndicator>
-      )}
+      {hasNextPage && <div ref={sentryRef}>Loading...</div>}
     </>
   );
 }

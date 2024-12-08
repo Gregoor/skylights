@@ -61,3 +61,7 @@ export function RelsProvider({
 }
 
 export const useRels = () => React.useContext(RelsCtx);
+
+const RelsLoadingCtx = React.createContext<boolean>(false);
+export const RelsLoadingProvider = RelsLoadingCtx.Provider;
+export const useRelsLoading = () => React.useContext(RelsLoadingCtx);

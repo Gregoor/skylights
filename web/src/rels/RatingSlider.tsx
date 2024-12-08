@@ -37,11 +37,11 @@ const Star = ({
 
 export function RatingSlider({
   value,
-  readonly,
+  disabled,
   onChange,
 }: {
   value?: number;
-  readonly?: boolean;
+  disabled?: boolean;
   onChange: (value: number) => void;
 }) {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
@@ -60,15 +60,15 @@ export function RatingSlider({
         type="range"
         className={cx(
           "absolute left-0 top-0 w-full h-full opacity-0",
-          !readonly && "cursor-pointer",
+          !disabled && "cursor-pointer",
         )}
         min={1}
         max={10}
-        disabled={readonly}
+        disabled={disabled}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         onMouseMove={(event) => {
-          if (readonly) return;
+          if (disabled) return;
           const el = event.target as HTMLElement;
           const { left, width } = el.getBoundingClientRect();
           const x = event.clientX - left;
@@ -76,7 +76,7 @@ export function RatingSlider({
         }}
         onMouseLeave={() => setHoverValue(null)}
         onClick={(event) => {
-          if (readonly) return;
+          if (disabled) return;
           event.preventDefault();
           if (typeof hoverValue == "number" && hoverValue != value) {
             onChange(hoverValue);

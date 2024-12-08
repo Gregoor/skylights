@@ -77,15 +77,24 @@ importers:
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
+      react-infinite-scroll-hook:
+        specifier: ^5.0.1
+        version: 5.0.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react-instantsearch:
         specifier: ^7.13.8
         version: 7.13.8(algoliasearch@5.15.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react-instantsearch-nextjs:
+        specifier: ^0.3.18
+        version: 0.3.18(next@15.0.4(@opentelemetry/api@1.9.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-instantsearch@7.13.8(algoliasearch@5.15.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
       react-textarea-autosize:
         specifier: ^8.5.5
         version: 8.5.5(@types/react@19.0.1)(react@19.0.0)
       remeda:
         specifier: ^2.17.4
         version: 2.17.4
+      ts-debounce:
+        specifier: ^4.0.0
+        version: 4.0.0
       valibot:
         specifier: 1.0.0-beta.8
         version: 1.0.0-beta.8(typescript@5.7.2)
@@ -2797,11 +2806,23 @@ packages:
     peerDependencies:
       react: ^19.0.0
 
+  react-infinite-scroll-hook@5.0.1:
+    resolution: {integrity: sha512-fn6+8BAZLQ9C1fvO5kPicGjDR2WHxK7rP4aaSWuaJkvtoJjYuudGJ9wjgPox7dghKm5Xj9cpKFycM86/wAJ3ig==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
   react-instantsearch-core@7.13.8:
     resolution: {integrity: sha512-1bcHCFJ3Qw9HWFkeM5MNMqzw0BI4LIR61qI1lPAcJREih9NXy3R3inPeOk2T2FKkgAp5PJbjNQ3DOTxErV88jg==}
     peerDependencies:
       algoliasearch: '>= 3.1 < 6'
       react: '>= 16.8.0 < 19'
+
+  react-instantsearch-nextjs@0.3.18:
+    resolution: {integrity: sha512-R1nVMURiwfwZs4kXVHw+CMmgCw/eZmvYbuAS5u6okZWeMJ875DAhxSfFJpSuNNFyr1uooCSk9t3NILcXHV16+g==}
+    peerDependencies:
+      next: '>= 13.4 < 15'
+      react-instantsearch: '>= 7.1.0 < 8'
 
   react-instantsearch@7.13.8:
     resolution: {integrity: sha512-14t7qAlp5H2dD+ljQLPhMZt40JX7YGKXdAooGZBo8IB+0M7NHAhsn/SVRdxSObb9bx1hg4uaBIZ51Wajgw8Xbg==}
@@ -2809,6 +2830,12 @@ packages:
       algoliasearch: '>= 3.1 < 6'
       react: '>= 16.8.0 < 19'
       react-dom: '>= 16.8.0 < 19'
+
+  react-intersection-observer-hook@3.0.1:
+    resolution: {integrity: sha512-nehzFUV+jVY49tc9FOm4yJHrmFFtCmsBZKiN1rUUB2675CMBf6kKu1ekuTqvCnmh4XG7RFP3bMyAevfqfV94xw==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -3108,6 +3135,9 @@ packages:
     engines: {node: '>=16'}
     peerDependencies:
       typescript: '>=4.2.0'
+
+  ts-debounce@4.0.0:
+    resolution: {integrity: sha512-+1iDGY6NmOGidq7i7xZGA4cm8DAa6fqdYcvO5Z6yBevH++Bdo9Qt/mN0TzHUgcCcKv1gmh9+W5dHqz8pMWbCbg==}
 
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
@@ -6028,6 +6058,12 @@ snapshots:
       react: 19.0.0
       scheduler: 0.25.0
 
+  react-infinite-scroll-hook@5.0.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+      react-intersection-observer-hook: 3.0.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+
   react-instantsearch-core@7.13.8(algoliasearch@5.15.0)(react@19.0.0):
     dependencies:
       '@babel/runtime': 7.26.0
@@ -6036,6 +6072,11 @@ snapshots:
       instantsearch.js: 4.75.5(algoliasearch@5.15.0)
       react: 19.0.0
       use-sync-external-store: 1.2.2(react@19.0.0)
+
+  react-instantsearch-nextjs@0.3.18(next@15.0.4(@opentelemetry/api@1.9.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-instantsearch@7.13.8(algoliasearch@5.15.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)):
+    dependencies:
+      next: 15.0.4(@opentelemetry/api@1.9.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react-instantsearch: 7.13.8(algoliasearch@5.15.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
 
   react-instantsearch@7.13.8(algoliasearch@5.15.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
@@ -6046,6 +6087,11 @@ snapshots:
       react: 19.0.0
       react-dom: 19.0.0(react@19.0.0)
       react-instantsearch-core: 7.13.8(algoliasearch@5.15.0)(react@19.0.0)
+
+  react-intersection-observer-hook@3.0.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
 
   react-is@16.13.1: {}
 
@@ -6424,6 +6470,8 @@ snapshots:
   ts-api-utils@1.4.3(typescript@5.7.2):
     dependencies:
       typescript: 5.7.2
+
+  ts-debounce@4.0.0: {}
 
   ts-interface-checker@0.1.13: {}
 

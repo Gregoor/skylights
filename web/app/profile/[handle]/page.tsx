@@ -8,7 +8,7 @@ import { fromEntries } from "remeda";
 import { getSessionAgent } from "@/auth";
 import { db } from "@/db";
 import { relsT } from "@/db/schema";
-import { RelsProvider } from "@/rels/RelsCtx";
+import { RelsProvider } from "@/rels/ctx";
 import { importRepo, resolveHandle } from "@/rels/utils";
 import { Card } from "@/ui";
 import { getPublicAgent } from "@/utils";

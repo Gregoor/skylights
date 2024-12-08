@@ -40,8 +40,11 @@ export const Button = ({
   <button
     type="button"
     className={cx(
-      "px-2 py-1 border text-sm transition-all outline-gray-400 hover:opacity-80 focus:outline-dashed cursor-pointer",
+      "px-2 py-1 border text-sm transition-all outline-gray-400",
       className,
+      props.disabled
+        ? "cursor-wait opacity-50"
+        : "cursor-pointer hover:opacity-80 focus:outline-dashed",
       intent == "danger" && "border-red-200 text-red-200",
     )}
     {...props}

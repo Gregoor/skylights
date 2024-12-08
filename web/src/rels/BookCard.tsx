@@ -8,8 +8,8 @@ import { entries } from "remeda";
 import { Button, CardSection, SectionedCard } from "@/ui";
 import { now } from "@/utils";
 
+import { getNextTID, useRels, useRelsLoading } from "./ctx";
 import { RatingSlider } from "./RatingSlider";
-import { getNextTID, useRels } from "./RelsCtx";
 import { RelRecordValue } from "./utils";
 
 function ImgWithDummy(props: React.ComponentProps<"img">) {
@@ -90,6 +90,10 @@ export function BookCard({
     }
   };
 
+  const loading = useRelsLoading();
+  // Start with note hidden if it's loaded later, to prevent layout shift
+  const [hideNote, setHideNote] = useState(loading);
+
   const [noteDraft, setNoteDraft] = useState<string | null>(null);
   const ratingValue = rel?.rating?.value;
   return (
@@ -111,7 +115,7 @@ export function BookCard({
 
           <div className="flex flex-row flex-wrap justify-between gap-2">
             <RatingSlider
-              readonly={readonly}
+              disabled={readonly || loading}
               value={ratingValue}
               onChange={(value) => {
                 if (ratingValue == value) {
@@ -121,11 +125,18 @@ export function BookCard({
                 }
               }}
             />
-            {!readonly && noteDraft == null && (
-              <Button onClick={() => setNoteDraft(rel?.note?.value ?? "")}>
-                {rel?.note ? "Edit" : "Add"} note
-              </Button>
-            )}
+            {!readonly &&
+              noteDraft == null &&
+              (rel?.note && hideNote ? (
+                <Button onClick={() => setHideNote(false)}>Show note</Button>
+              ) : (
+                <Button
+                  onClick={() => setNoteDraft(rel?.note?.value ?? "")}
+                  disabled={loading}
+                >
+                  {rel?.note ? "Edit" : "Add"} note
+                </Button>
+              ))}
           </div>
 
           {isbns.length > 0 && (
@@ -176,7 +187,8 @@ export function BookCard({
           </div>
         </CardSection>
       ) : (
-        rel?.note && (
+        rel?.note &&
+        !hideNote && (
           <CardSection>
             <h3 className="text-gray-500 text-sm font-semibold">Note</h3>
             {rel.note.value}

@@ -2,7 +2,7 @@
 
 import { Button, Card } from "@/ui";
 
-import { useRels } from "./RelsCtx";
+import { useRels } from "./ctx";
 import type { RelRecordValue } from "./utils";
 
 export function UnknownCard({
