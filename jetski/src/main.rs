@@ -21,7 +21,7 @@ async fn main() -> anyhow::Result<()> {
         ..Default::default()
     };
 
-    let mut db = PgConnection::connect(dotenv!("DB_URL")).await?;
+    let mut db = PgConnection::connect(dotenv!("POSTGRES_URL")).await?;
     println!("Connected to database");
 
     let receiver = JetstreamConnector::new(config)?.connect().await?;
