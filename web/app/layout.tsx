@@ -53,7 +53,7 @@ export default function RootLayout({
         <ClientOnly>
           <Stars />
         </ClientOnly>
-        <div className="max-w-lg mx-auto p-4 flex flex-col gap-4">
+        <div className="max-w-xl mx-auto p-4 flex flex-col gap-4">
           {children}
         </div>
       </body>

@@ -33,7 +33,7 @@ function ImgWithDummy(props: React.ComponentProps<"img">) {
     return (
       <div
         className={cx(
-          "border border-gray-400/50 h-full flex items-center justify-center",
+          "border border-gray-400/50 w-full h-full flex items-center justify-center",
           "text-gray-300",
           status == "loading" && "animate-pulse",
         )}
@@ -91,20 +91,18 @@ export function BookCard({
   };
 
   const loading = useRelsLoading();
-  // Start with note hidden if it's loaded later, to prevent layout shift
-  const [hideNote, setHideNote] = useState(loading);
 
   const [noteDraft, setNoteDraft] = useState<string | null>(null);
   const ratingValue = rel?.rating?.value;
   return (
     <SectionedCard>
       <CardSection className="flex flex-row gap-4">
-        <div className="flex-shrink-0 w-24 h-36 ">
+        <div className="border border-gray-600/50 flex-shrink-0 w-32 h-48 sm:w-40 sm:h-60 flex justify-center">
           <ImgWithDummy
             key={book.edition_key}
-            className="border border-gray-700/50 max-w-full max-h-full object-contain"
+            className=" max-w-full max-h-full object-contain"
             alt={`Book cover for "${book.title}"`}
-            src={`https://covers.openlibrary.org/b/olid/${book.edition_key}-M.jpg`}
+            src={`https://covers.openlibrary.org/b/olid/${book.edition_key}-L.jpg`}
           />
         </div>
         <div className="w-full flex flex-col gap-2">
@@ -113,7 +111,7 @@ export function BookCard({
             <div className="text-gray-400">{book.authors?.join(", ")}</div>
           </div>
 
-          <div className="flex flex-row flex-wrap justify-between gap-2">
+          <div className="flex flex-row justify-between items-center flex-wrap gap-2">
             <RatingSlider
               disabled={readonly || loading}
               value={ratingValue}
@@ -125,76 +123,77 @@ export function BookCard({
                 }
               }}
             />
-            {!readonly &&
-              noteDraft == null &&
-              (rel?.note && hideNote ? (
-                <Button onClick={() => setHideNote(false)}>Show note</Button>
-              ) : (
-                <Button
-                  onClick={() => setNoteDraft(rel?.note?.value ?? "")}
-                  disabled={loading}
-                >
-                  {rel?.note ? "Edit" : "Add"} note
-                </Button>
-              ))}
+
+            {isbns.length > 0 && (
+              <details className="text-sm text-gray-500">
+                <summary className="list-none underline text-end cursor-pointer">
+                  ISBN
+                </summary>
+                <p className="whitespace-pre">{isbns.join("\n")}</p>
+              </details>
+            )}
           </div>
 
-          {isbns.length > 0 && (
-            <span className="mt-auto ml-auto text-sm text-gray-500">
-              ISBN{isbns.length > 1 && "s"}: {isbns.join(", ")}
-            </span>
+          {!readonly && noteDraft == null && !rel?.note && (
+            <Button
+              className="mt-2 w-fit"
+              onClick={() => setNoteDraft(rel?.note?.value ?? "")}
+              disabled={loading}
+            >
+              {rel?.note ? "Edit" : "Add"} note
+            </Button>
+          )}
+
+          {noteDraft != null ? (
+            <div className="mt-2 w-full flex flex-col gap-2">
+              <TextareaAutosize
+                className={[
+                  "border rounded-lg border-gray-700 focus:border-gray-400",
+                  "transition-all p-2 outline-none w-full flex bg-transparent",
+                  "resize-none",
+                ].join(" ")}
+                placeholder="..."
+                autoFocus
+                value={noteDraft}
+                onChange={(event) => setNoteDraft(event.target.value)}
+              />
+              <div className="flex justify-end gap-2">
+                <Button
+                  intent="danger"
+                  onClick={() => {
+                    patch({ note: undefined });
+                    setNoteDraft(null);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  className="border-green-200 text-green-200"
+                  onClick={() => {
+                    patch({
+                      note: {
+                        value: noteDraft,
+                        createdAt: rel?.note?.createdAt ?? now(),
+                        updatedAt: now(),
+                      },
+                    });
+                    setNoteDraft(null);
+                  }}
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          ) : (
+            rel?.note && (
+              <div>
+                <h3 className="text-gray-500 text-sm font-semibold">Note</h3>
+                {rel.note.value}
+              </div>
+            )
           )}
         </div>
       </CardSection>
-      {noteDraft != null ? (
-        <CardSection className="flex flex-col gap-4">
-          <TextareaAutosize
-            className={[
-              "border rounded-lg border-gray-700 focus:border-gray-400",
-              "transition-all p-2 outline-none w-full flex bg-transparent",
-              "resize-none",
-            ].join(" ")}
-            placeholder="..."
-            autoFocus
-            value={noteDraft}
-            onChange={(event) => setNoteDraft(event.target.value)}
-          />
-          <div className="flex justify-end gap-2">
-            <Button
-              intent="danger"
-              onClick={() => {
-                patch({ note: undefined });
-                setNoteDraft(null);
-              }}
-            >
-              Delete
-            </Button>
-            <Button
-              className="border-green-200 text-green-200"
-              onClick={() => {
-                patch({
-                  note: {
-                    value: noteDraft,
-                    createdAt: rel?.note?.createdAt ?? now(),
-                    updatedAt: now(),
-                  },
-                });
-                setNoteDraft(null);
-              }}
-            >
-              Save
-            </Button>
-          </div>
-        </CardSection>
-      ) : (
-        rel?.note &&
-        !hideNote && (
-          <CardSection>
-            <h3 className="text-gray-500 text-sm font-semibold">Note</h3>
-            {rel.note.value}
-          </CardSection>
-        )
-      )}
     </SectionedCard>
   );
 }
