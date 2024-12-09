@@ -186,7 +186,14 @@ export function BookCard({
             </div>
           ) : (
             rel?.note && (
-              <div>
+              <div
+                role={readonly ? undefined : "button"}
+                onClick={() => {
+                  if (!readonly) {
+                    setNoteDraft(rel?.note?.value ?? "");
+                  }
+                }}
+              >
                 <h3 className="text-gray-500 text-sm font-semibold">Note</h3>
                 {rel.note.value}
               </div>
