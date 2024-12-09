@@ -13,7 +13,7 @@ cargo build --locked --release
 cp ./target/release/jetsky /bin/jetsky
 EOF
 
-FROM debian:bookworm-slim as runner
+FROM debian:bookworm as runner
 ARG UID=10001
 RUN adduser \
     --disabled-password \
