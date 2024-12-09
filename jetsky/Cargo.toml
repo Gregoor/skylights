@@ -1,5 +1,7 @@
 [package]
 name = "jetsky"
+description = "Skylight's jetstream consumer"
+license = "MIT"
 version = "0.1.0"
 edition = "2021"
 
