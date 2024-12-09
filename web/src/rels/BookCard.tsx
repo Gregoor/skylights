@@ -1,10 +1,13 @@
 "use client";
 
+import { ProfileView } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import cx from "classix";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { entries } from "remeda";
 
+import { AvatarLink } from "@/AvatarLink";
 import { Button, CardSection, SectionedCard } from "@/ui";
 import { now } from "@/utils";
 
@@ -60,10 +63,14 @@ export type Book = {
 
 export function BookCard({
   book,
+  reviewer,
   readonly,
+  ago,
 }: {
   book: Book;
   readonly?: boolean;
+  reviewer?: ProfileView;
+  ago?: string;
 }) {
   const editionKey = book.edition_key;
   const isbns = [...book.isbn_13, ...book.isbn_10];
@@ -96,6 +103,18 @@ export function BookCard({
   const ratingValue = rel?.rating?.value;
   return (
     <SectionedCard>
+      {reviewer && (
+        <CardSection className="flex flex-row items-center gap-2">
+          <AvatarLink smol profile={reviewer} />
+          <Link href={`/profile/${reviewer.handle}`}>
+            <span className="hover:underline">{reviewer.displayName}</span>{" "}
+            <span className="text-gray-400">
+              @{reviewer.handle}
+              {ago && " · " + ago}
+            </span>
+          </Link>
+        </CardSection>
+      )}
       <CardSection className="flex flex-row gap-4">
         <div className="border border-gray-600/50 flex-shrink-0 w-32 h-48 sm:w-40 sm:h-60 flex justify-center">
           <ImgWithDummy

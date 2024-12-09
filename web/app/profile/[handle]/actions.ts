@@ -25,12 +25,7 @@ export async function findRelsWithBooks(
     value: row.value as RelRecordValue,
   }));
 
-  const books = await fetchBooks(
-    rels
-      .map((r) => (r.value as RelRecordValue).item)
-      .filter((i) => i.ref == "open-library")
-      .map((i) => i.value),
-  );
+  const books = await fetchBooks(rels.map((r) => r.value));
   const booksByEditionKey = mapValues(
     groupBy(books, prop("edition_key")),
     (books) => books[0],

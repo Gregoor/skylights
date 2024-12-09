@@ -1,0 +1,2 @@
+ALTER TABLE "rels" ADD COLUMN "reviewedAt" timestamp GENERATED ALWAYS AS (GREATEST(to_tstz_immutable(value->'rating'->>'createdAt'),to_tstz_immutable(value->'note'->>'createdAt'))) STORED;--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "rels_reviewedAt_index" ON "rels" USING btree ("reviewedAt");

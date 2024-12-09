@@ -84,7 +84,7 @@ export default async function ProfilePage({ params }: { params: Params }) {
             className="w-full text-center underline hover:opacity-80"
             href="/"
           >
-            Login
+            Login to add your stars
           </Link>
         )}
         <Card sectionClassName="flex flex-row items-center gap-2">

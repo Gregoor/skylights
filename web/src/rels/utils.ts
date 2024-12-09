@@ -17,13 +17,17 @@ export type RelRecord = {
   value: RelRecordValue;
 };
 
+export const getDidAgent = cache(async (did: string) => {
+  const out = await new DidResolver({}).resolve(did);
+  const endpoint = out?.service?.find(
+    (s) => s.id == "#atproto_pds",
+  )?.serviceEndpoint;
+  return new Agent(`${endpoint ?? "https://bsky.social"}/xrpc`);
+});
+
 export const importRepo = cache(async (did: string) => {
   await buildMutex(`import-repo-${did}`).withLock(async () => {
-    const out = await new DidResolver({}).resolve(did);
-    const endpoint = out?.service?.find(
-      (s) => s.id == "#atproto_pds",
-    )?.serviceEndpoint;
-    const agent = new Agent(`${endpoint ?? "https://bsky.social"}/xrpc`);
+    const agent = await getDidAgent(did);
 
     await db.transaction(async (db) => {
       const recent = new Date();
@@ -83,7 +87,11 @@ export const importRepo = cache(async (did: string) => {
   });
 });
 
-export async function fetchBooks(editionKeys: string[]) {
+export async function fetchBooks(rels: RelRecordValue[]) {
+  const editionKeys = rels
+    .map((rel) => rel.item)
+    .filter((i) => i.ref == "open-library")
+    .map((i) => i.value);
   const response = await fetch(
     "https://ol.index.skylights.my/indexes/open-library/search",
     {
@@ -94,7 +102,6 @@ export async function fetchBooks(editionKeys: string[]) {
       },
       body: JSON.stringify({
         filter: `edition_key IN ${JSON.stringify(editionKeys)}`,
-        limit: editionKeys.length,
       }),
     },
   );
