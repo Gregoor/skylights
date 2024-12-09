@@ -1,4 +1,4 @@
-FROM rust:1.83.0-bookworm as builder
+FROM rust:1.83.0 as builder
 WORKDIR /usr/src/jetsky
 COPY . .
 RUN apt install libssl-dev
@@ -13,7 +13,7 @@ cargo build --locked --release
 cp ./target/release/jetsky /bin/jetsky
 EOF
 
-FROM debian:bookworm as runner
+FROM debian:bullseye-slim as runner
 ARG UID=10001
 RUN adduser \
     --disabled-password \
