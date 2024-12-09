@@ -1,4 +1,4 @@
-FROM rust:1.83.0 as builder
+FROM rust:1.83.0-bookworm as builder
 WORKDIR /usr/src/jetsky
 COPY . .
 RUN apt install libssl-dev
