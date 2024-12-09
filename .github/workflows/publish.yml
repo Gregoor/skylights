@@ -1,4 +1,4 @@
-name: Publish to Cargo
+name: Publish jetsky to Cargo
 
 on:
   push:
@@ -6,10 +6,8 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
-
     name: "publish"
-
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
         with:
@@ -19,3 +17,5 @@ jobs:
         uses: tu6ge/publish-action@v0.4.5
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        with:
+          DIR: "jetsky"
