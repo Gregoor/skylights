@@ -8,6 +8,13 @@
       "when": 1733522230110,
       "tag": "0000_broken_piledriver",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1733741080725,
+      "tag": "0001_spotty_black_widow",
+      "breakpoints": true
     }
   ]
 }

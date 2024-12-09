@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   char,
+  integer,
   jsonb,
   pgTable,
   primaryKey,
@@ -26,5 +27,6 @@ export const importedDidsT = pgTable("imported_dids", {
 });
 
 export const jetskiTimeT = pgTable("jetski_time", {
+  id: integer().primaryKey().default(42),
   time: timestamp().notNull(),
 });
