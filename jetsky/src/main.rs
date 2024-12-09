@@ -1,23 +1,26 @@
 mod jetstream;
 
-use dotenvy_macro::dotenv;
 use jetstream::{
     event::{CommitEvent::*, JetstreamEvent::*},
     DefaultJetstreamEndpoints, JetstreamCompression, JetstreamConfig, JetstreamConnector,
 };
 use sqlx::{postgres::PgConnection, query, Connection};
 
-async fn update_jetski_time(time: chrono::DateTime<chrono::Utc>) -> anyhow::Result<()> {
-    let mut db = PgConnection::connect(dotenv!("POSTGRES_URL")).await?;
+async fn update_jetski_time(
+    mut db: PgConnection,
+    time: chrono::DateTime<chrono::Utc>,
+) -> anyhow::Result<PgConnection> {
     query("INSERT INTO jetski_time (id, time) VALUES (42, $1) ON CONFLICT (id) DO UPDATE SET time = $1")
         .bind(time)
         .execute(&mut db)
         .await?;
-    Ok(())
+    Ok(db)
 }
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    let _ = dotenvy::dotenv();
+
     let mut last_time = chrono::Utc::now();
     let config = JetstreamConfig {
         endpoint: DefaultJetstreamEndpoints::USEastOne.into(),
@@ -27,7 +30,7 @@ async fn main() -> anyhow::Result<()> {
         ..Default::default()
     };
 
-    let mut db = PgConnection::connect(dotenv!("POSTGRES_URL")).await?;
+    let mut db = PgConnection::connect(&std::env::var("POSTGRES_URL")?).await?;
     println!("Connected to database");
 
     let receiver = JetstreamConnector::new(config)?.connect().await?;
@@ -38,7 +41,7 @@ async fn main() -> anyhow::Result<()> {
         let Commit(commit) = event else {
             if time.signed_duration_since(last_time).num_minutes() >= 2 {
                 println!("Updating jetski_time to {:#?}", time);
-                update_jetski_time(time).await?;
+                db = update_jetski_time(db, time).await?;
                 last_time = time;
             }
             continue;
