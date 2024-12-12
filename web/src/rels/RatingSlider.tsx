@@ -46,7 +46,7 @@ export function RatingSlider({
 }) {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   return (
-    <div className="relative flex flex-row">
+    <div className="w-fit relative flex flex-row">
       {Array.from({ length: 5 }).map((_, i) => {
         const fullValue = (i + 1) * 2;
         const v = hoverValue ?? value;
@@ -78,7 +78,7 @@ export function RatingSlider({
         onClick={(event) => {
           if (disabled) return;
           event.preventDefault();
-          if (typeof hoverValue == "number" && hoverValue != value) {
+          if (typeof hoverValue == "number") {
             onChange(hoverValue);
           }
         }}

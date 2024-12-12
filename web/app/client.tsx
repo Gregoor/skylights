@@ -1,5 +1,8 @@
 "use client";
 
+import cx from "classix";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useFormStatus } from "react-dom";
 
 export function SubmitButton() {
@@ -22,3 +25,22 @@ export function SubmitButton() {
     </button>
   );
 }
+
+export const NavLink = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof Link>) => {
+  const pathname = usePathname();
+  return (
+    <Link
+      className={cx(
+        className,
+        "hover:underline",
+        pathname == props.href ? "text-white" : "text-gray-500",
+      )}
+      {...props}
+    >
+      {props.children}
+    </Link>
+  );
+};

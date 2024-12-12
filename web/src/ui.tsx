@@ -1,4 +1,7 @@
+"use client";
+
 import cx from "classix";
+import Link from "next/link";
 
 export const SectionedCard = ({
   className,
@@ -32,6 +35,8 @@ export const Card = ({
   </SectionedCard>
 );
 
+const BUTTON_CX = "px-2 py-1 border text-sm transition-all outline-gray-400";
+
 export const Button = ({
   className,
   intent,
@@ -40,12 +45,28 @@ export const Button = ({
   <button
     type="button"
     className={cx(
-      "px-2 py-1 border text-sm transition-all outline-gray-400",
+      BUTTON_CX,
       className,
       props.disabled
         ? "cursor-wait opacity-50"
         : "cursor-pointer hover:opacity-80 focus:outline-dashed",
       intent == "danger" && "border-red-200 text-red-200",
+    )}
+    {...props}
+  />
+);
+
+export const LinkButton = ({
+  className,
+  active,
+  ...props
+}: { active?: boolean } & React.ComponentProps<typeof Link>) => (
+  <Link
+    className={cx(
+      BUTTON_CX,
+      className,
+      "cursor-pointer hover:opacity-80 focus:outline-dashed",
+      active && "bg-white text-black",
     )}
     {...props}
   />

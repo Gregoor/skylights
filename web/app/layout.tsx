@@ -8,6 +8,8 @@ import { Stars } from "@/Stars";
 
 import "./globals.css";
 
+import { NavLink } from "./client";
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -24,16 +26,23 @@ export const metadata: Metadata = { title: "Skylights" };
 async function Header() {
   const agent = await getSessionAgent(false);
   const profile = await agent?.getProfile({ actor: agent.did! });
-  if (!profile) return null;
   return (
     <>
-      <AvatarLink
-        className="hidden sm:block absolute right-3"
-        profile={profile.data}
-        style={{ top: 13 }}
-      />
-      <div className="mt-4 flex sm:hidden justify-center items-center">
-        <AvatarLink profile={profile.data} />
+      {profile && (
+        <AvatarLink
+          className="hidden sm:block absolute right-3"
+          profile={profile.data}
+          style={{ top: 13 }}
+        />
+      )}
+      <div className="mt-4 flex gap-6 justify-center items-center">
+        <NavLink href="/">{profile ? "Home" : "Login"}</NavLink>
+        {profile && (
+          <>
+            <AvatarLink className="sm:hidden" profile={profile.data} />
+            <NavLink href="/search">Search</NavLink>
+          </>
+        )}
       </div>
     </>
   );

@@ -1,6 +1,5 @@
 import { count, eq } from "drizzle-orm";
 import { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { fromEntries } from "remeda";
@@ -10,10 +9,10 @@ import { db } from "@/db";
 import { relsT } from "@/db/schema";
 import { RelsProvider } from "@/rels/ctx";
 import { importRepo, resolveHandle } from "@/rels/utils";
-import { Card } from "@/ui";
+import { Card, LinkButton } from "@/ui";
 import { getPublicAgent } from "@/utils";
 
-import { findRelsWithBooks } from "./actions";
+import { findRelsWithBooks, RelsOrderBy } from "./actions";
 import { Avatar } from "./client";
 import { RelList } from "./RelList";
 import { PAGE_SIZE } from "./share";
@@ -44,7 +43,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProfilePage({ params }: { params: Params }) {
+export default async function ProfilePage({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: Promise<{ orderBy?: RelsOrderBy }>;
+}) {
   let { handle } = await params;
   handle = decodeURIComponent(handle);
 
@@ -59,10 +64,11 @@ export default async function ProfilePage({ params }: { params: Params }) {
 
   await importRepo(did);
 
+  const orderBy = (await searchParams).orderBy ?? "best";
   const [[{ count: totalRels }], { rels, booksByEditionKey }] =
     await Promise.all([
       db.select({ count: count() }).from(relsT).where(eq(relsT.did, did)),
-      findRelsWithBooks(did, { limit: PAGE_SIZE, offset: 0 }),
+      findRelsWithBooks(did, { limit: PAGE_SIZE, offset: 0, orderBy }),
     ]);
 
   const isOwnProfile =
@@ -70,23 +76,11 @@ export default async function ProfilePage({ params }: { params: Params }) {
     (await agent.getProfile({ actor: agent.assertDid })).data.handle == handle;
 
   return (
-    <RelsProvider initialRels={fromEntries(rels.map((r) => [r.key, r.value]))}>
+    <RelsProvider
+      key={orderBy}
+      initialRels={fromEntries(rels.map((r) => [r.key, r.value]))}
+    >
       <div className="flex flex-col gap-4">
-        {agent ? (
-          <Link
-            className="w-full text-center underline hover:opacity-80"
-            href="/search"
-          >
-            Go to Search
-          </Link>
-        ) : (
-          <Link
-            className="w-full text-center underline hover:opacity-80"
-            href="/"
-          >
-            Login to add your stars
-          </Link>
-        )}
         <Card sectionClassName="flex flex-row items-center gap-2">
           {profile.avatar && (
             <a
@@ -109,11 +103,22 @@ export default async function ProfilePage({ params }: { params: Params }) {
             <span className="font-semibold">{totalRels}</span> books.
           </div>
         </Card>
+        <div className="flex flex-row items-center gap-2">
+          Order by
+          <LinkButton href="?orderBy=best" active={orderBy == "best"}>
+            Best
+          </LinkButton>
+          <LinkButton href="?orderBy=recent" active={orderBy == "recent"}>
+            Recent
+          </LinkButton>
+        </div>
         <RelList
+          key={orderBy}
           did={did}
           readonly={!isOwnProfile}
           booksByEditionKey={booksByEditionKey}
           total={totalRels}
+          orderBy={orderBy}
         />
       </div>
     </RelsProvider>

@@ -8,7 +8,7 @@ import { Book, BookCard } from "@/rels/BookCard";
 import { useRels } from "@/rels/ctx";
 import { UnknownCard } from "@/rels/UnknownCard";
 
-import { findRelsWithBooks } from "./actions";
+import { findRelsWithBooks, RelsOrderBy } from "./actions";
 import { PAGE_SIZE } from "./share";
 
 export function RelList({
@@ -16,11 +16,13 @@ export function RelList({
   readonly,
   booksByEditionKey: initialBooksByEditionKey,
   total,
+  orderBy,
 }: {
   did: string;
   readonly: boolean;
   booksByEditionKey: Record<string, Book>;
   total: number;
+  orderBy: RelsOrderBy;
 }) {
   const { rels, setRels } = useRels();
   const [booksByEditionKey, setBooksByEditionKey] = useState(
@@ -35,6 +37,7 @@ export function RelList({
     const result = await findRelsWithBooks(did, {
       limit: PAGE_SIZE,
       offset: newPage * PAGE_SIZE,
+      orderBy,
     });
     setLoading(false);
     setRels((rels) => ({

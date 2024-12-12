@@ -118,8 +118,7 @@ export function BookCard({
       <CardSection className="flex flex-row gap-4">
         <div className="border border-gray-600/50 flex-shrink-0 w-32 h-48 sm:w-40 sm:h-60 flex justify-center">
           <ImgWithDummy
-            key={book.edition_key}
-            className=" max-w-full max-h-full object-contain"
+            className="max-w-full max-h-full object-contain"
             alt={`Book cover for "${book.title}"`}
             src={`https://covers.openlibrary.org/b/olid/${book.edition_key}-L.jpg`}
           />
@@ -127,13 +126,23 @@ export function BookCard({
         <div className="w-full flex flex-col gap-2">
           <div>
             {book.title}
-            <div className="text-gray-400">{book.authors?.join(", ")}</div>
+            <div className="flex flex-row gap-2">
+              <div className="text-gray-400">{book.authors?.join(", ")}</div>
+              {isbns.length > 0 && (
+                <details className="ml-auto text-sm text-gray-500">
+                  <summary className="list-none underline text-end cursor-pointer">
+                    ISBN
+                  </summary>
+                  <p className="whitespace-pre">{isbns.join("\n")}</p>
+                </details>
+              )}
+            </div>
           </div>
 
-          <div className="flex flex-row justify-between items-center flex-wrap gap-2">
+          {(!readonly || ratingValue) && (
             <RatingSlider
               disabled={readonly || loading}
-              value={ratingValue}
+              value={ratingValue ?? 0}
               onChange={(value) => {
                 if (ratingValue == value) {
                   patch({ rating: undefined });
@@ -142,16 +151,7 @@ export function BookCard({
                 }
               }}
             />
-
-            {isbns.length > 0 && (
-              <details className="text-sm text-gray-500">
-                <summary className="list-none underline text-end cursor-pointer">
-                  ISBN
-                </summary>
-                <p className="whitespace-pre">{isbns.join("\n")}</p>
-              </details>
-            )}
-          </div>
+          )}
 
           {!readonly && noteDraft == null && !rel?.note && (
             <Button
