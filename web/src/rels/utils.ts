@@ -8,7 +8,7 @@ import { importedDidsT, relsT } from "@/db/schema";
 import { Record as _RelRecord } from "@/lexicon/types/my/skylights/rel";
 import { getPublicAgent } from "@/utils";
 
-import { Book, BOOK_KEY } from "./BookCard";
+import { Book } from "./BookCard";
 
 export type RelRecordValue = _RelRecord;
 export type RelRecord = {
