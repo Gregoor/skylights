@@ -1,10 +1,9 @@
-import { ProfileView } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import cx from "classix";
-import { desc, inArray, sql } from "drizzle-orm";
+import { desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { fromEntries } from "remeda";
 
-import { assertSessionAgent, authClient, getSessionAgent } from "@/auth";
+import { authClient, getSessionAgent } from "@/auth";
 import { db } from "@/db";
 import { relsT } from "@/db/schema";
 import { BookCard } from "@/rels/BookCard";
@@ -121,7 +120,9 @@ async function RecentReviews() {
     data: { profiles },
   } = await agent.getProfiles({ actors: rels.map((r) => r.did!) });
 
-  const books = await fetchBooks(rels.map((r) => r.value));
+  const books = await fetchBooks(
+    rels.map((r) => r.value.item?.value).filter(Boolean),
+  );
   const booksByEditionKey = fromEntries(
     books.map((book) => [book.edition_key, book]),
   );
@@ -130,7 +131,7 @@ async function RecentReviews() {
   return (
     <RelsProvider initialRels={fromEntries(rels.map((r) => [r.key, r.value]))}>
       {rels.map((rel) => {
-        const editionKey = rel.value.item.value;
+        const editionKey = rel.value.item?.value;
         const reviewer = rel.did && profilesByDid[rel.did];
         const book = editionKey ? booksByEditionKey[editionKey] : undefined;
         if (!book || !reviewer) return null;
@@ -139,65 +140,6 @@ async function RecentReviews() {
             key={rel.key}
             readonly={reviewer.did != sessionAgent?.did}
             ago={rel.reviewedAt ? timeSince(rel.reviewedAt) : undefined}
-            {...{ book, reviewer }}
-          />
-        );
-      })}
-    </RelsProvider>
-  );
-}
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function FollowsReviews() {
-  const agent = await assertSessionAgent();
-  const follows: ProfileView[] = [];
-  let cursor;
-  for (let i = 0; i < 5; i++) {
-    const { data } = await agent!.app.bsky.graph.getFollowers({
-      actor: agent!.assertDid,
-      cursor,
-      limit: 100,
-    });
-    cursor = data.cursor;
-    follows.push(...data.followers);
-  }
-
-  // for (const follow of follows) {
-  //   await importRepo(follow.did);
-  // }
-
-  const followsByDid = fromEntries(follows.map((f) => [f.did, f]));
-
-  const rows = await db.query.relsT.findMany({
-    where: inArray(
-      relsT.did,
-      follows.map((f) => f.did),
-    ),
-    orderBy: desc(sql`value->'rating'->'value'`),
-    limit: 10,
-  });
-  const rels = rows.map((row) => ({
-    ...row,
-    key: row.key!,
-    value: row.value as RelRecordValue,
-  }));
-
-  const books = await fetchBooks(rels.map((r) => r.value));
-  const booksByEditionKey = fromEntries(
-    books.map((book) => [book.edition_key, book]),
-  );
-
-  return (
-    <RelsProvider initialRels={fromEntries(rels.map((r) => [r.key, r.value]))}>
-      {rels.map((rel) => {
-        const editionKey = rel.value.item.value;
-        const reviewer = rel.did && followsByDid[rel.did];
-        const book = editionKey ? booksByEditionKey[editionKey] : undefined;
-        if (!book || !reviewer) return null;
-        return (
-          <BookCard
-            key={rel.key}
-            readonly={reviewer.did != agent.did}
             {...{ book, reviewer }}
           />
         );

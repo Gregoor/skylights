@@ -8,7 +8,7 @@ import { importedDidsT, relsT } from "@/db/schema";
 import { Record as _RelRecord } from "@/lexicon/types/my/skylights/rel";
 import { getPublicAgent } from "@/utils";
 
-import type { Book } from "./BookCard";
+import { Book, BOOK_KEY } from "./BookCard";
 
 export type RelRecordValue = _RelRecord;
 export type RelRecord = {
@@ -87,11 +87,7 @@ export const importRepo = cache(async (did: string) => {
   });
 });
 
-export async function fetchBooks(rels: RelRecordValue[]) {
-  const editionKeys = rels
-    .map((rel) => rel.item)
-    .filter((i) => i.ref == "open-library")
-    .map((i) => i.value);
+export async function fetchBooks(editionKeys: string[]) {
   const response = await fetch(
     "https://ol.index.skylights.my/indexes/open-library/search",
     {

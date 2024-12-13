@@ -1,54 +1,42 @@
 "use client";
 
 import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
+import cx from "classix";
 import { AnimatePresence, motion } from "motion/react";
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { merge } from "remeda";
+import useSWRImmutable from "swr/immutable";
 import { debounce } from "ts-debounce";
 
-import { Book, BookCard } from "@/rels/BookCard";
+import { Book, BOOK_KEY, BookCard } from "@/rels/BookCard";
 import { RelsLoadingProvider, useRels } from "@/rels/ctx";
+import { MOVIE_KEY, MovieCard, TV_SHOW_KEY, TVShowCard } from "@/rels/tmdb";
 import { Card } from "@/ui";
 
-import { findRels } from "./actions";
+import { findRels, searchTMDB } from "./actions";
 
-const {
-  InfiniteHits,
-  InstantSearch,
-  SearchBox,
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-} = require("react-instantsearch");
-
-const { searchClient } = instantMeiliSearch(
+const { searchClient: booksClient } = instantMeiliSearch(
   "https://ol.index.skylights.my",
   "k-PR1QX-I9D_52oTVAilHF1nOXvGoMHkhZ2mpA3lmg0",
   { placeholderSearch: false },
 );
 
-function search(requests: Parameters<typeof searchClient.search>[0]) {
+function searchBooks(requests: Parameters<typeof booksClient.search>[0]) {
   // non-dash query
   const ndq = (requests.at(0)?.params.query ?? "").replaceAll("-", "").trim();
   const isNumeric = ndq
     .split("")
     .every((char) => Number(char).toString() == char);
   if (isNumeric && (ndq.length == 10 || ndq.length == 13)) {
-    return searchClient.search([
+    return booksClient.search<Book>([
       {
         indexName: "open-library:rating:desc",
         params: { filters: `isbn_13 = ${ndq} OR isbn_10 = ${ndq}` },
       },
     ]);
   }
-  return searchClient.search(requests);
+  return booksClient.search<Book>(requests);
 }
-
-const Hit = ({ hit }: { hit: Book }) => (
-  <AnimatePresence key={hit.edition_key}>
-    <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-      <BookCard book={hit} />
-    </motion.div>
-  </AnimatePresence>
-);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function makeAbortable<F extends (...args: any[]) => any>(fn: F) {
@@ -65,87 +53,197 @@ function makeAbortable<F extends (...args: any[]) => any>(fn: F) {
 
 const findRelsWithAbortable = debounce(makeAbortable(findRels), 300);
 
+const RadioBox = ({
+  label,
+  ...props
+}: { label: string } & React.ComponentProps<"input">) => (
+  <label
+    className={cx(
+      "relative border border-white px-1 h-fit",
+      "has-[:checked]:bg-white has-[:checked]:text-black",
+      "hover:opacity-80",
+    )}
+  >
+    <input
+      type="radio"
+      className="left-0 absolute w-full h-full appearance-none cursor-pointer"
+      name="category"
+      {...props}
+    />
+    {label}
+  </label>
+);
+
+const SearchIcon = (props: React.ComponentProps<"svg">) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 490 490" {...props}>
+    <path
+      fill="none"
+      stroke="white"
+      strokeWidth="36"
+      strokeLinecap="round"
+      d="m280,278a153,153 0 1,0-2,2l170,170m-91-117 110,110-26,26-110-110"
+    />
+  </svg>
+);
+
 export function ClientSearchPage() {
-  const { setRels } = useRels();
+  const { rels, setRels } = useRels();
+  const [category, setCategory] = useState<"book" | "movie" | "tv">("book");
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [submittedQuery, setSubmittedQuery] = useState("");
 
-  const searchClient = useMemo(
-    () => ({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      async search(requests: any) {
-        const responses = await search(requests);
-        const editionKeys = (
-          responses.results[0] as unknown as {
-            hits: { edition_key: string }[];
-          }
-        ).hits.map((h) => h.edition_key);
-        setLoading(true);
-        findRelsWithAbortable(editionKeys).then(async (r) => {
-          const [rels, aborted] = await r;
-          if (aborted) return;
-          setLoading(false);
-          setRels((prevRels) =>
-            merge(
-              Object.fromEntries(rels.map((r) => [r.key, r.value])),
-              prevRels,
-            ),
-          );
-        });
+  const { data: hits } = useSWRImmutable(
+    [category, submittedQuery],
+    async ([category, query]) => {
+      if (!query) return [];
 
-        return responses;
-      },
-    }),
-    [setRels],
+      if (category == "book") {
+        const responses = await searchBooks([
+          {
+            indexName: "open-library:rating:desc",
+            params: { query, hitsPerPage: 10 },
+          },
+        ]);
+        return (
+          (responses.results as { hits: Book[] }[])
+            .at(0)
+            ?.hits.map((book) => ({ type: "book", book }) as const) ?? []
+        );
+      }
+
+      return searchTMDB(category, query);
+    },
+    { keepPreviousData: true },
+  );
+  const { isLoading: isRelsLoading } = useSWRImmutable(
+    [
+      {
+        book: BOOK_KEY,
+        movie: MOVIE_KEY,
+        tv: TV_SHOW_KEY,
+      }[category],
+      hits,
+    ],
+    async ([ref, hits]) => {
+      if (!hits?.length) return;
+      const keys = hits.map((hit) =>
+        hit.type == "book"
+          ? hit.book.edition_key
+          : (hit.type == "show" ? hit.show : hit.movie).id.toString(),
+      );
+      const [newRels, aborted] = await findRelsWithAbortable(ref, keys);
+      if (aborted) return;
+      setRels(
+        merge(Object.fromEntries(newRels.map((r) => [r.key, r.value])), rels),
+      );
+    },
   );
 
   return (
-    <RelsLoadingProvider value={loading}>
+    <RelsLoadingProvider value={isRelsLoading}>
       <div className="flex flex-col gap-4">
-        <InstantSearch
-          indexName="open-library:rating:desc"
-          searchClient={searchClient}
+        <form
+          className="relative flex flex-row flex-wrap gap-2 items-center whitespace-pre"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setSubmittedQuery(query);
+          }}
         >
-          <SearchBox
-            classNames={{
-              form: [
-                "border rounded-lg border-gray-400 focus-within:border-white",
-                "transition-all pr-2 flex flex-row gap-2 bg-black",
-              ].join(" "),
-              input: "outline-none p-2 w-full bg-transparent",
-              loadingIndicator: "py-3 scale-75",
-              loadingIcon: "stroke-white",
-              resetIcon: "fill-white",
-              submitIcon: "fill-white",
-            }}
+          {(
+            [
+              ["Books", "book"],
+              ["Movies", "movie"],
+              ["TV", "tv"],
+            ] as const
+          ).map(([label, value]) => (
+            <RadioBox
+              key={value}
+              label={label}
+              value={value}
+              checked={category == value}
+              onChange={() => setCategory(value)}
+            />
+          ))}
+          <input
+            type="text"
+            className={cx(
+              "flex-grow outline-none border rounded-lg border-gray-400",
+              "focus:border-white p-2 min-w-80 bg-transparent",
+            )}
             placeholder="Reach for the stars..."
-            onChangeCapture={(event: ChangeEvent) => {
-              setQuery((event.target as HTMLInputElement).value);
+            value={query}
+            onChange={(event: ChangeEvent) => {
+              const { value } = event.target as HTMLInputElement;
+              setQuery(value);
+              if (category == "book") {
+                setSubmittedQuery(value);
+              }
             }}
           />
-          <InfiniteHits
-            hitComponent={Hit}
-            classNames={{
-              list: "flex flex-col gap-4",
-              disabledLoadMore: "hidden",
-              loadMore: query
-                ? "mt-2 w-full text-center hover:underline"
-                : "hidden",
-            }}
-            showPrevious={false}
+          <button
+            type="submit"
+            className={
+              category == "book"
+                ? "hidden"
+                : "flex-shrink-0 my-1 border box-border hover:opacity-80"
+            }
+            style={category == "book" ? {} : { width: 34, height: 34 }}
           />
-        </InstantSearch>
-        <Card>
-          Book data is collected from{" "}
-          <a
-            href="https://openlibrary.org"
-            className="text-blue-400 underline hover:opacity-80"
-          >
-            Open Library
-          </a>
-          . Please contribute and donate to them to support free and universal
-          access to knowledge for everyone.
-        </Card>
+          <SearchIcon
+            className="absolute w-4 pointer-events-none"
+            style={{ right: 8, bottom: 13 }}
+          />
+        </form>
+        <div className="flex flex-col gap-4">
+          {hits?.map((hit) => (
+            <AnimatePresence
+              key={
+                hit.type == "book"
+                  ? hit.book.edition_key
+                  : (hit.type == "show" ? hit.show : hit.movie).id
+              }
+            >
+              <motion.div
+                initial={{ y: 16, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+              >
+                {hit.type == "book" ? (
+                  <BookCard book={hit.book} />
+                ) : hit.type == "show" ? (
+                  <TVShowCard show={hit.show} />
+                ) : (
+                  <MovieCard movie={hit.movie} />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          ))}
+        </div>
+
+        {category == "book" ? (
+          <Card>
+            Book data is collected from{" "}
+            <a
+              href="https://openlibrary.org"
+              className="text-blue-400 underline hover:opacity-80"
+            >
+              Open Library
+            </a>
+            . Please contribute and donate to them to support free and universal
+            access to knowledge for everyone.
+          </Card>
+        ) : (
+          <Card>
+            Movie and TV data is collected from{" "}
+            <a
+              href="https://www.themoviedb.org"
+              className="text-blue-400 underline hover:opacity-80"
+            >
+              The Movie Database
+            </a>
+            . Please contribute to them to support free and universal access to
+            knowledge for everyone.
+          </Card>
+        )}
       </div>
     </RelsLoadingProvider>
   );

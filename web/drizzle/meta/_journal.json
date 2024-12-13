@@ -22,6 +22,20 @@
       "when": 1733765523503,
       "tag": "0002_clear_shard",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1734049346173,
+      "tag": "0003_supreme_jigsaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1734051004065,
+      "tag": "0004_keen_molecule_man",
+      "breakpoints": true
     }
   ]
 }

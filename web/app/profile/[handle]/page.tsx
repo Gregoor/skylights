@@ -12,7 +12,7 @@ import { importRepo, resolveHandle } from "@/rels/utils";
 import { Card, LinkButton } from "@/ui";
 import { getPublicAgent } from "@/utils";
 
-import { findRelsWithBooks, RelsOrderBy } from "./actions";
+import { findRelsWithInfo, RelsOrderBy } from "./actions";
 import { Avatar } from "./client";
 import { RelList } from "./RelList";
 import { PAGE_SIZE } from "./share";
@@ -65,11 +65,10 @@ export default async function ProfilePage({
   await importRepo(did);
 
   const orderBy = (await searchParams).orderBy ?? "best";
-  const [[{ count: totalRels }], { rels, booksByEditionKey }] =
-    await Promise.all([
-      db.select({ count: count() }).from(relsT).where(eq(relsT.did, did)),
-      findRelsWithBooks(did, { limit: PAGE_SIZE, offset: 0, orderBy }),
-    ]);
+  const [[{ count: totalRels }], { rels, info }] = await Promise.all([
+    db.select({ count: count() }).from(relsT).where(eq(relsT.did, did)),
+    findRelsWithInfo(did, { limit: PAGE_SIZE, offset: 0, orderBy }),
+  ]);
 
   const isOwnProfile =
     agent &&
@@ -116,7 +115,7 @@ export default async function ProfilePage({
           key={orderBy}
           did={did}
           readonly={!isOwnProfile}
-          booksByEditionKey={booksByEditionKey}
+          info={info}
           total={totalRels}
           orderBy={orderBy}
         />

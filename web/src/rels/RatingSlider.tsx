@@ -66,7 +66,10 @@ export function RatingSlider({
         max={10}
         disabled={disabled}
         value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
+        onChange={(e) => {
+          if (hoverValue != null) return;
+          onChange(Number(e.target.value));
+        }}
         onMouseMove={(event) => {
           if (disabled) return;
           const el = event.target as HTMLElement;
