@@ -3,7 +3,6 @@ import React from "react";
 import { BaseCard } from "./BaseCard";
 import { BOOK_KEY, BookCard } from "./BookCard";
 import { MOVIE_KEY, MovieCard, TV_SHOW_KEY, TVShowCard } from "./tmdb";
-import { UnknownCard } from "./UnknownCard";
 import type { Info, RelRecordValue } from "./utils";
 
 export function RelCard({
