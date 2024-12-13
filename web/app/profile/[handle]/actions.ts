@@ -25,7 +25,7 @@ export async function findRelsWithInfo(
     where: eq(relsT.did, did),
     orderBy:
       orderBy == "best"
-        ? desc(sql`value->'rating'->'value'`)
+        ? desc(sql`COALESCE((value->'rating'->'value')::INTEGER, -1)`)
         : desc(relsT.reviewedAt),
     limit,
     offset,
