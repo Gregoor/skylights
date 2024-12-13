@@ -6,9 +6,9 @@ import { fromEntries } from "remeda";
 import { authClient, getSessionAgent } from "@/auth";
 import { db } from "@/db";
 import { relsT } from "@/db/schema";
-import { BookCard } from "@/rels/BookCard";
 import { RelsProvider } from "@/rels/ctx";
-import { fetchBooks, RelRecordValue } from "@/rels/utils";
+import { RelCard } from "@/rels/RelCard";
+import { fetchItemsInfo, RelRecordValue } from "@/rels/utils";
 import { Card } from "@/ui";
 import { getPublicAgent } from "@/utils";
 
@@ -120,27 +120,23 @@ async function RecentReviews() {
     data: { profiles },
   } = await agent.getProfiles({ actors: rels.map((r) => r.did!) });
 
-  const books = await fetchBooks(
-    rels.map((r) => r.value.item?.value).filter(Boolean),
-  );
-  const booksByEditionKey = fromEntries(
-    books.map((book) => [book.edition_key, book]),
+  const info = await fetchItemsInfo(
+    rels.map((r) => r.value.item).filter(Boolean),
   );
   const profilesByDid = fromEntries(profiles.map((p) => [p.did, p]));
 
   return (
     <RelsProvider initialRels={fromEntries(rels.map((r) => [r.key, r.value]))}>
       {rels.map((rel) => {
-        const editionKey = rel.value.item?.value;
         const reviewer = rel.did && profilesByDid[rel.did];
-        const book = editionKey ? booksByEditionKey[editionKey] : undefined;
-        if (!book || !reviewer) return null;
+        if (!reviewer) return null;
         return (
-          <BookCard
+          <RelCard
             key={rel.key}
+            item={rel.value.item}
             readonly={reviewer.did != sessionAgent?.did}
             ago={rel.reviewedAt ? timeSince(rel.reviewedAt) : undefined}
-            {...{ book, reviewer }}
+            {...{ info, reviewer }}
           />
         );
       })}

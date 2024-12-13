@@ -1,13 +1,15 @@
-import { count, eq } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { cache } from "react";
-import { fromEntries } from "remeda";
+import { cache, Fragment } from "react";
+import { fromEntries, prop, sortBy, sum } from "remeda";
 
 import { getSessionAgent } from "@/auth";
 import { db } from "@/db";
 import { relsT } from "@/db/schema";
+import { BOOK_KEY } from "@/rels/BookCard";
 import { RelsProvider } from "@/rels/ctx";
+import { MOVIE_KEY, TV_SHOW_KEY } from "@/rels/tmdb";
 import { importRepo, resolveHandle } from "@/rels/utils";
 import { Card, LinkButton } from "@/ui";
 import { getPublicAgent } from "@/utils";
@@ -65,8 +67,12 @@ export default async function ProfilePage({
   await importRepo(did);
 
   const orderBy = (await searchParams).orderBy ?? "best";
-  const [[{ count: totalRels }], { rels, info }] = await Promise.all([
-    db.select({ count: count() }).from(relsT).where(eq(relsT.did, did)),
+  const [counts, { rels, info }] = await Promise.all([
+    db
+      .select({ ref: sql`value->'item'->>'ref'`, count: count() })
+      .from(relsT)
+      .where(eq(relsT.did, did))
+      .groupBy(sql`value->'item'->>'ref'`),
     findRelsWithInfo(did, { limit: PAGE_SIZE, offset: 0, orderBy }),
   ]);
 
@@ -99,7 +105,22 @@ export default async function ProfilePage({
               {isOwnProfile ? "You" : (profile.displayName ?? profile.handle)}
             </a>{" "}
             {isOwnProfile ? "have" : "has"} reviewed{" "}
-            <span className="font-semibold">{totalRels}</span> books.
+            {sortBy(counts, (c) => -c.count).map((row, i) => (
+              <Fragment key={row.ref as string}>
+                <span className="font-semibold">{row.count}</span>{" "}
+                {
+                  {
+                    [BOOK_KEY]: "book",
+                    [MOVIE_KEY]: "movie",
+                    [TV_SHOW_KEY]: "show",
+                  }[row.ref as string]
+                }
+                {row.count > 1 && "s"}
+                {i < counts.length - 1 &&
+                  (i == counts.length - 2 ? " and " : ", ")}
+              </Fragment>
+            ))}
+            .
           </div>
         </Card>
         <div className="flex flex-row items-center gap-2">
@@ -116,7 +137,7 @@ export default async function ProfilePage({
           did={did}
           readonly={!isOwnProfile}
           info={info}
-          total={totalRels}
+          total={sum(counts.map(prop("count")))}
           orderBy={orderBy}
         />
       </div>

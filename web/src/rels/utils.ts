@@ -1,14 +1,19 @@
 import { Agent } from "@atproto/api";
 import { DidResolver } from "@atproto/identity";
-import { and, eq, lt } from "drizzle-orm";
+import { and, eq, inArray, lt } from "drizzle-orm";
 import { cache } from "react";
+import { fromEntries, groupBy, mapValues } from "remeda";
 
 import { buildMutex, db } from "@/db";
-import { importedDidsT, relsT } from "@/db/schema";
-import { Record as _RelRecord } from "@/lexicon/types/my/skylights/rel";
+import { importedDidsT, relsT, tmdbMoviesT, tmdbShowsT } from "@/db/schema";
+import {
+  Record as _RelRecord,
+  RefItem,
+} from "@/lexicon/types/my/skylights/rel";
 import { getPublicAgent } from "@/utils";
 
-import { Book } from "./BookCard";
+import { Book, BOOK_KEY } from "./BookCard";
+import { Movie, MOVIE_KEY, Show, TV_SHOW_KEY } from "./tmdb";
 
 export type RelRecordValue = _RelRecord;
 export type RelRecord = {
@@ -102,6 +107,46 @@ export async function fetchBooks(editionKeys: string[]) {
     },
   );
   return (await response.json()).hits as Book[];
+}
+
+export type Info = {
+  books: Record<string, Book>;
+  movies: Record<number, Movie>;
+  shows: Record<number, Show>;
+};
+
+export async function fetchItemsInfo(
+  items: RelRecordValue["item"][],
+): Promise<Info> {
+  const idsByRefs = mapValues(
+    groupBy(
+      items.filter((i): i is RefItem => "ref" in i),
+      (i) => i.ref,
+    ),
+    (items) => items.map((i) => i.value),
+  );
+  const bookIds = idsByRefs[BOOK_KEY];
+
+  const movieIds = idsByRefs[MOVIE_KEY];
+  const showIds = idsByRefs[TV_SHOW_KEY];
+  const [books, movies, shows] = await Promise.all([
+    bookIds ? fetchBooks(bookIds) : [],
+    movieIds
+      ? db.query.tmdbMoviesT.findMany({
+          where: inArray(tmdbMoviesT.id, movieIds.map(Number)),
+        })
+      : [],
+    showIds
+      ? db.query.tmdbShowsT.findMany({
+          where: inArray(tmdbShowsT.id, showIds.map(Number)),
+        })
+      : [],
+  ]);
+  return {
+    books: fromEntries(books.map((book) => [book.edition_key, book])),
+    movies: fromEntries(movies.map((row) => [row.id, row.value as Movie])),
+    shows: fromEntries(shows.map((row) => [row.id, row.value as Show])),
+  };
 }
 
 export async function resolveHandle(handle: string) {

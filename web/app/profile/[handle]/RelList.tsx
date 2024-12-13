@@ -5,12 +5,12 @@ import { useRef, useState } from "react";
 import useInfiniteScroll from "react-infinite-scroll-hook";
 import { mapValues } from "remeda";
 
-import { BOOK_KEY, BookCard } from "@/rels/BookCard";
 import { useRels } from "@/rels/ctx";
-import { MOVIE_KEY, MovieCard, TV_SHOW_KEY } from "@/rels/tmdb";
+import { RelCard } from "@/rels/RelCard";
 import { UnknownCard } from "@/rels/UnknownCard";
+import { Info } from "@/rels/utils";
 
-import { findRelsWithInfo, Info, RelsOrderBy } from "./actions";
+import { findRelsWithInfo, RelsOrderBy } from "./actions";
 import { PAGE_SIZE } from "./share";
 
 export function RelList({
@@ -73,25 +73,7 @@ export function RelList({
               initial={i < PAGE_SIZE ? undefined : { y: 16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
             >
-              {
-                {
-                  [BOOK_KEY]: (
-                    <BookCard
-                      key={key}
-                      book={info.books[item.value]}
-                      {...{ readonly }}
-                    />
-                  ),
-                  [MOVIE_KEY]: (
-                    <MovieCard
-                      key={key}
-                      movie={info.movies[Number(item.value)]}
-                      {...{ readonly }}
-                    />
-                  ),
-                  [TV_SHOW_KEY]: null,
-                }[item.ref as string]
-              }
+              <RelCard key={key} info={info} item={item} {...{ readonly }} />
             </motion.div>
           </AnimatePresence>
         );

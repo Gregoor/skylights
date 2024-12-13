@@ -1,4 +1,4 @@
-import { RelCard, Title } from "./RelCard";
+import { BaseCard, Title } from "./BaseCard";
 
 export type Movie = {
   id: number;
@@ -25,11 +25,11 @@ export function MovieCard({
 }: {
   movie: Movie;
 } & Omit<
-  React.ComponentProps<typeof RelCard>,
+  React.ComponentProps<typeof BaseCard>,
   "imgSrc" | "item" | "children"
 >) {
   return (
-    <RelCard
+    <BaseCard
       imgSrc={`https://image.tmdb.org/t/p/w500${movie.poster_path!}`}
       item={{ ref: MOVIE_KEY, value: `${movie.id}` }}
       {...props}
@@ -40,7 +40,7 @@ export function MovieCard({
           {new Date(movie.release_date).getFullYear()}
         </div>
       </div>
-    </RelCard>
+    </BaseCard>
   );
 }
 
@@ -50,11 +50,11 @@ export function TVShowCard({
 }: {
   show: Show;
 } & Omit<
-  React.ComponentProps<typeof RelCard>,
+  React.ComponentProps<typeof BaseCard>,
   "imgSrc" | "item" | "children"
 >) {
   return (
-    <RelCard
+    <BaseCard
       imgSrc={`https://image.tmdb.org/t/p/w500${show.poster_path!}`}
       item={{ ref: TV_SHOW_KEY, value: `${show.id}` }}
       {...props}
@@ -65,6 +65,6 @@ export function TVShowCard({
           {new Date(show.first_air_date).getFullYear()}
         </div>
       </div>
-    </RelCard>
+    </BaseCard>
   );
 }

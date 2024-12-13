@@ -1,4 +1,4 @@
-import { RelCard, Title } from "./RelCard";
+import { BaseCard, Title } from "./BaseCard";
 
 export type Book = {
   title: string;
@@ -17,13 +17,13 @@ export function BookCard({
 }: {
   book: Book;
 } & Omit<
-  React.ComponentProps<typeof RelCard>,
+  React.ComponentProps<typeof BaseCard>,
   "imgSrc" | "item" | "children"
 >) {
   const editionKey = book.edition_key;
   const isbns = [...book.isbn_13, ...book.isbn_10];
   return (
-    <RelCard
+    <BaseCard
       imgSrc={`https://covers.openlibrary.org/b/olid/${book.edition_key}-L.jpg`}
       item={{ ref: BOOK_KEY, value: editionKey }}
       {...props}
@@ -42,6 +42,6 @@ export function BookCard({
           )}
         </div>
       </div>
-    </RelCard>
+    </BaseCard>
   );
 }
