@@ -115,6 +115,16 @@ export type Info = {
   shows: Record<number, Show>;
 };
 
+async function fetchDetailsTMDB(category: "movie" | "tv", id: string) {
+  return fetch(`https://api.themoviedb.org/3/${category}/${id}`, {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${process.env.TMDB_API_KEY}`,
+    },
+  }).then((r) => r.json());
+}
+
 export async function fetchItemsInfo(
   items: RelRecordValue["item"][],
 ): Promise<Info> {
@@ -126,22 +136,52 @@ export async function fetchItemsInfo(
     (items) => items.map((i) => i.value),
   );
   const bookIds = idsByRefs[BOOK_KEY];
-
   const movieIds = idsByRefs[MOVIE_KEY];
   const showIds = idsByRefs[TV_SHOW_KEY];
   const [books, movies, shows] = await Promise.all([
-    bookIds ? fetchBooks(bookIds) : [],
+    bookIds ? fetchBooks(bookIds) : ([] as Book[]),
     movieIds
       ? db.query.tmdbMoviesT.findMany({
           where: inArray(tmdbMoviesT.id, movieIds.map(Number)),
         })
-      : [],
+      : ([] as { id: number; value: unknown }[]),
     showIds
       ? db.query.tmdbShowsT.findMany({
           where: inArray(tmdbShowsT.id, showIds.map(Number)),
         })
-      : [],
+      : ([] as { id: number; value: unknown }[]),
   ]);
+
+  const missingMovieIds = movieIds?.filter(
+    (id) => !movies.some((m) => m.id == Number(id)),
+  );
+  if (missingMovieIds?.length > 0) {
+    const movieData = await Promise.all(
+      missingMovieIds.map((id) => fetchDetailsTMDB("movie", id)),
+    );
+    const missingMovies = await db
+      .insert(tmdbMoviesT)
+      .values(movieData.map((r) => ({ id: r.id, value: r })))
+      .onConflictDoNothing()
+      .returning();
+    movies.push(...missingMovies);
+  }
+
+  const missingShowIds = showIds?.filter(
+    (id) => !shows.some((m) => m.id == Number(id)),
+  );
+  if (missingShowIds?.length > 0) {
+    const showData = await Promise.all(
+      missingShowIds.map((id) => fetchDetailsTMDB("tv", id)),
+    );
+    const missingShows = await db
+      .insert(tmdbShowsT)
+      .values(showData.map((r) => ({ id: r.id, value: r })))
+      .onConflictDoNothing()
+      .returning();
+    shows.push(...missingShows);
+  }
+
   return {
     books: fromEntries(books.map((book) => [book.edition_key, book])),
     movies: fromEntries(movies.map((row) => [row.id, row.value as Movie])),
