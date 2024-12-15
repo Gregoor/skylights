@@ -1,7 +1,6 @@
-FROM rust:1.83.0 as builder
+FROM rust:1.83.0-bullseye-slim as builder
 WORKDIR /usr/src/jetsky
 COPY . .
-RUN apt install libssl-dev
 RUN --mount=type=bind,source=src,target=src \
     --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
     --mount=type=bind,source=Cargo.lock,target=Cargo.lock \
@@ -15,6 +14,7 @@ EOF
 
 FROM debian:bullseye-slim as runner
 ARG UID=10001
+RUN apt install libssl
 RUN adduser \
     --disabled-password \
     --gecos "" \
