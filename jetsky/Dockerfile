@@ -1,4 +1,4 @@
-FROM rust:1.83.0-bullseye-slim as builder
+FROM rust:1.83.0-bullseye as builder
 WORKDIR /usr/src/jetsky
 COPY . .
 RUN --mount=type=bind,source=src,target=src \
@@ -14,7 +14,8 @@ EOF
 
 FROM debian:bullseye-slim as runner
 ARG UID=10001
-RUN apt install libssl
+RUN apt update
+RUN apt install libssl-dev
 RUN adduser \
     --disabled-password \
     --gecos "" \
