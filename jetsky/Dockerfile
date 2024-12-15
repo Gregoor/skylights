@@ -14,7 +14,9 @@ EOF
 
 FROM debian:bullseye-slim as runner
 ARG UID=10001
-RUN apt update
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates
+RUN update-ca-certificates
 RUN apt install libssl-dev
 RUN adduser \
     --disabled-password \
