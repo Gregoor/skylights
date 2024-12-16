@@ -59,7 +59,7 @@ const RadioBox = ({
 }: { label: string } & React.ComponentProps<"input">) => (
   <label
     className={cx(
-      "relative border border-white px-1 h-fit",
+      "relative border border-white p-1 sm:py-0 h-fit text-center",
       "has-[:checked]:bg-white has-[:checked]:text-black",
       "hover:opacity-80",
     )}
@@ -143,56 +143,60 @@ export function ClientSearchPage() {
     <RelsLoadingProvider value={isRelsLoading}>
       <div className="flex flex-col gap-4">
         <form
-          className="relative flex flex-row flex-wrap gap-2 items-center whitespace-pre"
+          className="flex flex-row flex-wrap gap-2 items-center whitespace-pre"
           onSubmit={(event) => {
             event.preventDefault();
             setSubmittedQuery(query);
           }}
         >
-          {(
-            [
-              ["Books", "book"],
-              ["Movies", "movie"],
-              ["TV", "tv"],
-            ] as const
-          ).map(([label, value]) => (
-            <RadioBox
-              key={value}
-              label={label}
-              value={value}
-              checked={category == value}
-              onChange={() => setCategory(value)}
+          <div className="w-full sm:w-fit grid grid-cols-3 gap-2">
+            {(
+              [
+                ["Books", "book"],
+                ["Movies", "movie"],
+                ["TV", "tv"],
+              ] as const
+            ).map(([label, value]) => (
+              <RadioBox
+                key={value}
+                label={label}
+                value={value}
+                checked={category == value}
+                onChange={() => setCategory(value)}
+              />
+            ))}
+          </div>
+          <div className="flex-grow relative flex flex-row gap-2 max-w-full">
+            <input
+              type="text"
+              className={cx(
+                "flex-grow outline-none border rounded-lg border-gray-400",
+                "focus:border-white p-2 w-full bg-transparent",
+              )}
+              placeholder="Reach for the stars..."
+              value={query}
+              onChange={(event: ChangeEvent) => {
+                const { value } = event.target as HTMLInputElement;
+                setQuery(value);
+                if (category == "book") {
+                  setSubmittedQuery(value);
+                }
+              }}
             />
-          ))}
-          <input
-            type="text"
-            className={cx(
-              "flex-grow outline-none border rounded-lg border-gray-400",
-              "focus:border-white p-2 min-w-80 bg-transparent",
-            )}
-            placeholder="Reach for the stars..."
-            value={query}
-            onChange={(event: ChangeEvent) => {
-              const { value } = event.target as HTMLInputElement;
-              setQuery(value);
-              if (category == "book") {
-                setSubmittedQuery(value);
+            <button
+              type="submit"
+              className={
+                category == "book"
+                  ? "hidden"
+                  : "flex-shrink-0 my-1 border box-border hover:opacity-80"
               }
-            }}
-          />
-          <button
-            type="submit"
-            className={
-              category == "book"
-                ? "hidden"
-                : "flex-shrink-0 my-1 border box-border hover:opacity-80"
-            }
-            style={category == "book" ? {} : { width: 34, height: 34 }}
-          />
-          <SearchIcon
-            className="absolute w-4 pointer-events-none"
-            style={{ right: 8, bottom: 13 }}
-          />
+              style={category == "book" ? {} : { width: 34, height: 34 }}
+            />
+            <SearchIcon
+              className="absolute w-4 pointer-events-none"
+              style={{ right: 8, bottom: 13 }}
+            />
+          </div>
         </form>
         <div className="flex flex-col gap-4">
           {hits?.map((hit) => (
