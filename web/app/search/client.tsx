@@ -21,9 +21,12 @@ const { searchClient: booksClient } = instantMeiliSearch(
   { placeholderSearch: false },
 );
 
-function searchBooks(requests: Parameters<typeof booksClient.search>[0]) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function searchBooks(requests: any) {
   // non-dash query
-  const ndq = (requests.at(0)?.params.query ?? "").replaceAll("-", "").trim();
+  const ndq = (requests.at(0)?.params.query ?? "")
+    .replaceAll("-", "")
+    .trim() as string;
   const isNumeric = ndq
     .split("")
     .every((char) => Number(char).toString() == char);
