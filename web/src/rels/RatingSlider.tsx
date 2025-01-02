@@ -6,18 +6,21 @@ import { useId, useState } from "react";
 const Star = ({
   fill: fill,
   className,
+  smol,
 }: {
   fill?: boolean | "half";
   className?: string;
+  smol?: boolean;
 }) => {
   const id = useId();
+  const size = smol ? 20 : 28;
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 260 245"
       className={className}
-      width={28}
-      height={28}
+      width={size}
+      height={size}
     >
       <defs>
         <linearGradient id={"grad" + id}>
@@ -39,10 +42,12 @@ export function RatingSlider({
   value,
   disabled,
   onChange,
+  smol,
 }: {
   value?: number;
   disabled?: boolean;
-  onChange: (value: number) => void;
+  onChange?: (value: number) => void;
+  smol?: boolean;
 }) {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
   return (
@@ -51,10 +56,10 @@ export function RatingSlider({
         const fullValue = (i + 1) * 2;
         const v = hoverValue ?? value;
         if (typeof v != "number" || v < fullValue - 1) {
-          return <Star key={i} />;
+          return <Star key={i} smol={smol} />;
         }
-        if (v >= fullValue) return <Star key={i} fill />;
-        return <Star key={i} fill="half" />;
+        if (v >= fullValue) return <Star key={i} smol={smol} fill />;
+        return <Star key={i} smol={smol} fill="half" />;
       })}
       <input
         type="range"
@@ -68,7 +73,7 @@ export function RatingSlider({
         value={value}
         onChange={(e) => {
           if (hoverValue != null) return;
-          onChange(Number(e.target.value));
+          onChange?.(Number(e.target.value));
         }}
         onMouseMove={(event) => {
           if (disabled) return;
@@ -82,7 +87,7 @@ export function RatingSlider({
           if (disabled) return;
           event.preventDefault();
           if (typeof hoverValue == "number") {
-            onChange(hoverValue);
+            onChange?.(hoverValue);
           }
         }}
       />

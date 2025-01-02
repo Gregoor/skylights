@@ -108,14 +108,21 @@ export function BaseCard({
         </CardSection>
       )}
       <CardSection className="flex flex-row gap-4">
-        <div className="border border-gray-600/50 flex-shrink-0 w-32 h-48 sm:w-40 sm:h-60 flex justify-center">
-          <ImgWithDummy
-            className="max-w-full max-h-full object-contain"
-            src={imgSrc}
-          />
-        </div>
+        <Link href={`/rel/${item.ref}/${item.value}`}>
+          <div className="border border-gray-600/50 flex-shrink-0 w-32 h-48 sm:w-40 sm:h-60 flex justify-center">
+            <ImgWithDummy
+              className="max-w-full max-h-full object-contain"
+              src={imgSrc}
+            />
+          </div>
+        </Link>
         <div className="w-full flex flex-col gap-2">
-          {children}
+          <Link
+            href={`/rel/${item.ref}/${item.value}`}
+            className="hover:opacity-80"
+          >
+            {children}
+          </Link>
 
           {(!readonly || ratingValue) && (
             <RatingSlider
@@ -139,6 +146,15 @@ export function BaseCard({
             >
               {rel?.note ? "Edit" : "Add"} note
             </Button>
+          )}
+
+          {readonly && !reviewer && (
+            <em>
+              <Link href="/" className="underline hover:opacity-80">
+                Login
+              </Link>{" "}
+              to review this work
+            </em>
           )}
 
           {noteDraft != null ? (
