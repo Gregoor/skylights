@@ -148,14 +148,14 @@ export function BaseCard({
             </Button>
           )}
 
-          {readonly && !reviewer && (
+          {/* {readonly && !reviewer && (
             <em>
               <Link href="/" className="underline hover:opacity-80">
                 Login
               </Link>{" "}
               to review this work
             </em>
-          )}
+          )} */}
 
           {noteDraft != null ? (
             <div className="mt-2 w-full flex flex-col gap-2">
