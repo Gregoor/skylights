@@ -29,7 +29,7 @@ export function RelList({
   const { rels, setRels } = useRels();
   const [info, setInfo] = useState(initialInfo);
 
-  const pageRef = useRef(0);
+  const pageRef = useRef(-1);
   const [loading, setLoading] = useState(false);
   const loadMore = async () => {
     setLoading(true);

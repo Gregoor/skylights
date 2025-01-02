@@ -2,7 +2,7 @@ import { count, eq, sql } from "drizzle-orm";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { cache, Fragment } from "react";
-import { fromEntries, prop, sortBy, sum } from "remeda";
+import { prop, sortBy, sum } from "remeda";
 
 import { getSessionAgent } from "@/auth";
 import { db } from "@/db";
@@ -14,10 +14,9 @@ import { importRepo, resolveHandle } from "@/rels/utils";
 import { Card, LinkButton } from "@/ui";
 import { getPublicAgent } from "@/utils";
 
-import { findRelsWithInfo, RelsOrderBy } from "./actions";
+import { RelsOrderBy } from "./actions";
 import { Avatar } from "./client";
 import { RelList } from "./RelList";
-import { PAGE_SIZE } from "./share";
 
 type Params = Promise<{
   handle: string;
@@ -55,36 +54,31 @@ export default async function ProfilePage({
   let { handle } = await params;
   handle = decodeURIComponent(handle);
 
-  const profile = await getProfile(handle);
+  const [profile, agent, did] = await Promise.all([
+    getProfile(handle),
+    getSessionAgent(),
+    resolveHandle(handle),
+  ]);
 
   if (profile.handle != handle) {
     redirect(`/profile/${profile.handle}`);
   }
 
-  const agent = await getSessionAgent();
-  const did = await resolveHandle(handle);
-
   await importRepo(did);
 
   const orderBy = (await searchParams).orderBy ?? "best";
-  const [counts, { rels, info }] = await Promise.all([
-    db
-      .select({ ref: sql`value->'item'->>'ref'`, count: count() })
-      .from(relsT)
-      .where(eq(relsT.did, did))
-      .groupBy(sql`value->'item'->>'ref'`),
-    findRelsWithInfo(did, { limit: PAGE_SIZE, offset: 0, orderBy }),
-  ]);
+  const counts = await db
+    .select({ ref: sql`value->'item'->>'ref'`, count: count() })
+    .from(relsT)
+    .where(eq(relsT.did, did))
+    .groupBy(sql`value->'item'->>'ref'`);
 
   const isOwnProfile =
     agent &&
     (await agent.getProfile({ actor: agent.assertDid })).data.handle == handle;
 
   return (
-    <RelsProvider
-      key={orderBy}
-      initialRels={fromEntries(rels.map((r) => [r.key, r.value]))}
-    >
+    <RelsProvider key={orderBy}>
       <div className="flex flex-col gap-4">
         <Card sectionClassName="flex flex-row items-center gap-2">
           {profile.avatar && (
@@ -136,7 +130,7 @@ export default async function ProfilePage({
           key={orderBy}
           did={did}
           readonly={!isOwnProfile}
-          info={info}
+          info={{ books: {}, movies: {}, shows: {} }}
           total={sum(counts.map(prop("count")))}
           orderBy={orderBy}
         />
