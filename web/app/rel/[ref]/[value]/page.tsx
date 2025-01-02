@@ -2,7 +2,7 @@ import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/act
 import { and, eq, sql } from "drizzle-orm";
 import { Metadata } from "next";
 import Link from "next/link";
-import { fromEntries, mapValues, partition, values } from "remeda";
+import { fromEntries, mapValues, partition } from "remeda";
 
 import { getSessionAgent } from "@/auth";
 import { AvatarLink } from "@/AvatarLink";
