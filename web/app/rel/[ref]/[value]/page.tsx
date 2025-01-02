@@ -113,7 +113,7 @@ export default async function RefPage({ params }: { params: Params }) {
         const profile = profilesByDid[rel.did!];
         const ago = rel.reviewedAt ? timeSince(rel.reviewedAt) : undefined;
         return (
-          <SectionedCard>
+          <SectionedCard key={rel.did! + rel.key!}>
             <CardSection className="flex flex-row items-center gap-2">
               <AvatarLink smol profile={profile} />
               <Link href={`/profile/${profile.handle}`}>
