@@ -124,6 +124,25 @@ export default async function LandingPage() {
     <div className="flex flex-col gap-4">
       {!agent && <SignInCard />}
 
+      <Card>
+        <div className="mb-2 text-center">
+          <h1 className="text-xl">💫 Skylights 💫</h1>
+          <h2 className="text-lg text-gray-200">
+            All your public reviews, in one place
+          </h2>
+        </div>
+        <ul className="list-disc list-inside">
+          <li>
+            Your data is yours, and not locked into a silo like on other
+            platforms, thanks to ATProto (the protocol behind Bluesky)
+          </li>
+          <li>
+            One platform for all your reviews. At the moment that includes
+            books, movies and TV shows. Next up: Papers and URLs.
+          </li>
+        </ul>
+      </Card>
+
       <RecentReviews />
     </div>
   );
