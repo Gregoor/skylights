@@ -103,7 +103,9 @@ export default async function RefPage({ params }: { params: Params }) {
   return (
     <>
       <RelsProvider
-        initialRels={fromEntries(ownRels.map((r) => [r.key!, r.value as any]))}
+        initialRels={fromEntries(
+          ownRels.map((r) => [r.key!, r.value as RelRecordValue]),
+        )}
       >
         <RelCard info={info} item={item} readonly={!agent} />
       </RelsProvider>
