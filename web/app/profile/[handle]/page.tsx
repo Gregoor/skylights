@@ -18,9 +18,7 @@ import { RelsOrderBy } from "./actions";
 import { Avatar } from "./client";
 import { RelList } from "./RelList";
 
-type Params = Promise<{
-  handle: string;
-}>;
+type Params = Promise<{ handle: string }>;
 
 const getProfile = cache(async (handle: string) =>
   getPublicAgent()

@@ -1,6 +1,7 @@
 import cx from "classix";
 import { desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { fromEntries } from "remeda";
 
 import { authClient, getSessionAgent } from "@/auth";
@@ -143,7 +144,9 @@ export default async function LandingPage() {
         </ul>
       </Card>
 
-      <RecentReviews />
+      <Suspense>
+        <RecentReviews />
+      </Suspense>
     </div>
   );
 }
