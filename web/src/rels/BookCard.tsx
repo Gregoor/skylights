@@ -18,7 +18,7 @@ export function BookCard({
   book: Book;
 } & Omit<
   React.ComponentProps<typeof BaseCard>,
-  "imgSrc" | "item" | "children"
+  "imgSrc" | "item" | "children" | "type"
 >) {
   const editionKey = book.edition_key;
   const isbns = [...book.isbn_13, ...book.isbn_10];
@@ -26,6 +26,7 @@ export function BookCard({
     <BaseCard
       imgSrc={`https://covers.openlibrary.org/b/olid/${book.edition_key}-L.jpg`}
       item={{ ref: BOOK_KEY, value: editionKey }}
+      type="book"
       {...props}
     >
       <div>

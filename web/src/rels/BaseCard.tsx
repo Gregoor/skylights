@@ -59,6 +59,7 @@ export const Title = ({ children }: { children: React.ReactNode }) => (
 export function BaseCard({
   imgSrc,
   item,
+  type,
   reviewer,
   readonly,
   ago,
@@ -66,6 +67,7 @@ export function BaseCard({
 }: {
   imgSrc: string;
   item: RelRecordValue["item"];
+  type: "book" | "film" | "show";
   readonly?: boolean;
   reviewer?: ProfileView;
   ago?: string;
@@ -107,7 +109,17 @@ export function BaseCard({
           </Link>
         </CardSection>
       )}
-      <CardSection className="flex flex-row gap-4">
+      <CardSection className="relative flex flex-row gap-4 overflow-hidden">
+        <div
+          className={cx(
+            "absolute -rotate-45 border-b border-gray-500/50 pt-5 pb-1 px-8",
+            "text-white text-xs uppercase font-bold opacity-80",
+          )}
+          style={{ top: -6, left: -36, background: "#0b1128" }}
+        >
+          {type}
+        </div>
+
         <Link href={`/rel/${item.ref}/${item.value}`}>
           <div className="border border-gray-600/50 flex-shrink-0 w-32 h-48 sm:w-40 sm:h-60 flex justify-center">
             <ImgWithDummy

@@ -81,7 +81,7 @@ export default async function ProfilePage({
         <Card sectionClassName="flex flex-row items-center gap-2">
           {profile.avatar && (
             <a
-              className="hover:opacity-80"
+              className="flex-shrink-0 hover:opacity-80"
               href={`https://bsky.app/profile/${handle}`}
               target="_blank"
             >

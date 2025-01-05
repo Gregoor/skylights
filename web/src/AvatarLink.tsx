@@ -21,7 +21,7 @@ export function AvatarLink({
     <Link
       href={href}
       className={cx(
-        "rounded-full block",
+        "rounded-full block flex-shrink-0",
         className,
         smol ? "w-8 h-8" : "w-12 h-12",
       )}

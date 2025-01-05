@@ -26,12 +26,13 @@ export function MovieCard({
   movie: Movie;
 } & Omit<
   React.ComponentProps<typeof BaseCard>,
-  "imgSrc" | "item" | "children"
+  "imgSrc" | "item" | "children" | "type"
 >) {
   return (
     <BaseCard
       imgSrc={`https://image.tmdb.org/t/p/w500${movie.poster_path!}`}
       item={{ ref: MOVIE_KEY, value: `${movie.id}` }}
+      type="film"
       {...props}
     >
       <div className="flex flex-row gap-2">
@@ -51,12 +52,13 @@ export function TVShowCard({
   show: Show;
 } & Omit<
   React.ComponentProps<typeof BaseCard>,
-  "imgSrc" | "item" | "children"
+  "imgSrc" | "item" | "children" | "type"
 >) {
   return (
     <BaseCard
       imgSrc={`https://image.tmdb.org/t/p/w500${show.poster_path!}`}
       item={{ ref: TV_SHOW_KEY, value: `${show.id}` }}
+      type="show"
       {...props}
     >
       <div className="flex flex-row gap-2">
