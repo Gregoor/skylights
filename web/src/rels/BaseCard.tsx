@@ -72,7 +72,7 @@ export function BaseCard({
   readonly?: boolean;
   reviewer?: ProfileView;
   ago?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   const { rels, putRel, deleteRel } = useRels();
   const key = useMemo(
