@@ -10,7 +10,7 @@ import { debounce } from "ts-debounce";
 
 import { Book, BOOK_KEY, BookCard } from "@/rels/BookCard";
 import { RelsLoadingProvider, useRels } from "@/rels/ctx";
-import { MOVIE_KEY, MovieCard, TV_SHOW_KEY, TVShowCard } from "@/rels/tmdb";
+import { MOVIE_KEY, MovieCard, SHOW_KEY, TVShowCard } from "@/rels/tmdb";
 import { Card } from "@/ui";
 
 import { findRels, searchTMDB } from "./actions";
@@ -123,7 +123,7 @@ export function ClientSearchPage() {
       {
         book: BOOK_KEY,
         movie: MOVIE_KEY,
-        tv: TV_SHOW_KEY,
+        tv: SHOW_KEY,
       }[category],
       hits,
     ],

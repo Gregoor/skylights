@@ -13,7 +13,7 @@ import {
 import { getPublicAgent } from "@/utils";
 
 import { Book, BOOK_KEY } from "./BookCard";
-import { Movie, MOVIE_KEY, Show, TV_SHOW_KEY } from "./tmdb";
+import { Movie, MOVIE_KEY, Show, SHOW_KEY } from "./tmdb";
 
 export type RelRecordValue = _RelRecord;
 export type RelRecord = {
@@ -33,7 +33,6 @@ export const getDidAgent = cache(async (did: string) => {
 export const importRepo = cache(async (did: string) => {
   await buildMutex(`import-repo-${did}`).withLock(async () => {
     const agent = await getDidAgent(did);
-
     await db.transaction(async (db) => {
       const recent = new Date();
       recent.setMinutes(recent.getMinutes() - 30);
@@ -137,7 +136,7 @@ export async function fetchItemsInfo(
   );
   const bookIds = idsByRefs[BOOK_KEY];
   const movieIds = idsByRefs[MOVIE_KEY];
-  const showIds = idsByRefs[TV_SHOW_KEY];
+  const showIds = idsByRefs[SHOW_KEY];
   const [books, movies, shows] = await Promise.all([
     bookIds ? fetchBooks(bookIds) : ([] as Book[]),
     movieIds

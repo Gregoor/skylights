@@ -17,7 +17,7 @@ export type Show = {
 };
 
 export const MOVIE_KEY = "tmdb:m";
-export const TV_SHOW_KEY = "tmdb:s";
+export const SHOW_KEY = "tmdb:s";
 
 export function MovieCard({
   movie,
@@ -57,7 +57,7 @@ export function TVShowCard({
   return (
     <BaseCard
       imgSrc={`https://image.tmdb.org/t/p/w500${show.poster_path!}`}
-      item={{ ref: TV_SHOW_KEY, value: `${show.id}` }}
+      item={{ ref: SHOW_KEY, value: `${show.id}` }}
       type="show"
       {...props}
     >

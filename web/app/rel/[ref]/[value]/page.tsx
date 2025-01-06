@@ -2,7 +2,7 @@ import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/act
 import { and, eq, sql } from "drizzle-orm";
 import { Metadata } from "next";
 import Link from "next/link";
-import { fromEntries, mapValues, partition } from "remeda";
+import { fromEntries, mapValues, partition, values } from "remeda";
 
 import { getSessionAgent } from "@/auth";
 import { AvatarLink } from "@/AvatarLink";
@@ -12,7 +12,7 @@ import { BOOK_KEY } from "@/rels/BookCard";
 import { RelsProvider } from "@/rels/ctx";
 import { RatingSlider } from "@/rels/RatingSlider";
 import { RelCard } from "@/rels/RelCard";
-import { MOVIE_KEY, TV_SHOW_KEY } from "@/rels/tmdb";
+import { MOVIE_KEY, SHOW_KEY } from "@/rels/tmdb";
 import { fetchItemsInfo, Info, RelRecordValue } from "@/rels/utils";
 import { CardSection, SectionedCard } from "@/ui";
 import { getPublicAgent, timeSince } from "@/utils";
@@ -42,7 +42,7 @@ function getOG_Fields(item: RefItem, info: Info) {
           }
         : null;
     }
-    case TV_SHOW_KEY: {
+    case SHOW_KEY: {
       const show = info.shows[Number(item.value)];
       return show
         ? {
@@ -69,7 +69,12 @@ export async function generateMetadata({
     title: fields.title,
     openGraph: {
       description: `Visit Skylights to read the reviews and add your own`,
-      images: new URL(fields.imageURL),
+      ...{
+        [BOOK_KEY]: { authors: values(info.books).at(0)?.authors?.join(", ") },
+        [MOVIE_KEY]: {},
+        [SHOW_KEY]: {},
+      }[item.ref],
+      images: `https://ceaugysdma.cloudimg.io/${fields.imageURL}?width=1200&height=630&gravity=smart`,
     },
   };
 }

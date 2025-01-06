@@ -9,7 +9,7 @@ import { db } from "@/db";
 import { relsT } from "@/db/schema";
 import { BOOK_KEY } from "@/rels/BookCard";
 import { RelsProvider } from "@/rels/ctx";
-import { MOVIE_KEY, TV_SHOW_KEY } from "@/rels/tmdb";
+import { MOVIE_KEY, SHOW_KEY } from "@/rels/tmdb";
 import { importRepo, resolveHandle } from "@/rels/utils";
 import { Card, LinkButton } from "@/ui";
 import { getPublicAgent } from "@/utils";
@@ -104,7 +104,7 @@ export default async function ProfilePage({
                   {
                     [BOOK_KEY]: "book",
                     [MOVIE_KEY]: "movie",
-                    [TV_SHOW_KEY]: "show",
+                    [SHOW_KEY]: "show",
                   }[row.ref as string]
                 }
                 {row.count > 1 && "s"}
