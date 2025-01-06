@@ -112,7 +112,16 @@ export default async function RefPage({ params }: { params: Params }) {
           ownRels.map((r) => [r.key!, r.value as RelRecordValue]),
         )}
       >
-        <RelCard info={info} item={item} readonly={!agent} />
+        <RelCard info={info} item={item} readonly={!agent}>
+          {!agent && (
+            <div className="mt-4">
+              <Link href="/" className="underline hover:opacity-80">
+                Login
+              </Link>{" "}
+              to add your review
+            </div>
+          )}
+        </RelCard>
       </RelsProvider>
       {otherRels.map((rel) => {
         const profile = profilesByDid[rel.did!];

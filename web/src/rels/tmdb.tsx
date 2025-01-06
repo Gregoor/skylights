@@ -21,13 +21,11 @@ export const SHOW_KEY = "tmdb:s";
 
 export function MovieCard({
   movie,
+  children,
   ...props
 }: {
   movie: Movie;
-} & Omit<
-  React.ComponentProps<typeof BaseCard>,
-  "imgSrc" | "item" | "children" | "type"
->) {
+} & Omit<React.ComponentProps<typeof BaseCard>, "imgSrc" | "item" | "type">) {
   return (
     <BaseCard
       imgSrc={`https://image.tmdb.org/t/p/w500${movie.poster_path!}`}
@@ -41,19 +39,18 @@ export function MovieCard({
           {new Date(movie.release_date).getFullYear()}
         </div>
       </div>
+      {children}
     </BaseCard>
   );
 }
 
 export function TVShowCard({
   show,
+  children,
   ...props
 }: {
   show: Show;
-} & Omit<
-  React.ComponentProps<typeof BaseCard>,
-  "imgSrc" | "item" | "children" | "type"
->) {
+} & Omit<React.ComponentProps<typeof BaseCard>, "imgSrc" | "item" | "type">) {
   return (
     <BaseCard
       imgSrc={`https://image.tmdb.org/t/p/w500${show.poster_path!}`}
@@ -67,6 +64,7 @@ export function TVShowCard({
           {new Date(show.first_air_date).getFullYear()}
         </div>
       </div>
+      {children}
     </BaseCard>
   );
 }

@@ -3,6 +3,7 @@
 import { ProfileView } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import cx from "classix";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { entries, isDeepEqual } from "remeda";
@@ -95,6 +96,9 @@ export function BaseCard({
 
   const [noteDraft, setNoteDraft] = useState<string | null>(null);
   const ratingValue = rel?.rating?.value;
+
+  const pathname = usePathname();
+  const itemPathname = `/rel/${item.ref}/${item.value}`;
   return (
     <SectionedCard>
       {reviewer && (
@@ -120,7 +124,7 @@ export function BaseCard({
           {type}
         </div>
 
-        <Link href={`/rel/${item.ref}/${item.value}`}>
+        <Link href={itemPathname}>
           <div className="border border-gray-600/50 flex-shrink-0 w-32 h-48 sm:w-40 sm:h-60 flex justify-center">
             <ImgWithDummy
               className="max-w-full max-h-full object-contain"
@@ -129,12 +133,13 @@ export function BaseCard({
           </div>
         </Link>
         <div className="w-full flex flex-col gap-2">
-          <Link
-            href={`/rel/${item.ref}/${item.value}`}
-            className="hover:opacity-80"
-          >
-            {children}
-          </Link>
+          {pathname == itemPathname ? (
+            <div>{children}</div>
+          ) : (
+            <Link href={itemPathname} className="hover:opacity-80">
+              {children}
+            </Link>
+          )}
 
           {(!readonly || ratingValue) && (
             <RatingSlider
@@ -184,13 +189,11 @@ export function BaseCard({
               />
               <div className="flex justify-end gap-2">
                 <Button
-                  intent="danger"
                   onClick={() => {
-                    patch({ note: undefined });
                     setNoteDraft(null);
                   }}
                 >
-                  Delete
+                  Abort
                 </Button>
                 <Button
                   className="border-green-200 text-green-200"
@@ -211,15 +214,35 @@ export function BaseCard({
             </div>
           ) : (
             rel?.note && (
-              <div
-                role={readonly ? undefined : "button"}
-                onClick={() => {
-                  if (!readonly) {
-                    setNoteDraft(rel?.note?.value ?? "");
-                  }
-                }}
-              >
-                <h3 className="text-gray-500 text-sm font-semibold">Note</h3>
+              <div>
+                <h3 className="text-gray-500 text-sm font-semibold">
+                  Note
+                  {!readonly && (
+                    <>
+                      {" "}
+                      (
+                      <button
+                        type="button"
+                        className="text-gray-300 underline hover:opacity-80"
+                        onClick={() => setNoteDraft(rel?.note?.value ?? "")}
+                      >
+                        edit
+                      </button>
+                      {" | "}
+                      <button
+                        type="button"
+                        className="text-red-500 underline hover:opacity-80"
+                        onClick={() =>
+                          confirm("Do you really want to delete your note?") &&
+                          patch({ note: undefined })
+                        }
+                      >
+                        delete
+                      </button>
+                      )
+                    </>
+                  )}
+                </h3>
                 {rel.note.value}
               </div>
             )

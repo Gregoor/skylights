@@ -13,13 +13,11 @@ export const BOOK_KEY = "open-library";
 
 export function BookCard({
   book,
+  children,
   ...props
 }: {
   book: Book;
-} & Omit<
-  React.ComponentProps<typeof BaseCard>,
-  "imgSrc" | "item" | "children" | "type"
->) {
+} & Omit<React.ComponentProps<typeof BaseCard>, "imgSrc" | "item" | "type">) {
   const editionKey = book.edition_key;
   const isbns = [...book.isbn_13, ...book.isbn_10];
   return (
@@ -42,6 +40,7 @@ export function BookCard({
             </details>
           )}
         </div>
+        {children}
       </div>
     </BaseCard>
   );
