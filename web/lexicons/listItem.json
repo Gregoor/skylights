@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "my.skylights.listItem",
+  "defs": {
+    "main": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "union",
+          "refs": [
+            "my.skylights.list",
+            "my.skylights.listItem#inProgress",
+            "my.skylights.listItem#todo",
+            "my.skylights.listItem#abandoned",
+            "my.skylights.listItem#owned",
+            "my.skylights.listItem#wanted"
+          ]
+        },
+        "addedAt": { "type": "string", "format": "datetime" },
+        "position": { "type": "string" }
+      },
+      "required": ["list", "addedAt", "position"]
+    },
+    "inProgress": { "type": "token" },
+    "todo": { "type": "token" },
+    "abandoned": { "type": "token" },
+    "owned": { "type": "token" },
+    "wanted": { "type": "token" }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "lexicon": 1,
+  "id": "my.skylights.list",
+  "defs": {
+    "main": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" }
+      },
+      "required": ["title"]
+    }
+  }
+}
