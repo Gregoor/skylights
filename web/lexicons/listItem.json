@@ -5,6 +5,7 @@
     "main": {
       "type": "object",
       "properties": {
+        "ref": { "type": "ref", "ref": "my.skylights.defs#item" },
         "list": {
           "type": "union",
           "refs": [
@@ -17,14 +18,24 @@
           ]
         },
         "addedAt": { "type": "string", "format": "datetime" },
-        "position": { "type": "string" }
+        "position": { "type": "string" },
+        "note": { "type": "string" }
       },
       "required": ["list", "addedAt", "position"]
     },
-    "inProgress": { "type": "token" },
-    "todo": { "type": "token" },
-    "abandoned": { "type": "token" },
-    "owned": { "type": "token" },
-    "wanted": { "type": "token" }
+    "inProgress": {
+      "type": "token",
+      "description": "User is currently reading/watching/... the item"
+    },
+    "todo": {
+      "type": "token",
+      "description": "User plans to read/watch/... the item"
+    },
+    "abandoned": {
+      "type": "token",
+      "description": "User gave up on finishing the item"
+    },
+    "owned": { "type": "token", "description": "User owns the item" },
+    "wanted": { "type": "token", "description": "User wants to own the item" }
   }
 }

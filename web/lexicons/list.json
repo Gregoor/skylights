@@ -5,7 +5,10 @@
     "main": {
       "type": "object",
       "properties": {
-        "title": { "type": "string" }
+        "title": { "type": "string" },
+        "createdAt": { "type": "string", "format": "datetime" },
+        "description": { "type": "string" },
+        "sortBy": { "type": "string", "knownValues": ["position", "date"] }
       },
       "required": ["title"]
     }

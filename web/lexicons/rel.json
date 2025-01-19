@@ -8,11 +8,7 @@
       "record": {
         "type": "object",
         "properties": {
-          "item": {
-            "type": "union",
-            "refs": ["#refItem", "#urlItem"],
-            "closed": true
-          },
+          "ref": { "type": "ref", "ref": "my.skylights.defs#item" },
           "rating": { "type": "ref", "ref": "#rating" },
           "note": { "type": "ref", "ref": "#note" },
           "finishedAt": {
@@ -22,19 +18,6 @@
         },
         "required": ["item"]
       }
-    },
-    "refItem": {
-      "type": "object",
-      "properties": {
-        "ref": { "type": "string" },
-        "value": { "type": "string" }
-      },
-      "required": ["ref", "value"]
-    },
-    "urlItem": {
-      "type": "object",
-      "properties": { "value": { "type": "string" } },
-      "required": ["value"]
     },
     "rating": {
       "type": "object",
