@@ -151,7 +151,7 @@ export function RatingSlider({
             onChange?.(tempValue == value ? null : tempValue);
           }
         }}
-        onTouchMoveCapture={(event) => {
+        onTouchMove={(event) => {
           if (disabled) return;
           event.preventDefault();
           const el = event.target as HTMLElement;
@@ -163,8 +163,8 @@ export function RatingSlider({
           setSwiping(true);
           updateTemp(el, touch.clientX);
         }}
-        onTouchEndCapture={stopSwipe}
-        onTouchCancelCapture={stopSwipe}
+        onTouchEnd={stopSwipe}
+        onTouchCancel={stopSwipe}
       />
     </div>
   );
