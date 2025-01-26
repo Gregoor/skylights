@@ -144,13 +144,11 @@ export function BaseCard({
           {(!readonly || ratingValue) && (
             <RatingSlider
               disabled={readonly || loading}
-              value={ratingValue ?? 0}
+              value={ratingValue ?? null}
               onChange={(value) => {
-                if (ratingValue == value) {
-                  patch({ rating: undefined });
-                } else {
-                  patch({ rating: { value, createdAt: now() } });
-                }
+                patch({
+                  rating: value ? { value, createdAt: now() } : undefined,
+                });
               }}
             />
           )}
