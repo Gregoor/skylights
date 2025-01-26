@@ -2,7 +2,7 @@
 
 import cx from "classix";
 import Image from "next/image";
-import { useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import swipeImg from "./swipe.png";
 
@@ -56,15 +56,16 @@ export function RatingSlider({
   const [isInDeleteZone, setIsInDeleteZone] = useState(false);
   const [tempValue, setTempValue] = useState<number | null>(null);
 
-  const getValueFromClientX = (el: HTMLElement, clientX: number) => {
-    const { left, width } = el.getBoundingClientRect();
-    const x = clientX - left;
-    return 1 + Math.round(9 * (x / width));
-  };
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const updateTemp = (...params: Parameters<typeof getValueFromClientX>) => {
-    setTempValue(getValueFromClientX(...params));
-  };
+  const updateTemp = useCallback(
+    (el: HTMLElement, clientX: number) => {
+      const { left, width } = el.getBoundingClientRect();
+      const x = clientX - left;
+      setTempValue(1 + Math.round(9 * (x / width)));
+    },
+    [setTempValue],
+  );
 
   const stopSwipe = () => {
     setSwiping(false);
@@ -76,6 +77,26 @@ export function RatingSlider({
       onChange?.(tempValue);
     }
   };
+
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    const handleTouchMove = (event: TouchEvent) => {
+      if (disabled) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const el = event.target as HTMLElement;
+      const touch = event.touches[0];
+
+      const { top } = el.getBoundingClientRect();
+      const y = touch.clientY - top;
+      setIsInDeleteZone(y > 80);
+      setSwiping(true);
+      updateTemp(el, touch.clientX);
+    };
+    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    return () => el.removeEventListener("touchmove", handleTouchMove);
+  }, [disabled, updateTemp]);
 
   return (
     <div className="w-fit relative">
@@ -126,6 +147,7 @@ export function RatingSlider({
         })}
       </div>
       <input
+        ref={inputRef}
         type="range"
         className={cx(
           "absolute left-0 top-0 w-full h-full opacity-0",
@@ -150,18 +172,6 @@ export function RatingSlider({
           if (typeof tempValue == "number") {
             onChange?.(tempValue == value ? null : tempValue);
           }
-        }}
-        onTouchMove={(event) => {
-          if (disabled) return;
-          event.preventDefault();
-          const el = event.target as HTMLElement;
-          const touch = event.touches[0];
-
-          const { top } = el.getBoundingClientRect();
-          const y = touch.clientY - top;
-          setIsInDeleteZone(y > 80);
-          setSwiping(true);
-          updateTemp(el, touch.clientX);
         }}
         onTouchEnd={stopSwipe}
         onTouchCancel={stopSwipe}
