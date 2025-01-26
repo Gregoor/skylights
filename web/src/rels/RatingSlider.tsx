@@ -153,6 +153,7 @@ export function RatingSlider({
         }}
         onTouchMoveCapture={(event) => {
           if (disabled) return;
+          event.preventDefault();
           const el = event.target as HTMLElement;
           const touch = event.touches[0];
 
