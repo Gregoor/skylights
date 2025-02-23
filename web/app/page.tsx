@@ -93,7 +93,7 @@ async function RecentReviews() {
   const {
     data: { profiles },
   } = await agent.getProfiles({
-    actors: rels.map((r) => r.did).filter((d): d is string => !!d),
+    actors: rels.map((r) => r.did?.trim()).filter((d): d is string => !!d),
   });
 
   const info = await fetchItemsInfo(

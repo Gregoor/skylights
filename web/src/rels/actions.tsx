@@ -28,7 +28,7 @@ export async function putRecord(
   }
   await db
     .insert(relsT)
-    .values({ did, key: data.rkey, value: data.record })
+    .values({ did: did.trim(), key: data.rkey, value: data.record })
     .onConflictDoUpdate({
       target: [relsT.did, relsT.key],
       set: { value: data.record },
