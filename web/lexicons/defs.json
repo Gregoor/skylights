@@ -1,0 +1,17 @@
+{
+  "lexicon": 1,
+  "id": "my.skylights.defs",
+  "defs": {
+    "item": {
+      "type": "object",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "knownValues": ["open-library", "tmdb:m", "tmdb:s"]
+        },
+        "value": { "type": "string" }
+      },
+      "required": ["ref", "value"]
+    }
+  }
+}

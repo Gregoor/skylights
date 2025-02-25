@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "my.skylights.listItem",
+  "defs": {
+    "main": {
+      "type": "object",
+      "properties": {
+        "ref": { "type": "ref", "ref": "my.skylights.defs#item" },
+        "list": {
+          "type": "union",
+          "refs": [
+            "my.skylights.list",
+            "my.skylights.listItem#inProgress",
+            "my.skylights.listItem#todo",
+            "my.skylights.listItem#abandoned",
+            "my.skylights.listItem#owned",
+            "my.skylights.listItem#wanted"
+          ]
+        },
+        "addedAt": { "type": "string", "format": "datetime" },
+        "position": { "type": "string" },
+        "note": { "type": "string" }
+      },
+      "required": ["list", "addedAt", "position"]
+    },
+    "inProgress": {
+      "type": "token",
+      "description": "User is currently reading/watching/... the item"
+    },
+    "todo": {
+      "type": "token",
+      "description": "User plans to read/watch/... the item"
+    },
+    "abandoned": {
+      "type": "token",
+      "description": "User gave up on finishing the item"
+    },
+    "owned": { "type": "token", "description": "User owns the item" },
+    "wanted": { "type": "token", "description": "User wants to own the item" }
+  }
+}
