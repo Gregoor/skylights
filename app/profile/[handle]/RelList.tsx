@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import useInfiniteScroll from "react-infinite-scroll-hook";
 import { mapValues } from "remeda";
 
+import { Item } from "@/lexicon/types/my/skylights/rel";
 import { useRels } from "@/rels/ctx";
 import { RelCard } from "@/rels/RelCard";
 import { UnknownCard } from "@/rels/UnknownCard";
@@ -45,7 +46,7 @@ export function RelList({
       ...Object.fromEntries(result.rels.map((r) => [r.key, r.value])),
     }));
     setInfo((info) =>
-      mapValues(info, (value, key) => ({ ...value, ...result.info[key] }))
+      mapValues(info, (value, key) => ({ ...value, ...result.info[key] })),
     );
     pageRef.current = newPage;
   };
@@ -61,7 +62,7 @@ export function RelList({
   return (
     <>
       {Object.entries(rels).map(([key, rel], i) => {
-        const item = rel?.item as any;
+        const item = rel?.item as Item;
         if (!item) {
           return (
             <UnknownCard key={key} {...{ readonly, uri: key }} rel={rel} />
