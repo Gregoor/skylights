@@ -1,9 +1,8 @@
 "use client";
 
-import { instantMeiliSearch } from "@meilisearch/instant-meilisearch";
 import cx from "classix";
 import { AnimatePresence, motion } from "motion/react";
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
 import { merge } from "remeda";
 import useSWRImmutable from "swr/immutable";
 import { debounce } from "ts-debounce";
@@ -14,32 +13,6 @@ import { MOVIE_KEY, MovieCard, SHOW_KEY, TVShowCard } from "@/rels/tmdb";
 import { Card } from "@/ui";
 
 import { findRels, searchTMDB } from "./actions";
-
-const { searchClient: booksClient } = instantMeiliSearch(
-  "https://ol.index.skylights.my",
-  "k-PR1QX-I9D_52oTVAilHF1nOXvGoMHkhZ2mpA3lmg0",
-  { placeholderSearch: false },
-);
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function searchBooks(requests: any) {
-  // non-dash query
-  const ndq = (requests.at(0)?.params.query ?? "")
-    .replaceAll("-", "")
-    .trim() as string;
-  const isNumeric = ndq
-    .split("")
-    .every((char) => Number(char).toString() == char);
-  if (isNumeric && (ndq.length == 10 || ndq.length == 13)) {
-    return booksClient.search<Book>([
-      {
-        indexName: "open-library:rating:desc",
-        params: { filters: `isbn_13 = ${ndq} OR isbn_10 = ${ndq}` },
-      },
-    ]);
-  }
-  return booksClient.search<Book>(requests);
-}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function makeAbortable<F extends (...args: any[]) => any>(fn: F) {
@@ -95,28 +68,28 @@ export function ClientSearchPage() {
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
 
-  const { data: hits } = useSWRImmutable(
+  const { data: hits, isLoading: isSearching } = useSWRImmutable(
     [category, submittedQuery],
-    async ([category, query]) => {
-      if (!query) return [];
+    async ([category, submittedQuery]) => {
+      if (!submittedQuery) return [];
 
       if (category == "book") {
-        const responses = await searchBooks([
-          {
-            indexName: "open-library:rating:desc",
-            params: { query, hitsPerPage: 10 },
-          },
-        ]);
-        return (
-          (responses.results as { hits: Book[] }[])
-            .at(0)
-            ?.hits.map((book) => ({ type: "book", book }) as const) ?? []
+        // non-dash query
+        const ndq = submittedQuery.replaceAll("-", "").trim() as string;
+        const isNumeric = ndq
+          .split("")
+          .every((char) => Number(char).toString() == char);
+        const isISBN = isNumeric && (ndq.length == 10 || ndq.length == 13);
+        const result = await fetch(
+          `https://openlibrary.org/search.json?q=${isISBN ? "isbn:" + ndq : submittedQuery}&fields=key,title,author_name,editions,isbn&limit=20`,
+        ).then((r) => r.json());
+        return (result as { docs: Book[] }).docs.map(
+          (book) => ({ type: "book", book }) as const,
         );
       }
 
-      return searchTMDB(category, query);
+      return searchTMDB(category, submittedQuery);
     },
-    { keepPreviousData: true },
   );
   const { isLoading: isRelsLoading } = useSWRImmutable(
     [
@@ -131,7 +104,7 @@ export function ClientSearchPage() {
       if (!hits?.length) return;
       const keys = hits.map((hit) =>
         hit.type == "book"
-          ? hit.book.edition_key
+          ? (hit.book.editions.docs.at(0)?.key.split("/").at(2) ?? "")
           : (hit.type == "show" ? hit.show : hit.movie).id.toString(),
       );
       const [newRels, aborted] = await findRelsWithAbortable(ref, keys);
@@ -169,7 +142,7 @@ export function ClientSearchPage() {
               />
             ))}
           </div>
-          <div className="flex-grow relative flex flex-row gap-2 max-w-full">
+          <div className="flex-grow flex flex-row gap-2 max-w-full">
             <input
               type="text"
               className={cx(
@@ -178,35 +151,27 @@ export function ClientSearchPage() {
               )}
               placeholder="Reach for the stars..."
               value={query}
-              onChange={(event: ChangeEvent) => {
-                const { value } = event.target as HTMLInputElement;
-                setQuery(value);
-                if (category == "book") {
-                  setSubmittedQuery(value);
-                }
+              onChange={(event) => {
+                setQuery(event.target.value);
               }}
             />
             <button
               type="submit"
-              className={
-                category == "book"
-                  ? "hidden"
-                  : "flex-shrink-0 my-1 border box-border hover:opacity-80"
-              }
-              style={category == "book" ? {} : { width: 34, height: 34 }}
-            />
-            <SearchIcon
-              className="absolute w-4 pointer-events-none"
-              style={{ right: 8, bottom: 13 }}
-            />
+              className="flex-shrink-0 my-1 px-2 border box-border hover:opacity-80"
+            >
+              <SearchIcon className="w-4" />
+            </button>
           </div>
         </form>
+        {isSearching
+          ? "Searching..."
+          : submittedQuery && !hits?.length && "No results found"}
         <div className="flex flex-col gap-4">
           {hits?.map((hit) => (
             <AnimatePresence
               key={
                 hit.type == "book"
-                  ? hit.book.edition_key
+                  ? hit.book.key
                   : (hit.type == "show" ? hit.show : hit.movie).id
               }
             >

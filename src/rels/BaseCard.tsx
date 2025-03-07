@@ -114,15 +114,17 @@ export function BaseCard({
         </CardSection>
       )}
       <CardSection className="relative flex flex-row gap-4 overflow-hidden">
-        <div
-          className={cx(
-            "absolute -rotate-45 border-b border-gray-500/50 pt-5 pb-1 px-8",
-            "text-white text-xs uppercase font-bold opacity-80",
-          )}
-          style={{ top: -6, left: -36, background: "#0b1128" }}
-        >
-          {type}
-        </div>
+        {!pathname.startsWith("/search") && (
+          <div
+            className={cx(
+              "absolute -rotate-45 border-b border-gray-500/50 pt-5 pb-1 px-8",
+              "text-white text-xs uppercase font-bold opacity-80",
+            )}
+            style={{ top: -6, left: -36, background: "#0b1128" }}
+          >
+            {type}
+          </div>
+        )}
 
         <Link href={itemPathname}>
           <div className="border border-gray-600/50 flex-shrink-0 w-32 h-48 sm:w-40 sm:h-60 flex justify-center">

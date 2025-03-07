@@ -93,19 +93,9 @@ export const importRepo = cache(async (did: string) => {
 
 export async function fetchBooks(editionKeys: string[]) {
   const response = await fetch(
-    "https://ol.index.skylights.my/indexes/open-library/search",
-    {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer k-PR1QX-I9D_52oTVAilHF1nOXvGoMHkhZ2mpA3lmg0",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        filter: `edition_key IN ${JSON.stringify(editionKeys)}`,
-      }),
-    },
+    `https://openlibrary.org/search.json?q=${editionKeys.join(" OR ")}&fields=key,title,author_name,editions,isbn`,
   );
-  return (await response.json()).hits as Book[];
+  return (await response.json()).docs as Book[];
 }
 
 export type Info = {
@@ -182,7 +172,12 @@ export async function fetchItemsInfo(
   }
 
   return {
-    books: fromEntries(books.map((book) => [book.edition_key, book])),
+    books: fromEntries(
+      books.map((book) => [
+        book.editions.docs.at(0)?.key.split("/").at(2) ?? "",
+        book,
+      ]),
+    ),
     movies: fromEntries(movies.map((row) => [row.id, row.value as Movie])),
     shows: fromEntries(shows.map((row) => [row.id, row.value as Show])),
   };
