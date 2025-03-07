@@ -9,12 +9,12 @@ import type { RelRecordValue } from "./utils";
 
 const noop = () => {};
 
-type Rels = Partial<Record<string, RelRecordValue>>;
+type Rels = Partial<Record<string, Omit<RelRecordValue, "$type">>>;
 
 const RelsCtx = React.createContext<{
   rels: Rels;
   setRels: React.Dispatch<React.SetStateAction<Rels>>;
-  putRel: (rkey: string, record: RelRecordValue) => void;
+  putRel: (rkey: string, record: Omit<RelRecordValue, "$type">) => void;
   deleteRel: (rkey: string) => void;
 }>({ rels: {}, setRels: noop, putRel: noop, deleteRel: noop });
 

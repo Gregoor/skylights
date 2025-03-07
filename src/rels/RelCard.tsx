@@ -13,7 +13,7 @@ export function RelCard({
   React.ComponentProps<typeof BaseCard>,
   "readonly" | "reviewer" | "ago" | "children"
 >) {
-  switch (item?.ref) {
+  switch (item.ref) {
     case BOOK_KEY: {
       const book = info.books[item.value];
       return book ? <BookCard book={book} {...props} /> : null;

@@ -12,7 +12,7 @@ export function UnknownCard({
 }: {
   uri: string;
   readonly: boolean;
-  rel?: RelRecordValue;
+  rel?: Omit<RelRecordValue, "$type">;
 }) {
   const { deleteRel } = useRels();
   return (

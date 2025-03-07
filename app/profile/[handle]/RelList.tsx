@@ -45,7 +45,7 @@ export function RelList({
       ...Object.fromEntries(result.rels.map((r) => [r.key, r.value])),
     }));
     setInfo((info) =>
-      mapValues(info, (value, key) => ({ ...value, ...result.info[key] })),
+      mapValues(info, (value, key) => ({ ...value, ...result.info[key] }))
     );
     pageRef.current = newPage;
   };
@@ -61,7 +61,7 @@ export function RelList({
   return (
     <>
       {Object.entries(rels).map(([key, rel], i) => {
-        const item = rel?.item;
+        const item = rel?.item as any;
         if (!item) {
           return (
             <UnknownCard key={key} {...{ readonly, uri: key }} rel={rel} />

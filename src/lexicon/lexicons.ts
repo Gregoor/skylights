@@ -1,7 +1,13 @@
 /**
  * GENERATED CODE - DO NOT MODIFY
  */
-import { LexiconDoc, Lexicons } from '@atproto/lexicon'
+import {
+  LexiconDoc,
+  Lexicons,
+  ValidationError,
+  ValidationResult,
+} from '@atproto/lexicon'
+import { $Typed, is$typed, maybe$typed } from './util.js'
 
 export const schemaDict = {
   MySkylightsRel: {
@@ -15,12 +21,8 @@ export const schemaDict = {
           type: 'object',
           properties: {
             item: {
-              type: 'union',
-              refs: [
-                'lex:my.skylights.rel#refItem',
-                'lex:my.skylights.rel#urlItem',
-              ],
-              closed: true,
+              type: 'ref',
+              ref: 'lex:my.skylights.rel#item',
             },
             rating: {
               type: 'ref',
@@ -41,7 +43,7 @@ export const schemaDict = {
           required: ['item'],
         },
       },
-      refItem: {
+      item: {
         type: 'object',
         properties: {
           ref: {
@@ -52,15 +54,6 @@ export const schemaDict = {
           },
         },
         required: ['ref', 'value'],
-      },
-      urlItem: {
-        type: 'object',
-        properties: {
-          value: {
-            type: 'string',
-          },
-        },
-        required: ['value'],
       },
       rating: {
         type: 'object',
@@ -98,6 +91,37 @@ export const schemaDict = {
   },
 } as const satisfies Record<string, LexiconDoc>
 
-export const schemas = Object.values(schemaDict)
+export const schemas = Object.values(schemaDict) satisfies LexiconDoc[]
 export const lexicons: Lexicons = new Lexicons(schemas)
-export const ids = { MySkylightsRel: 'my.skylights.rel' }
+
+export function validate<T extends { $type: string }>(
+  v: unknown,
+  id: string,
+  hash: string,
+  requiredType: true,
+): ValidationResult<T>
+export function validate<T extends { $type?: string }>(
+  v: unknown,
+  id: string,
+  hash: string,
+  requiredType?: false,
+): ValidationResult<T>
+export function validate(
+  v: unknown,
+  id: string,
+  hash: string,
+  requiredType?: boolean,
+): ValidationResult {
+  return (requiredType ? is$typed : maybe$typed)(v, id, hash)
+    ? lexicons.validate(`${id}#${hash}`, v)
+    : {
+        success: false,
+        error: new ValidationError(
+          `Must be an object with "${hash === 'main' ? id : `${id}#${hash}`}" $type property`,
+        ),
+      }
+}
+
+export const ids = {
+  MySkylightsRel: 'my.skylights.rel',
+} as const

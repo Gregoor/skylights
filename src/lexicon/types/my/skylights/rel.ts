@@ -2,88 +2,78 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import { ValidationResult, BlobRef } from '@atproto/lexicon'
-import { lexicons } from '../../../lexicons'
-import { isObj, hasProp } from '../../../util'
 import { CID } from 'multiformats/cid'
+import { validate as _validate } from '../../../lexicons'
+import { $Typed, is$typed as _is$typed, OmitKey } from '../../../util'
+
+const is$typed = _is$typed,
+  validate = _validate
+const id = 'my.skylights.rel'
 
 export interface Record {
-  item: RefItem | UrlItem
+  $type: 'my.skylights.rel'
+  item: Item
   rating?: Rating
   note?: Note
   finishedAt?: string[]
   [k: string]: unknown
 }
 
-export function isRecord(v: unknown): v is Record {
-  return (
-    isObj(v) &&
-    hasProp(v, '$type') &&
-    (v.$type === 'my.skylights.rel#main' || v.$type === 'my.skylights.rel')
-  )
+const hashRecord = 'main'
+
+export function isRecord<V>(v: V) {
+  return is$typed(v, id, hashRecord)
 }
 
-export function validateRecord(v: unknown): ValidationResult {
-  return lexicons.validate('my.skylights.rel#main', v)
+export function validateRecord<V>(v: V) {
+  return validate<Record & V>(v, id, hashRecord, true)
 }
 
-export interface RefItem {
+export interface Item {
+  $type?: 'my.skylights.rel#item'
   ref: string
   value: string
-  [k: string]: unknown
 }
 
-export function isRefItem(v: unknown): v is RefItem {
-  return (
-    isObj(v) && hasProp(v, '$type') && v.$type === 'my.skylights.rel#refItem'
-  )
+const hashItem = 'item'
+
+export function isItem<V>(v: V) {
+  return is$typed(v, id, hashItem)
 }
 
-export function validateRefItem(v: unknown): ValidationResult {
-  return lexicons.validate('my.skylights.rel#refItem', v)
-}
-
-export interface UrlItem {
-  value: string
-  [k: string]: unknown
-}
-
-export function isUrlItem(v: unknown): v is UrlItem {
-  return (
-    isObj(v) && hasProp(v, '$type') && v.$type === 'my.skylights.rel#urlItem'
-  )
-}
-
-export function validateUrlItem(v: unknown): ValidationResult {
-  return lexicons.validate('my.skylights.rel#urlItem', v)
+export function validateItem<V>(v: V) {
+  return validate<Item & V>(v, id, hashItem)
 }
 
 export interface Rating {
+  $type?: 'my.skylights.rel#rating'
   value: number
   createdAt: string
-  [k: string]: unknown
 }
 
-export function isRating(v: unknown): v is Rating {
-  return (
-    isObj(v) && hasProp(v, '$type') && v.$type === 'my.skylights.rel#rating'
-  )
+const hashRating = 'rating'
+
+export function isRating<V>(v: V) {
+  return is$typed(v, id, hashRating)
 }
 
-export function validateRating(v: unknown): ValidationResult {
-  return lexicons.validate('my.skylights.rel#rating', v)
+export function validateRating<V>(v: V) {
+  return validate<Rating & V>(v, id, hashRating)
 }
 
 export interface Note {
+  $type?: 'my.skylights.rel#note'
   value: string
   createdAt: string
   updatedAt: string
-  [k: string]: unknown
 }
 
-export function isNote(v: unknown): v is Note {
-  return isObj(v) && hasProp(v, '$type') && v.$type === 'my.skylights.rel#note'
+const hashNote = 'note'
+
+export function isNote<V>(v: V) {
+  return is$typed(v, id, hashNote)
 }
 
-export function validateNote(v: unknown): ValidationResult {
-  return lexicons.validate('my.skylights.rel#note', v)
+export function validateNote<V>(v: V) {
+  return validate<Note & V>(v, id, hashNote)
 }

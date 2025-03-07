@@ -1,6 +1,9 @@
 "use client";
 
-import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
+import {
+  ProfileView,
+  ProfileViewDetailed,
+} from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import cx from "classix";
 import Link from "next/link";
 import { useState } from "react";
@@ -11,7 +14,7 @@ export function AvatarLink({
   profile,
   smol,
   ...props
-}: { profile: ProfileViewDetailed; smol?: boolean } & Omit<
+}: { profile: ProfileViewDetailed | ProfileView; smol?: boolean } & Omit<
   React.ComponentProps<typeof Link>,
   "href"
 >) {
@@ -23,7 +26,7 @@ export function AvatarLink({
       className={cx(
         "rounded-full block flex-shrink-0",
         className,
-        smol ? "w-8 h-8" : "w-12 h-12",
+        smol ? "w-8 h-8" : "w-12 h-12"
       )}
       style={{
         boxShadow: `0 0 ${smol ? 8 : 12}px ${hovered ? (smol ? 1 : 2) : 0}px white`,

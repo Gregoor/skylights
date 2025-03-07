@@ -7,7 +7,7 @@ import { fromEntries, mapValues, partition, values } from "remeda";
 import { getSessionAgent } from "@/auth";
 import { AvatarLink } from "@/AvatarLink";
 import { db } from "@/db";
-import { RefItem } from "@/lexicon/types/my/skylights/rel";
+import { Item } from "@/lexicon/types/my/skylights/rel";
 import { BOOK_KEY } from "@/rels/BookCard";
 import { RelsProvider } from "@/rels/ctx";
 import { RatingSlider } from "@/rels/RatingSlider";
@@ -22,14 +22,14 @@ type Params = Promise<{
   value: string;
 }>;
 
-function getOG_Fields(item: RefItem, info: Info) {
+function getOG_Fields(item: Item, info: Info) {
   switch (item.ref) {
     case BOOK_KEY: {
       const book = info.books[item.value];
       return book
         ? {
             title: book.title,
-            imageURL: `https://covers.openlibrary.org/b/olid/${book.edition_key}-L.jpg`,
+            imageURL: `https://covers.openlibrary.org/b/olid/${book.editions.docs.at(0)?.key.split("/").at(2)}-L.jpg`,
           }
         : null;
     }
@@ -70,7 +70,9 @@ export async function generateMetadata({
     openGraph: {
       description: `Visit Skylights to read the reviews and add your own`,
       ...{
-        [BOOK_KEY]: { authors: values(info.books).at(0)?.authors?.join(", ") },
+        [BOOK_KEY]: {
+          authors: values(info.books).at(0)?.author_name?.join(", "),
+        },
         [MOVIE_KEY]: {},
         [SHOW_KEY]: {},
       }[item.ref],
@@ -86,14 +88,14 @@ export default async function RefPage({ params }: { params: Params }) {
     db.query.relsT.findMany({
       where: and(
         eq(sql`value->'item'->>'ref'`, item.ref),
-        eq(sql`value->'item'->>'value'`, item.value),
+        eq(sql`value->'item'->>'value'`, item.value)
       ),
     }),
     getSessionAgent(false),
   ]);
   const [ownRels, otherRels] = partition(
     allRels.map((r) => ({ ...r, value: r.value as RelRecordValue })),
-    (r) => r.did == agent?.did,
+    (r) => r.did == agent?.did
   );
 
   let profiles: ProfileViewDetailed[] = [];
@@ -109,7 +111,7 @@ export default async function RefPage({ params }: { params: Params }) {
     <>
       <RelsProvider
         initialRels={fromEntries(
-          ownRels.map((r) => [r.key!, r.value as RelRecordValue]),
+          ownRels.map((r) => [r.key!, r.value as RelRecordValue])
         )}
       >
         <RelCard info={info} item={item} readonly={!agent}>

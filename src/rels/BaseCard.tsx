@@ -1,6 +1,9 @@
 "use client";
 
-import { ProfileView } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
+import {
+  ProfileView,
+  ProfileViewDetailed,
+} from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import cx from "classix";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,7 +31,7 @@ function ImgWithDummy(props: React.ComponentProps<"img">) {
     img.src = props.src;
     img.onload = (event) => {
       setStatus(
-        (event.target as HTMLImageElement).naturalWidth == 1 ? "error" : "done",
+        (event.target as HTMLImageElement).naturalWidth == 1 ? "error" : "done"
       );
     };
   }, [props.src]);
@@ -39,7 +42,7 @@ function ImgWithDummy(props: React.ComponentProps<"img">) {
         className={cx(
           "border border-gray-400/50 w-full h-full flex items-center justify-center",
           "text-gray-300",
-          status == "loading" && "animate-pulse",
+          status == "loading" && "animate-pulse"
         )}
       >
         {status == "error" && "?"}
@@ -70,7 +73,7 @@ export function BaseCard({
   item: RelRecordValue["item"];
   type: "book" | "film" | "show";
   readonly?: boolean;
-  reviewer?: ProfileView;
+  reviewer?: ProfileView | ProfileViewDetailed;
   ago?: string;
   children?: React.ReactNode;
 }) {
@@ -79,7 +82,7 @@ export function BaseCard({
     () =>
       entries(rels).find(([, rel]) => isDeepEqual(item, rel?.item))?.[0] ??
       getNextTID(),
-    [item, rels],
+    [item, rels]
   );
   const rel = rels[key] as RelRecordValue | undefined;
 
@@ -118,7 +121,7 @@ export function BaseCard({
           <div
             className={cx(
               "absolute -rotate-45 border-b border-gray-500/50 pt-5 pb-1 px-8",
-              "text-white text-xs uppercase font-bold opacity-80",
+              "text-white text-xs uppercase font-bold opacity-80"
             )}
             style={{ top: -6, left: -36, background: "#0b1128" }}
           >

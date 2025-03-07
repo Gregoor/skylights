@@ -6,10 +6,7 @@ import { fromEntries, groupBy, mapValues } from "remeda";
 
 import { buildMutex, db } from "@/db";
 import { importedDidsT, relsT, tmdbMoviesT, tmdbShowsT } from "@/db/schema";
-import {
-  Record as _RelRecord,
-  RefItem,
-} from "@/lexicon/types/my/skylights/rel";
+import { Record as _RelRecord, Item } from "@/lexicon/types/my/skylights/rel";
 import { getPublicAgent } from "@/utils";
 
 import { Book, BOOK_KEY } from "./BookCard";
@@ -25,7 +22,7 @@ export type RelRecord = {
 export const getDidAgent = cache(async (did: string) => {
   const out = await new DidResolver({}).resolve(did);
   const endpoint = out?.service?.find(
-    (s) => s.id == "#atproto_pds",
+    (s) => s.id == "#atproto_pds"
   )?.serviceEndpoint;
   return new Agent(`${endpoint ?? "https://bsky.social"}/xrpc`);
 });
@@ -44,7 +41,7 @@ export const importRepo = cache(async (did: string) => {
         where: (t) =>
           and(
             eq(t.did, did),
-            isJetksiBehind ? lt(t.importedAt, recent) : undefined,
+            isJetksiBehind ? lt(t.importedAt, recent) : undefined
           ),
       });
 
@@ -93,7 +90,7 @@ export const importRepo = cache(async (did: string) => {
 
 export async function fetchBooks(editionKeys: string[]) {
   const response = await fetch(
-    `https://openlibrary.org/search.json?q=${editionKeys.join(" OR ")}&fields=key,title,author_name,editions,isbn`,
+    `https://openlibrary.org/search.json?q=${editionKeys.join(" OR ")}&fields=key,title,author_name,editions,isbn`
   );
   return (await response.json()).docs as Book[];
 }
@@ -115,14 +112,14 @@ async function fetchDetailsTMDB(category: "movie" | "tv", id: string) {
 }
 
 export async function fetchItemsInfo(
-  items: RelRecordValue["item"][],
+  items: RelRecordValue["item"][]
 ): Promise<Info> {
   const idsByRefs = mapValues(
     groupBy(
-      items.filter((i): i is RefItem => "ref" in i),
-      (i) => i.ref,
+      items.filter((i): i is Item => "ref" in i),
+      (i) => i.ref
     ),
-    (items) => items.map((i) => i.value),
+    (items) => items.map((i) => i.value)
   );
   const bookIds = idsByRefs[BOOK_KEY];
   const movieIds = idsByRefs[MOVIE_KEY];
@@ -142,11 +139,11 @@ export async function fetchItemsInfo(
   ]);
 
   const missingMovieIds = movieIds?.filter(
-    (id) => !movies.some((m) => m.id == Number(id)),
+    (id) => !movies.some((m) => m.id == Number(id))
   );
   if (missingMovieIds?.length > 0) {
     const movieData = await Promise.all(
-      missingMovieIds.map((id) => fetchDetailsTMDB("movie", id)),
+      missingMovieIds.map((id) => fetchDetailsTMDB("movie", id))
     );
     const missingMovies = await db
       .insert(tmdbMoviesT)
@@ -157,11 +154,11 @@ export async function fetchItemsInfo(
   }
 
   const missingShowIds = showIds?.filter(
-    (id) => !shows.some((m) => m.id == Number(id)),
+    (id) => !shows.some((m) => m.id == Number(id))
   );
   if (missingShowIds?.length > 0) {
     const showData = await Promise.all(
-      missingShowIds.map((id) => fetchDetailsTMDB("tv", id)),
+      missingShowIds.map((id) => fetchDetailsTMDB("tv", id))
     );
     const missingShows = await db
       .insert(tmdbShowsT)
@@ -176,7 +173,7 @@ export async function fetchItemsInfo(
       books.map((book) => [
         book.editions.docs.at(0)?.key.split("/").at(2) ?? "",
         book,
-      ]),
+      ])
     ),
     movies: fromEntries(movies.map((row) => [row.id, row.value as Movie])),
     shows: fromEntries(shows.map((row) => [row.id, row.value as Show])),
