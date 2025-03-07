@@ -9,11 +9,11 @@ export function RelCard({
   item,
   info,
   ...props
-}: { item: RelRecordValue["item"]; info: Info } & Pick<
+}: { item?: RelRecordValue["item"]; info: Info } & Pick<
   React.ComponentProps<typeof BaseCard>,
   "readonly" | "reviewer" | "ago" | "children"
 >) {
-  switch (item.ref) {
+  switch (item?.ref) {
     case BOOK_KEY: {
       const book = info.books[item.value];
       return book ? <BookCard book={book} {...props} /> : null;
