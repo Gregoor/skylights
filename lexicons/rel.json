@@ -19,6 +19,14 @@
         "required": ["item"]
       }
     },
+    "item": {
+      "type": "object",
+      "properties": {
+        "ref": { "type": "string" },
+        "value": { "type": "string" }
+      },
+      "required": ["ref", "value"]
+    },
     "rating": {
       "type": "object",
       "properties": {
