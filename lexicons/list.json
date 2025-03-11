@@ -1,0 +1,16 @@
+{
+  "lexicon": 1,
+  "id": "my.skylights.list",
+  "defs": {
+    "main": {
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "createdAt": { "type": "string", "format": "datetime" },
+        "description": { "type": "string" },
+        "sortBy": { "type": "string", "knownValues": ["position", "date"] }
+      },
+      "required": ["title"]
+    }
+  }
+}
