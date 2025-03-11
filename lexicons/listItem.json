@@ -5,7 +5,7 @@
     "main": {
       "type": "object",
       "properties": {
-        "ref": { "type": "ref", "ref": "my.skylights.defs#item" },
+        "item": { "type": "ref", "ref": "my.skylights.defs#item" },
         "list": {
           "type": "union",
           "refs": [
