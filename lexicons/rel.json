@@ -19,14 +19,7 @@
         "required": ["item"]
       }
     },
-    "item": {
-      "type": "object",
-      "properties": {
-        "ref": { "type": "string" },
-        "value": { "type": "string" }
-      },
-      "required": ["ref", "value"]
-    },
+    "item": { "type": "ref", "ref": "my.skylights.defs#item" },
     "rating": {
       "type": "object",
       "properties": {
