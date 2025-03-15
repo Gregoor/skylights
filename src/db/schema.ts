@@ -56,3 +56,34 @@ export const tmdbShowsT = pgTable("tmdb_shows", {
   id: integer().primaryKey(),
   value: jsonb().notNull(),
 });
+
+export const listsT = pgTable(
+  "lists",
+  {
+    did: char({ length: 32 }).notNull(),
+    key: char({ length: 13 }).notNull(),
+    value: jsonb().notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.did, t.key] }),
+  }),
+);
+
+export const listItemsT = pgTable(
+  "list_items",
+  {
+    did: char({ length: 32 }).notNull(),
+    key: char({ length: 13 }).notNull(),
+    value: jsonb().notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.did, t.key] }),
+    listKeyIdx: index("list_items_list_key_idx").on(sql`(value->>'list')`),
+    itemValueIdx: index("list_items_item_value_idx").on(
+      sql`(value->'item'->>'value')`,
+    ),
+    itemRefIdx: index("list_items_item_ref_idx").on(
+      sql`(value->'item'->>'ref')`,
+    ),
+  }),
+);

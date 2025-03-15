@@ -8,20 +8,28 @@
         "item": { "type": "ref", "ref": "my.skylights.defs#item" },
         "list": {
           "type": "union",
-          "refs": [
-            "my.skylights.list",
-            "my.skylights.listItem#inProgress",
-            "my.skylights.listItem#todo",
-            "my.skylights.listItem#abandoned",
-            "my.skylights.listItem#owned",
-            "my.skylights.listItem#wanted"
-          ]
+          "refs": ["my.skylights.list", "#builtin"]
         },
         "addedAt": { "type": "string", "format": "datetime" },
         "position": { "type": "string" },
         "note": { "type": "string" }
       },
       "required": ["list", "addedAt", "position"]
+    },
+    "builtin": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "union",
+          "refs": [
+            "my.skylights.listItem#inProgress",
+            "my.skylights.listItem#todo",
+            "my.skylights.listItem#abandoned",
+            "my.skylights.listItem#owned",
+            "my.skylights.listItem#wanted"
+          ]
+        }
+      }
     },
     "inProgress": {
       "type": "token",

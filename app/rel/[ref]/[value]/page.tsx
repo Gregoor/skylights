@@ -7,13 +7,13 @@ import { fromEntries, mapValues, partition, values } from "remeda";
 import { getSessionAgent } from "@/auth";
 import { AvatarLink } from "@/AvatarLink";
 import { db } from "@/db";
-import { Item } from "@/lexicon/types/my/skylights/rel";
-import { BOOK_KEY } from "@/rels/BookCard";
-import { RelsProvider } from "@/rels/ctx";
-import { RatingSlider } from "@/rels/RatingSlider";
-import { RelCard } from "@/rels/RelCard";
-import { MOVIE_KEY, SHOW_KEY } from "@/rels/tmdb";
-import { fetchItemsInfo, Info, RelRecordValue } from "@/rels/utils";
+import { BOOK_KEY } from "@/items/BookCard";
+import { RelsProvider } from "@/items/ctx";
+import { RatingSlider } from "@/items/RatingSlider";
+import { RelCard } from "@/items/RelCard";
+import { MOVIE_KEY, SHOW_KEY } from "@/items/tmdb";
+import { fetchItemsInfo, Info, RelRecordValue } from "@/items/utils";
+import { Item } from "@/lexicon/types/my/skylights/defs";
 import { CardSection, SectionedCard } from "@/ui";
 import { getPublicAgent, timeSince } from "@/utils";
 
@@ -88,14 +88,14 @@ export default async function RefPage({ params }: { params: Params }) {
     db.query.relsT.findMany({
       where: and(
         eq(sql`value->'item'->>'ref'`, item.ref),
-        eq(sql`value->'item'->>'value'`, item.value)
+        eq(sql`value->'item'->>'value'`, item.value),
       ),
     }),
     getSessionAgent(false),
   ]);
   const [ownRels, otherRels] = partition(
     allRels.map((r) => ({ ...r, value: r.value as RelRecordValue })),
-    (r) => r.did == agent?.did
+    (r) => r.did == agent?.did,
   );
 
   let profiles: ProfileViewDetailed[] = [];
@@ -111,7 +111,7 @@ export default async function RefPage({ params }: { params: Params }) {
     <>
       <RelsProvider
         initialRels={fromEntries(
-          ownRels.map((r) => [r.key!, r.value as RelRecordValue])
+          ownRels.map((r) => [r.key!, r.value as RelRecordValue]),
         )}
       >
         <RelCard info={info} item={item} readonly={!agent}>
@@ -132,10 +132,17 @@ export default async function RefPage({ params }: { params: Params }) {
           <SectionedCard key={rel.did! + rel.key!}>
             <CardSection className="flex flex-row items-center gap-2">
               <AvatarLink smol profile={profile} />
-              <Link href={`/profile/${profile.handle}`}>
-                <span className="hover:underline">{profile.displayName}</span>{" "}
-                <span className="text-gray-400 inline-flex flex-row">
-                  @{profile.handle}
+              <div className="flex flex-row">
+                <Link href={`/profile/${profile.handle}`} className="w-fit">
+                  <span className="hover:underline">{profile.displayName}</span>{" "}
+                  <span className="text-gray-400 inline-flex flex-row">
+                    @{profile.handle}
+                  </span>
+                </Link>
+                <Link
+                  href={`/profile/${profile.handle}/rel/${item.ref}/${item.value}`}
+                  className="ml-1 inline-flex flex-row text-gray-400 hover:opacity-80"
+                >
                   {ago && " · " + ago}
                   {rel.value.rating && (
                     <span className="ml-3">
@@ -146,8 +153,8 @@ export default async function RefPage({ params }: { params: Params }) {
                       />
                     </span>
                   )}
-                </span>
-              </Link>
+                </Link>
+              </div>
             </CardSection>
             {rel.value.note && (
               <CardSection>{rel.value.note.value}</CardSection>

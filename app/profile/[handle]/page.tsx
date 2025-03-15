@@ -7,10 +7,10 @@ import { prop, sortBy, sum } from "remeda";
 import { getSessionAgent } from "@/auth";
 import { db } from "@/db";
 import { relsT } from "@/db/schema";
-import { BOOK_KEY } from "@/rels/BookCard";
-import { RelsProvider } from "@/rels/ctx";
-import { MOVIE_KEY, SHOW_KEY } from "@/rels/tmdb";
-import { importRepo, resolveHandle } from "@/rels/utils";
+import { BOOK_KEY } from "@/items/BookCard";
+import { RelsProvider } from "@/items/ctx";
+import { MOVIE_KEY, SHOW_KEY } from "@/items/tmdb";
+import { importRepo, resolveHandle } from "@/items/utils";
 import { Card, LinkButton } from "@/ui";
 import { getPublicAgent } from "@/utils";
 
@@ -127,6 +127,7 @@ export default async function ProfilePage({
         <RelList
           key={orderBy}
           did={did}
+          handle={handle}
           readonly={!isOwnProfile}
           info={{ books: {}, movies: {}, shows: {} }}
           total={sum(counts.map(prop("count")))}

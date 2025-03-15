@@ -5,7 +5,14 @@ import { cache } from "react";
 import { fromEntries, groupBy, mapValues } from "remeda";
 
 import { buildMutex, db } from "@/db";
-import { importedDidsT, relsT, tmdbMoviesT, tmdbShowsT } from "@/db/schema";
+import {
+  importedDidsT,
+  listItemsT,
+  listsT,
+  relsT,
+  tmdbMoviesT,
+  tmdbShowsT,
+} from "@/db/schema";
 import { Record as _RelRecord, Item } from "@/lexicon/types/my/skylights/rel";
 import { getPublicAgent } from "@/utils";
 
@@ -22,14 +29,41 @@ export type RelRecord = {
 export const getDidAgent = cache(async (did: string) => {
   const out = await new DidResolver({}).resolve(did);
   const endpoint = out?.service?.find(
-    (s) => s.id == "#atproto_pds"
+    (s) => s.id == "#atproto_pds",
   )?.serviceEndpoint;
   return new Agent(`${endpoint ?? "https://bsky.social"}/xrpc`);
 });
 
+async function* fetchWholeCollection(did: string, collection: string) {
+  const agent = await getDidAgent(did);
+  let cursor: string | undefined;
+  while (true) {
+    const { data } = await agent.com.atproto.repo.listRecords({
+      repo: did,
+      collection,
+      limit: 100,
+      cursor,
+    });
+
+    const rows = data.records.map(({ uri, value }) => ({
+      did,
+      key: uri.split("/").pop()!,
+      value,
+    }));
+    if (!rows.length) {
+      break;
+    }
+    yield rows;
+    cursor = data.cursor;
+
+    if (data.records.length < 100) {
+      break;
+    }
+  }
+}
+
 export const importRepo = cache(async (did: string) => {
   await buildMutex(`import-repo-${did}`).withLock(async () => {
-    const agent = await getDidAgent(did);
     await db.transaction(async (db) => {
       const recent = new Date();
       recent.setMinutes(recent.getMinutes() - 30);
@@ -41,7 +75,7 @@ export const importRepo = cache(async (did: string) => {
         where: (t) =>
           and(
             eq(t.did, did),
-            isJetksiBehind ? lt(t.importedAt, recent) : undefined
+            isJetksiBehind ? lt(t.importedAt, recent) : undefined,
           ),
       });
 
@@ -50,24 +84,7 @@ export const importRepo = cache(async (did: string) => {
       }
 
       await db.delete(relsT).where(eq(relsT.did, did));
-
-      let cursor: string | undefined;
-      while (true) {
-        const { data } = await agent.com.atproto.repo.listRecords({
-          repo: did,
-          collection: "my.skylights.rel",
-          limit: 100,
-          cursor,
-        });
-
-        const rows = data.records.map(({ uri, value }) => ({
-          did,
-          key: uri.split("/").pop()!,
-          value,
-        }));
-        if (!rows.length) {
-          break;
-        }
+      for await (const rows of fetchWholeCollection(did, "my.skylights.rel")) {
         await db
           .insert(relsT)
           .values(rows)
@@ -75,11 +92,31 @@ export const importRepo = cache(async (did: string) => {
             target: [relsT.did, relsT.key],
             set: { value: rows.map((r) => r.value) },
           });
+      }
 
-        if (data.records.length < 100) {
-          break;
-        }
-        cursor = data.cursor;
+      await db.delete(listsT).where(eq(listsT.did, did));
+      for await (const rows of fetchWholeCollection(did, "my.skylights.list")) {
+        await db
+          .insert(listsT)
+          .values(rows)
+          .onConflictDoUpdate({
+            target: [listsT.did, listsT.key],
+            set: { value: rows.map((r) => r.value) },
+          });
+      }
+
+      await db.delete(listItemsT).where(eq(listItemsT.did, did));
+      for await (const rows of fetchWholeCollection(
+        did,
+        "my.skylights.listItem",
+      )) {
+        await db
+          .insert(listItemsT)
+          .values(rows)
+          .onConflictDoUpdate({
+            target: [listItemsT.did, listItemsT.key],
+            set: { value: rows.map((r) => r.value) },
+          });
       }
 
       await db.delete(importedDidsT).where(eq(importedDidsT.did, did));
@@ -90,7 +127,7 @@ export const importRepo = cache(async (did: string) => {
 
 export async function fetchBooks(editionKeys: string[]) {
   const response = await fetch(
-    `https://openlibrary.org/search.json?q=${editionKeys.join(" OR ")}&fields=key,title,author_name,editions,isbn`
+    `https://openlibrary.org/search.json?q=${editionKeys.join(" OR ")}&fields=key,title,author_name,editions,isbn`,
   );
   return (await response.json()).docs as Book[];
 }
@@ -112,14 +149,14 @@ async function fetchDetailsTMDB(category: "movie" | "tv", id: string) {
 }
 
 export async function fetchItemsInfo(
-  items: RelRecordValue["item"][]
+  items: RelRecordValue["item"][],
 ): Promise<Info> {
   const idsByRefs = mapValues(
     groupBy(
       items.filter((i): i is Item => "ref" in i),
-      (i) => i.ref
+      (i) => i.ref,
     ),
-    (items) => items.map((i) => i.value)
+    (items) => items.map((i) => i.value),
   );
   const bookIds = idsByRefs[BOOK_KEY];
   const movieIds = idsByRefs[MOVIE_KEY];
@@ -139,11 +176,11 @@ export async function fetchItemsInfo(
   ]);
 
   const missingMovieIds = movieIds?.filter(
-    (id) => !movies.some((m) => m.id == Number(id))
+    (id) => !movies.some((m) => m.id == Number(id)),
   );
   if (missingMovieIds?.length > 0) {
     const movieData = await Promise.all(
-      missingMovieIds.map((id) => fetchDetailsTMDB("movie", id))
+      missingMovieIds.map((id) => fetchDetailsTMDB("movie", id)),
     );
     const missingMovies = await db
       .insert(tmdbMoviesT)
@@ -154,11 +191,11 @@ export async function fetchItemsInfo(
   }
 
   const missingShowIds = showIds?.filter(
-    (id) => !shows.some((m) => m.id == Number(id))
+    (id) => !shows.some((m) => m.id == Number(id)),
   );
   if (missingShowIds?.length > 0) {
     const showData = await Promise.all(
-      missingShowIds.map((id) => fetchDetailsTMDB("tv", id))
+      missingShowIds.map((id) => fetchDetailsTMDB("tv", id)),
     );
     const missingShows = await db
       .insert(tmdbShowsT)
@@ -173,7 +210,7 @@ export async function fetchItemsInfo(
       books.map((book) => [
         book.editions.docs.at(0)?.key.split("/").at(2) ?? "",
         book,
-      ])
+      ]),
     ),
     movies: fromEntries(movies.map((row) => [row.id, row.value as Movie])),
     shows: fromEntries(shows.map((row) => [row.id, row.value as Show])),

@@ -4,11 +4,19 @@
 import {
   createServer as createXrpcServer,
   Server as XrpcServer,
-  Options as XrpcOptions,
-  AuthVerifier,
-  StreamAuthVerifier,
+  type Options as XrpcOptions,
+  type AuthVerifier,
+  type StreamAuthVerifier,
 } from '@atproto/xrpc-server'
 import { schemas } from './lexicons.js'
+
+export const MY_SKYLIGHTS = {
+  ListItemInProgress: 'my.skylights.listItem#inProgress',
+  ListItemTodo: 'my.skylights.listItem#todo',
+  ListItemAbandoned: 'my.skylights.listItem#abandoned',
+  ListItemOwned: 'my.skylights.listItem#owned',
+  ListItemWanted: 'my.skylights.listItem#wanted',
+}
 
 export function createServer(options?: XrpcOptions): Server {
   return new Server(options)

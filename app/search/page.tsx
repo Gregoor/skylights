@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
 import { getSessionAgent } from "@/auth";
-import { RelsProvider } from "@/rels/ctx";
-import { importRepo } from "@/rels/utils";
+import { RelsProvider } from "@/items/ctx";
+import { importRepo } from "@/items/utils";
 
 import { ClientSearchPage } from "./client";
 

@@ -5,8 +5,8 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import { assertSessionAgent } from "@/auth";
 import { db } from "@/db";
 import { relsT, tmdbMoviesT, tmdbShowsT } from "@/db/schema";
-import { Movie, Show } from "@/rels/tmdb";
-import { importRepo } from "@/rels/utils";
+import { Movie, Show } from "@/items/tmdb";
+import { importRepo } from "@/items/utils";
 
 export async function findRels(ref: string, values: string[]) {
   const session = await assertSessionAgent();

@@ -8,7 +8,7 @@
       "record": {
         "type": "object",
         "properties": {
-          "item": { "type": "ref", "ref": "#item" },
+          "item": { "type": "ref", "ref": "my.skylights.defs#item" },
           "rating": { "type": "ref", "ref": "#rating" },
           "note": { "type": "ref", "ref": "#note" },
           "finishedAt": {
@@ -19,7 +19,6 @@
         "required": ["item"]
       }
     },
-    "item": { "type": "ref", "ref": "my.skylights.defs#item" },
     "rating": {
       "type": "object",
       "properties": {

@@ -7,13 +7,13 @@ import { fromEntries } from "remeda";
 import { authClient, getSessionAgent } from "@/auth";
 import { db } from "@/db";
 import { relsT } from "@/db/schema";
-import { RelsProvider } from "@/rels/ctx";
-import { RelCard } from "@/rels/RelCard";
-import { fetchItemsInfo, RelRecordValue } from "@/rels/utils";
+import { RelsProvider } from "@/items/ctx";
+import { RelCard } from "@/items/RelCard";
+import { fetchItemsInfo, RelRecordValue } from "@/items/utils";
 import { Card } from "@/ui";
 import { getPublicAgent, timeSince } from "@/utils";
 
-import { SubmitButton } from "./client";
+import { Memput, SubmitButton } from "./client";
 
 async function login(formData: FormData) {
   "use server";
@@ -61,7 +61,7 @@ function SignInCard() {
           >
             @
           </div>
-          <input
+          <Memput
             type="text"
             name="handle"
             placeholder="Handle"
@@ -112,6 +112,7 @@ async function RecentReviews() {
             item={rel.value.item}
             readonly={reviewer.did != sessionAgent?.did}
             ago={rel.reviewedAt ? timeSince(rel.reviewedAt) : undefined}
+            profileHandle={reviewer.handle}
             {...{ info, reviewer }}
           />
         );
@@ -144,6 +145,24 @@ export default async function LandingPage() {
             books, movies and TV shows. Next up: Papers and URLs.
           </li>
         </ul>
+        <hr className="my-3 border-gray-700" />
+        <div className="flex flex-row gap-2 justify-between text-sm">
+          <a
+            href="https://github.com/Gregoor/skylights"
+            className="hover:underline"
+          >
+            View Source / Report Issues
+          </a>
+          <div>
+            Made by{" "}
+            <a
+              href="https://bsky.app/profile/watwa.re"
+              className="hover:underline"
+            >
+              @watwa.re
+            </a>
+          </div>
+        </div>
       </Card>
 
       <Suspense>

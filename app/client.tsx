@@ -3,6 +3,7 @@
 import cx from "classix";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 export function SubmitButton() {
@@ -44,3 +45,21 @@ export const NavLink = ({
     </Link>
   );
 };
+
+export function Memput(
+  props: { name: string } & React.ComponentProps<"input">,
+) {
+  const [value, setValue] = useState(
+    props.value ?? localStorage.getItem(props.name) ?? "",
+  );
+  useEffect(() => {
+    localStorage.setItem(props.name, value?.toString());
+  }, [props.name, value]);
+  return (
+    <input
+      {...props}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+    />
+  );
+}

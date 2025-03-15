@@ -7,7 +7,7 @@ import {
 import cx from "classix";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { entries, isDeepEqual } from "remeda";
 
@@ -16,6 +16,7 @@ import { Button, CardSection, SectionedCard } from "@/ui";
 import { now } from "@/utils";
 
 import { getNextTID, useRels, useRelsLoading } from "./ctx";
+import { ListButton } from "./ListButton";
 import { RatingSlider } from "./RatingSlider";
 import { RelRecordValue } from "./utils";
 
@@ -31,7 +32,7 @@ function ImgWithDummy(props: React.ComponentProps<"img">) {
     img.src = props.src;
     img.onload = (event) => {
       setStatus(
-        (event.target as HTMLImageElement).naturalWidth == 1 ? "error" : "done"
+        (event.target as HTMLImageElement).naturalWidth == 1 ? "error" : "done",
       );
     };
   }, [props.src]);
@@ -42,7 +43,7 @@ function ImgWithDummy(props: React.ComponentProps<"img">) {
         className={cx(
           "border border-gray-400/50 w-full h-full flex items-center justify-center",
           "text-gray-300",
-          status == "loading" && "animate-pulse"
+          status == "loading" && "animate-pulse",
         )}
       >
         {status == "error" && "?"}
@@ -60,11 +61,43 @@ export const Title = ({ children }: { children: React.ReactNode }) => (
   <div className="font-serif text-xl">{children}</div>
 );
 
+function ClampedNote({ value }: { value: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [clamped, setClamped] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    setClamped(el.scrollHeight > el.clientHeight);
+  }, [value]);
+  return (
+    <div
+      role={clamped && !isOpen ? "button" : undefined}
+      onClick={() => !isOpen && setIsOpen(true)}
+      className={clamped && !isOpen ? "cursor-pointer hover:opacity-80" : ""}
+    >
+      <div ref={ref} className={isOpen ? "" : "line-clamp-4 text-ellipsis"}>
+        {value}
+      </div>
+      {clamped && (
+        <button
+          type="button"
+          className="text-gray-400 hover:opacity-80"
+          onClick={() => setIsOpen((isOpen) => !isOpen)}
+        >
+          Show {isOpen ? "less" : "more"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function BaseCard({
   imgSrc,
   item,
   type,
   reviewer,
+  profileHandle,
   readonly,
   ago,
   children,
@@ -73,6 +106,7 @@ export function BaseCard({
   item: RelRecordValue["item"];
   type: "book" | "film" | "show";
   readonly?: boolean;
+  profileHandle?: string;
   reviewer?: ProfileView | ProfileViewDetailed;
   ago?: string;
   children?: React.ReactNode;
@@ -82,12 +116,17 @@ export function BaseCard({
     () =>
       entries(rels).find(([, rel]) => isDeepEqual(item, rel?.item))?.[0] ??
       getNextTID(),
-    [item, rels]
+    [item, rels],
   );
   const rel = rels[key] as RelRecordValue | undefined;
 
   const patch = (fields: Partial<RelRecordValue>) => {
-    const record = { item, ...rel, ...fields };
+    const record = {
+      $type: "my.skylights.rel",
+      item,
+      ...rel,
+      ...fields,
+    } as const;
     if (record.note || record.rating) {
       putRel(key, record);
     } else {
@@ -107,13 +146,24 @@ export function BaseCard({
       {reviewer && (
         <CardSection className="flex flex-row items-center gap-2">
           <AvatarLink smol profile={reviewer} />
-          <Link href={`/profile/${reviewer.handle}`}>
-            <span className="hover:underline">{reviewer.displayName}</span>{" "}
-            <span className="text-gray-400">
-              @{reviewer.handle}
-              {ago && " · " + ago}
-            </span>
-          </Link>
+          <div>
+            <Link href={`/profile/${reviewer.handle}`}>
+              <span className="hover:underline">{reviewer.displayName}</span>{" "}
+              <span className="text-gray-400">@{reviewer.handle}</span>
+            </Link>
+
+            {ago && (
+              <>
+                {" · "}
+                <Link
+                  href={`/profile/${reviewer.handle}${itemPathname}`}
+                  className="text-gray-400 hover:opacity-80"
+                >
+                  {ago}
+                </Link>
+              </>
+            )}
+          </div>
         </CardSection>
       )}
       <CardSection className="relative flex flex-row gap-4 overflow-hidden">
@@ -121,7 +171,7 @@ export function BaseCard({
           <div
             className={cx(
               "absolute -rotate-45 border-b border-gray-500/50 pt-5 pb-1 px-8",
-              "text-white text-xs uppercase font-bold opacity-80"
+              "text-white text-xs uppercase font-bold opacity-80",
             )}
             style={{ top: -6, left: -36, background: "#0b1128" }}
           >
@@ -146,17 +196,21 @@ export function BaseCard({
             </Link>
           )}
 
-          {(!readonly || ratingValue) && (
-            <RatingSlider
-              disabled={readonly || loading}
-              value={ratingValue ?? null}
-              onChange={(value) => {
-                patch({
-                  rating: value ? { value, createdAt: now() } : undefined,
-                });
-              }}
-            />
-          )}
+          <div className="flex flex-row gap-3 items-center">
+            {(!readonly || ratingValue) && (
+              <RatingSlider
+                disabled={readonly || loading}
+                value={ratingValue ?? null}
+                onChange={(value) => {
+                  patch({
+                    rating: value ? { value, createdAt: now() } : undefined,
+                  });
+                }}
+              />
+            )}
+
+            <ListButton item={item} />
+          </div>
 
           {!readonly && noteDraft == null && !rel?.note && (
             <Button
@@ -219,7 +273,16 @@ export function BaseCard({
             rel?.note && (
               <div>
                 <h3 className="text-gray-500 text-sm font-semibold">
-                  Note
+                  {profileHandle ? (
+                    <Link
+                      href={`/profile/${profileHandle}${itemPathname}`}
+                      className="hover:opacity-80"
+                    >
+                      Note
+                    </Link>
+                  ) : (
+                    "Note"
+                  )}
                   {!readonly && (
                     <>
                       {" "}
@@ -246,7 +309,7 @@ export function BaseCard({
                     </>
                   )}
                 </h3>
-                {rel.note.value}
+                <ClampedNote value={rel.note.value} />
               </div>
             )
           )}

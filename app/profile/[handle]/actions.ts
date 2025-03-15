@@ -4,7 +4,12 @@ import { desc, eq, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { relsT } from "@/db/schema";
-import { fetchItemsInfo, importRepo, Info, RelRecordValue } from "@/rels/utils";
+import {
+  fetchItemsInfo,
+  importRepo,
+  Info,
+  RelRecordValue,
+} from "@/items/utils";
 
 export type RelsOrderBy = "best" | "recent";
 

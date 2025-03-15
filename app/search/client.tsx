@@ -7,9 +7,9 @@ import { merge } from "remeda";
 import useSWRImmutable from "swr/immutable";
 import { debounce } from "ts-debounce";
 
-import { Book, BOOK_KEY, BookCard } from "@/rels/BookCard";
-import { RelsLoadingProvider, useRels } from "@/rels/ctx";
-import { MOVIE_KEY, MovieCard, SHOW_KEY, TVShowCard } from "@/rels/tmdb";
+import { Book, BOOK_KEY, BookCard } from "@/items/BookCard";
+import { RelsLoadingProvider, useRels } from "@/items/ctx";
+import { MOVIE_KEY, MovieCard, SHOW_KEY, TVShowCard } from "@/items/tmdb";
 import { Card } from "@/ui";
 
 import { findRels, searchTMDB } from "./actions";

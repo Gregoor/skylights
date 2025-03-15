@@ -9,12 +9,12 @@ import type { RelRecordValue } from "./utils";
 
 const noop = () => {};
 
-type Rels = Partial<Record<string, Omit<RelRecordValue, "$type">>>;
+type Rels = Partial<Record<string, RelRecordValue>>;
 
 const RelsCtx = React.createContext<{
   rels: Rels;
   setRels: React.Dispatch<React.SetStateAction<Rels>>;
-  putRel: (rkey: string, record: Omit<RelRecordValue, "$type">) => void;
+  putRel: (rkey: string, record: RelRecordValue) => void;
   deleteRel: (rkey: string) => void;
 }>({ rels: {}, setRels: noop, putRel: noop, deleteRel: noop });
 
@@ -23,7 +23,7 @@ export const getNextTID = (() => {
   return () => (lastTID = TID.nextStr(lastTID));
 })();
 
-const COLLECTION_REL_KEY = "my.skylights.rel";
+const REL_KEY = "my.skylights.rel";
 
 export function RelsProvider({
   initialRels = {},
@@ -40,7 +40,7 @@ export function RelsProvider({
         setRels,
         putRel(uri, record) {
           putRecord({
-            collection: COLLECTION_REL_KEY,
+            collection: REL_KEY,
             rkey: uri.split("/").pop()!,
             record,
           });
@@ -48,7 +48,7 @@ export function RelsProvider({
         },
         deleteRel(uri) {
           deleteRecord({
-            collection: COLLECTION_REL_KEY,
+            collection: REL_KEY,
             rkey: uri.split("/").pop()!,
           });
           setRels((rels) => omit(rels, [uri]));

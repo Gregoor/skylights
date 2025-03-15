@@ -5,23 +5,25 @@ import { useRef, useState } from "react";
 import useInfiniteScroll from "react-infinite-scroll-hook";
 import { mapValues } from "remeda";
 
-import { Item } from "@/lexicon/types/my/skylights/rel";
-import { useRels } from "@/rels/ctx";
-import { RelCard } from "@/rels/RelCard";
-import { UnknownCard } from "@/rels/UnknownCard";
-import { Info } from "@/rels/utils";
+import { useRels } from "@/items/ctx";
+import { RelCard } from "@/items/RelCard";
+import { UnknownCard } from "@/items/UnknownCard";
+import { Info } from "@/items/utils";
+import { Item } from "@/lexicon/types/my/skylights/defs";
 
 import { findRelsWithInfo, RelsOrderBy } from "./actions";
 import { PAGE_SIZE } from "./share";
 
 export function RelList({
   did,
+  handle,
   readonly,
   info: initialInfo,
   total,
   orderBy,
 }: {
   did: string;
+  handle: string;
   readonly: boolean;
   info: Info;
   total: number;
@@ -74,7 +76,13 @@ export function RelList({
               initial={i < PAGE_SIZE ? undefined : { y: 16, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
             >
-              <RelCard key={key} info={info} item={item} {...{ readonly }} />
+              <RelCard
+                key={key}
+                info={info}
+                item={item}
+                profileHandle={handle}
+                {...{ readonly }}
+              />
             </motion.div>
           </AnimatePresence>
         );

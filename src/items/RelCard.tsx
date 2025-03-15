@@ -11,7 +11,7 @@ export function RelCard({
   ...props
 }: { item?: RelRecordValue["item"]; info: Info } & Pick<
   React.ComponentProps<typeof BaseCard>,
-  "readonly" | "reviewer" | "ago" | "children"
+  "readonly" | "reviewer" | "ago" | "children" | "profileHandle"
 >) {
   switch (item?.ref) {
     case BOOK_KEY: {
