@@ -11,10 +11,7 @@ import { assertSessionAgent } from "@/auth";
 import { db } from "@/db";
 import { listItemsT, listsT, relsT } from "@/db/schema";
 import { Item } from "@/lexicon/types/my/skylights/defs";
-import {
-  Main as ListItem,
-  validateMain as validateListItem,
-} from "@/lexicon/types/my/skylights/listItem";
+import { validateMain as validateListItem } from "@/lexicon/types/my/skylights/listItem";
 
 const COLLECTION_TABLES = {
   "my.skylights.rel": relsT,
@@ -145,7 +142,8 @@ export async function toggleListInclusion(item: Item, key: string) {
       repo: did,
       collection: "my.skylights.listItem",
       rkey: rkey,
-      record,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      record: record as any,
     });
     await db.insert(listItemsT).values({ did, key: rkey, value: record });
   }

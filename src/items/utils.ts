@@ -13,7 +13,8 @@ import {
   tmdbMoviesT,
   tmdbShowsT,
 } from "@/db/schema";
-import { Record as _RelRecord, Item } from "@/lexicon/types/my/skylights/rel";
+import { Item } from "@/lexicon/types/my/skylights/defs";
+import { Record as _RelRecord } from "@/lexicon/types/my/skylights/rel";
 import { getPublicAgent } from "@/utils";
 
 import { Book, BOOK_KEY } from "./BookCard";
