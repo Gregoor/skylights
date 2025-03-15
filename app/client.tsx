@@ -50,7 +50,10 @@ export function Memput(
   props: { name: string } & React.ComponentProps<"input">,
 ) {
   const [value, setValue] = useState(
-    props.value ?? localStorage.getItem(props.name) ?? "",
+    props.value ??
+      (typeof localStorage == "undefined"
+        ? ""
+        : (localStorage.getItem(props.name) ?? "")),
   );
   useEffect(() => {
     localStorage.setItem(props.name, value?.toString());
