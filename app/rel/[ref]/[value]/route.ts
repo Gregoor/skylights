@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 
 export async function GET(
   request: Request,
-  { params }: { params: { ref: string; value: string } },
+  { params }: { params: Promise<{ ref: string; value: string }> },
 ) {
-  redirect(`/review/${params.ref}/${params.value}`);
+  const { ref, value } = await params;
+  redirect(`/reviews/${ref}/${value}`);
 }

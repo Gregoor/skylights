@@ -83,7 +83,8 @@ export async function generateMetadata({
 
 export default async function RefPage({ params }: { params: Params }) {
   const item = mapValues(await params, decodeURIComponent);
-  const [info, allRels, agent] = await Promise.all([
+  const agent = await getSessionAgent(false);
+  const [info, allRels, profile] = await Promise.all([
     fetchItemsInfo([item]),
     db.query.relsT.findMany({
       where: and(
@@ -91,7 +92,7 @@ export default async function RefPage({ params }: { params: Params }) {
         eq(sql`value->'item'->>'value'`, item.value),
       ),
     }),
-    getSessionAgent(false),
+    agent?.getProfile({ actor: agent.assertDid }),
   ]);
   const [ownRels, otherRels] = partition(
     allRels.map((r) => ({ ...r, value: r.value as RelRecordValue })),
@@ -114,7 +115,12 @@ export default async function RefPage({ params }: { params: Params }) {
           ownRels.map((r) => [r.key!, r.value as RelRecordValue]),
         )}
       >
-        <RelCard info={info} item={item} readonly={!agent}>
+        <RelCard
+          info={info}
+          item={item}
+          readonly={!agent}
+          profileHandle={profile?.data?.handle}
+        >
           {!agent && (
             <div className="mt-4">
               <Link href="/" className="underline hover:opacity-80">

@@ -140,7 +140,7 @@ export function BaseCard({
   const ratingValue = rel?.rating?.value;
 
   const pathname = usePathname();
-  const itemPathname = `/review/${item.ref}/${item.value}`;
+  const itemPathname = `/reviews/${item.ref}/${item.value}`;
   return (
     <SectionedCard>
       {reviewer && (
@@ -156,7 +156,7 @@ export function BaseCard({
               <>
                 {" · "}
                 <Link
-                  href={`/profile/${reviewer.handle}${itemPathname}`}
+                  href={`/profile/${reviewer.handle}/review/${item.ref}/${item.value}`}
                   className="text-gray-400 hover:opacity-80"
                 >
                   {ago}
@@ -275,7 +275,7 @@ export function BaseCard({
                 <h3 className="text-gray-500 text-sm font-semibold">
                   {profileHandle ? (
                     <Link
-                      href={`/profile/${profileHandle}${itemPathname}`}
+                      href={`/profile/${profileHandle}/review/${item.ref}/${item.value}`}
                       className="hover:opacity-80"
                     >
                       Note
@@ -287,6 +287,17 @@ export function BaseCard({
                     <>
                       {" "}
                       (
+                      {profileHandle && (
+                        <>
+                          <Link
+                            href={`/profile/${profileHandle}/review/${item.ref}/${item.value}`}
+                            className="text-gray-300 underline hover:opacity-80"
+                          >
+                            view
+                          </Link>
+                          {" | "}
+                        </>
+                      )}
                       <button
                         type="button"
                         className="text-gray-300 underline hover:opacity-80"
