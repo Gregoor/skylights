@@ -140,7 +140,7 @@ export function BaseCard({
   const ratingValue = rel?.rating?.value;
 
   const pathname = usePathname();
-  const itemPathname = `/rel/${item.ref}/${item.value}`;
+  const itemPathname = `/review/${item.ref}/${item.value}`;
   return (
     <SectionedCard>
       {reviewer && (

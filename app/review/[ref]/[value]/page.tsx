@@ -140,7 +140,7 @@ export default async function RefPage({ params }: { params: Params }) {
                   </span>
                 </Link>
                 <Link
-                  href={`/profile/${profile.handle}/rel/${item.ref}/${item.value}`}
+                  href={`/profile/${profile.handle}/review/${item.ref}/${item.value}`}
                   className="ml-1 inline-flex flex-row text-gray-400 hover:opacity-80"
                 >
                   {ago && " · " + ago}
