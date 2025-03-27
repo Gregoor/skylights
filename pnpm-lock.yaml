@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@atcute/car':
+        specifier: ^3.0.1
+        version: 3.0.1
       '@atproto/api':
         specifier: ^0.14.9
         version: 0.14.9
@@ -141,6 +144,24 @@ packages:
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
+
+  '@atcute/car@3.0.1':
+    resolution: {integrity: sha512-YPy6cEmlkjsKenworEJ0wwPBc5alzDHYyZJqP7lfu5C/qoo7ZyHefXYzAS6YMTftV5O3XIEyPq6JZ4oo9qXSqQ==}
+
+  '@atcute/cbor@2.2.0':
+    resolution: {integrity: sha512-W3ttcDJHiB5N6MbfEpJbTINZSjg0KB8gpBds8UWOGmybqUnuz43HZkFSpF/Vom0KilYg6QWU/ZM4X8SXZE+kow==}
+
+  '@atcute/cid@2.2.0':
+    resolution: {integrity: sha512-ty+WjGcTfi1JJtcRNz6bsJMqT69lEIl4Ts7vl4U8SBHbxjbb6Tk/pcnQZVClKRYduRoZ1XhS9n5qOSIbIMctDA==}
+
+  '@atcute/multibase@1.1.2':
+    resolution: {integrity: sha512-KFX+c7a/u2jSNcRw0rLaUHG/XEKf1A1c8XF5soHnsb1JMCShihf/anfZ1kJ4no/IlIp9HEHV3PQRQO2sWL6ASQ==}
+
+  '@atcute/uint8array@1.0.1':
+    resolution: {integrity: sha512-AAnlFKyfDRgb9GNZJbhQ6OuMhbmNPirQyapb8KnmcEhxQZ3+tt+4NcwqekEegY4MpNqSTYeeTdyxq0wGZv1JHg==}
+
+  '@atcute/varint@1.0.2':
+    resolution: {integrity: sha512-0O31hePzzr4O3NGWHUKKOyta6CGSL+AtN8iir8grGxu9jXyI7DBARlw6PbgKA6uTAvsXdpmRmF8MX+p0TsLnNg==}
 
   '@atproto-labs/did-resolver@0.1.11':
     resolution: {integrity: sha512-qXNzIX2GPQnxT1gl35nv/8ErDdc4Fj/+RlJE7oyE7JGkFAPUyuY03TvKJ79SmWFsWE8wyTXEpLuphr9Da1Vhkw==}
@@ -3247,6 +3268,31 @@ packages:
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
+
+  '@atcute/car@3.0.1':
+    dependencies:
+      '@atcute/cbor': 2.2.0
+      '@atcute/cid': 2.2.0
+      '@atcute/varint': 1.0.2
+
+  '@atcute/cbor@2.2.0':
+    dependencies:
+      '@atcute/cid': 2.2.0
+      '@atcute/multibase': 1.1.2
+      '@atcute/uint8array': 1.0.1
+
+  '@atcute/cid@2.2.0':
+    dependencies:
+      '@atcute/multibase': 1.1.2
+      '@atcute/uint8array': 1.0.1
+
+  '@atcute/multibase@1.1.2':
+    dependencies:
+      '@atcute/uint8array': 1.0.1
+
+  '@atcute/uint8array@1.0.1': {}
+
+  '@atcute/varint@1.0.2': {}
 
   '@atproto-labs/did-resolver@0.1.11':
     dependencies:

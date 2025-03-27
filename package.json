@@ -13,6 +13,7 @@
     "migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@atcute/car": "^3.0.1",
     "@atproto/api": "^0.14.9",
     "@atproto/common": "^0.4.8",
     "@atproto/common-web": "^0.4.0",

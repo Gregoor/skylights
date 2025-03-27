@@ -1,3 +1,4 @@
+import { iterateAtpRepo, readCar } from "@atcute/car";
 import { Agent } from "@atproto/api";
 import { DidResolver } from "@atproto/identity";
 import { and, eq, inArray, lt } from "drizzle-orm";
@@ -35,34 +36,6 @@ export const getDidAgent = cache(async (did: string) => {
   return new Agent(`${endpoint ?? "https://bsky.social"}/xrpc`);
 });
 
-async function* fetchWholeCollection(did: string, collection: string) {
-  const agent = await getDidAgent(did);
-  let cursor: string | undefined;
-  while (true) {
-    const { data } = await agent.com.atproto.repo.listRecords({
-      repo: did,
-      collection,
-      limit: 100,
-      cursor,
-    });
-
-    const rows = data.records.map(({ uri, value }) => ({
-      did,
-      key: uri.split("/").pop()!,
-      value,
-    }));
-    if (!rows.length) {
-      break;
-    }
-    yield rows;
-    cursor = data.cursor;
-
-    if (data.records.length < 100) {
-      break;
-    }
-  }
-}
-
 export const importRepo = cache(async (did: string) => {
   await buildMutex(`import-repo-${did}`).withLock(async () => {
     await db.transaction(async (db) => {
@@ -84,40 +57,47 @@ export const importRepo = cache(async (did: string) => {
         return;
       }
 
+      const agent = await getDidAgent(did);
+      const { data } = await agent.com.atproto.sync.getRepo({ did });
+
       await db.delete(relsT).where(eq(relsT.did, did));
-      for await (const rows of fetchWholeCollection(did, "my.skylights.rel")) {
-        await db
-          .insert(relsT)
-          .values(rows)
-          .onConflictDoUpdate({
-            target: [relsT.did, relsT.key],
-            set: { value: rows.map((r) => r.value) },
-          });
-      }
-
       await db.delete(listsT).where(eq(listsT.did, did));
-      for await (const rows of fetchWholeCollection(did, "my.skylights.list")) {
-        await db
-          .insert(listsT)
-          .values(rows)
-          .onConflictDoUpdate({
-            target: [listsT.did, listsT.key],
-            set: { value: rows.map((r) => r.value) },
-          });
-      }
-
       await db.delete(listItemsT).where(eq(listItemsT.did, did));
-      for await (const rows of fetchWholeCollection(
-        did,
-        "my.skylights.listItem",
+
+      for (const { collection, rkey: key, record: value } of iterateAtpRepo(
+        data,
       )) {
-        await db
-          .insert(listItemsT)
-          .values(rows)
-          .onConflictDoUpdate({
-            target: [listItemsT.did, listItemsT.key],
-            set: { value: rows.map((r) => r.value) },
-          });
+        switch (collection) {
+          case "my.skylights.rel":
+            await db
+              .insert(relsT)
+              .values({ did, key, value })
+              .onConflictDoUpdate({
+                target: [relsT.did, relsT.key],
+                set: { value },
+              });
+            break;
+
+          case "my.skylights.list":
+            await db
+              .insert(listsT)
+              .values({ did, key, value })
+              .onConflictDoUpdate({
+                target: [listsT.did, listsT.key],
+                set: { value },
+              });
+            break;
+
+          case "my.skylights.listItem":
+            await db
+              .insert(listItemsT)
+              .values({ did, key, value })
+              .onConflictDoUpdate({
+                target: [listItemsT.did, listItemsT.key],
+                set: { value },
+              });
+            break;
+        }
       }
 
       await db.delete(importedDidsT).where(eq(importedDidsT.did, did));
