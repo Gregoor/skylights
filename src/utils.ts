@@ -39,3 +39,11 @@ export const BUILT_IN_LISTS = {
   owned: "Owned",
   wishlist: "Wishlist",
 };
+
+export function startTimer(label: string) {
+  const rnd = Math.random().toString(36).substring(2, 15);
+  console.time(`${label}#${rnd}`);
+  return () => {
+    console.timeEnd(`${label}#${rnd}`);
+  };
+}

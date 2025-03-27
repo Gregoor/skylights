@@ -1,7 +1,7 @@
 import { iterateAtpRepo } from "@atcute/car";
 import { Agent } from "@atproto/api";
 import { DidResolver } from "@atproto/identity";
-import { and, eq, inArray, lt } from "drizzle-orm";
+import { and, eq, gt, inArray } from "drizzle-orm";
 import { cache } from "react";
 import { fromEntries, groupBy, mapValues } from "remeda";
 
@@ -49,7 +49,7 @@ export const importRepo = cache(async (did: string) => {
         where: (t) =>
           and(
             eq(t.did, did),
-            isJetksiBehind ? lt(t.importedAt, recent) : undefined,
+            isJetksiBehind ? gt(t.importedAt, recent) : undefined,
           ),
       });
 

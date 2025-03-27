@@ -2,6 +2,7 @@ import cx from "classix";
 import { desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { fromEntries } from "remeda";
 
 import { authClient, getSessionAgent } from "@/auth";
@@ -165,9 +166,11 @@ export default async function LandingPage() {
         </div>
       </Card>
 
-      <Suspense>
-        <RecentReviews />
-      </Suspense>
+      <ErrorBoundary fallback={null}>
+        <Suspense>
+          <RecentReviews />
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
 }

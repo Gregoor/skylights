@@ -37,6 +37,7 @@
     "react": "19.0.0",
     "react-click-away-listener": "^2.3.0",
     "react-dom": "19.0.0",
+    "react-error-boundary": "^5.0.0",
     "react-infinite-scroll-hook": "^5.0.1",
     "react-textarea-autosize": "^8.5.7",
     "remeda": "^2.21.1",
