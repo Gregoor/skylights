@@ -128,7 +128,8 @@ export const importRepo = cache(async (did: string) => {
 
 export async function fetchBooks(editionKeys: string[]) {
   const response = await fetch(
-    `https://openlibrary.org/search.json?q=${editionKeys.join(" OR ")}&fields=key,title,author_name,editions,isbn`,
+    "https://openlibrary.org/search.json" +
+      `?q=${editionKeys.join(" OR ")}&fields=key,title,author_name,editions,isbn`,
   );
   return (await response.json()).docs as Book[];
 }
@@ -149,9 +150,7 @@ async function fetchDetailsTMDB(category: "movie" | "tv", id: string) {
   }).then((r) => r.json());
 }
 
-export async function fetchItemsInfo(
-  items: RelRecordValue["item"][],
-): Promise<Info> {
+export async function fetchItemsInfo(items: Item[]): Promise<Info> {
   const idsByRefs = mapValues(
     groupBy(
       items.filter((i): i is Item => "ref" in i),

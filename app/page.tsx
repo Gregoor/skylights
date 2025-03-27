@@ -8,7 +8,7 @@ import { authClient, getSessionAgent } from "@/auth";
 import { db } from "@/db";
 import { relsT } from "@/db/schema";
 import { RelsProvider } from "@/items/ctx";
-import { RelCard } from "@/items/RelCard";
+import { ItemCard } from "@/items/ItemCard";
 import { fetchItemsInfo, RelRecordValue } from "@/items/utils";
 import { Card } from "@/ui";
 import { getPublicAgent, timeSince } from "@/utils";
@@ -107,7 +107,7 @@ async function RecentReviews() {
         const reviewer = rel.did && profilesByDid[rel.did];
         if (!reviewer) return null;
         return (
-          <RelCard
+          <ItemCard
             key={rel.key}
             item={rel.value.item}
             readonly={reviewer.did != sessionAgent?.did}

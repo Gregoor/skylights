@@ -1,15 +1,17 @@
 import React from "react";
 
+import { Item } from "@/lexicon/types/my/skylights/defs";
+
 import { BaseCard } from "./BaseCard";
 import { BOOK_KEY, BookCard } from "./BookCard";
 import { MOVIE_KEY, MovieCard, SHOW_KEY, TVShowCard } from "./tmdb";
-import type { Info, RelRecordValue } from "./utils";
+import type { Info } from "./utils";
 
-export function RelCard({
+export function ItemCard({
   item,
   info,
   ...props
-}: { item?: RelRecordValue["item"]; info: Info } & Pick<
+}: { item?: Item; info: Info } & Pick<
   React.ComponentProps<typeof BaseCard>,
   "readonly" | "reviewer" | "ago" | "children" | "profileHandle"
 >) {

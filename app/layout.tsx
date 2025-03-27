@@ -8,6 +8,8 @@ import { Stars } from "@/Stars";
 
 import "./globals.css";
 
+import { HasSessionProvider } from "@/session-ctx";
+
 import { NavLink } from "./client";
 
 const geistSans = localFont({
@@ -48,11 +50,12 @@ async function Header() {
   );
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const agent = await getSessionAgent(false);
   return (
     <html lang="en">
       <body
@@ -62,9 +65,11 @@ export default function RootLayout({
         <ClientOnly>
           <Stars />
         </ClientOnly>
-        <div className="max-w-xl mx-auto p-4 flex flex-col gap-4">
-          {children}
-        </div>
+        <HasSessionProvider value={!!agent}>
+          <div className="max-w-xl mx-auto p-4 flex flex-col gap-4">
+            {children}
+          </div>
+        </HasSessionProvider>
       </body>
     </html>
   );

@@ -40,10 +40,10 @@ export interface Builtin {
   $type?: "my.skylights.listItem#builtin";
   type?:
     | $Typed<typeof INPROGRESS>
-    | $Typed<typeof TODO>
+    | $Typed<typeof QUEUE>
     | $Typed<typeof ABANDONED>
     | $Typed<typeof OWNED>
-    | $Typed<typeof WANTED>
+    | $Typed<typeof WISHLIST>
     | { $type: string };
 }
 
@@ -60,10 +60,10 @@ export function validateBuiltin<V>(v: V) {
 /** User is currently reading/watching/... the item */
 export const INPROGRESS = `${id}#inProgress`;
 /** User plans to read/watch/... the item */
-export const TODO = `${id}#todo`;
+export const QUEUE = `${id}#queue`;
 /** User gave up on finishing the item */
 export const ABANDONED = `${id}#abandoned`;
 /** User owns the item */
 export const OWNED = `${id}#owned`;
 /** User wants to own the item */
-export const WANTED = `${id}#wanted`;
+export const WISHLIST = `${id}#wishlist`;

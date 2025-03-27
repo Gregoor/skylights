@@ -92,25 +92,31 @@ export async function fetchListInclusions({ ref, value }: Item) {
         `Invalid list item: ${JSON.stringify(result.error, null, 2)}`,
       );
     }
-    return result.value.list;
+    return (
+      result.value.list as unknown as { type: { type: string } }
+    ).type.type.split("#")[1];
   });
 }
 
 export async function toggleListInclusion(item: Item, key: string) {
   const agent = await assertSessionAgent();
   const did = agent.assertDid;
+
+  const listItemKey = "my.skylights.listItem#" + key;
+
   const [listItem] = await db
     .select()
     .from(listItemsT)
     .where(
       and(
         eq(listItemsT.did, did),
-        eq(sql.raw(`value->'item'->>'ref'`), item.ref),
-        eq(sql.raw(`value->'item'->>'value'`), item.value),
-        eq(sql.raw(`value->>'list'`), key),
+        eq(sql`value->'item'->>'ref'`, item.ref),
+        eq(sql`value->'item'->>'value'`, item.value),
+        eq(sql`value->'list'->'type'->>'type'`, listItemKey),
       ),
     )
     .limit(1);
+
   if (listItem) {
     await agent.com.atproto.repo.deleteRecord({
       repo: did,
@@ -124,7 +130,13 @@ export async function toggleListInclusion(item: Item, key: string) {
     const recordResult = validateListItem({
       $type: "my.skylights.listItem",
       item,
-      list: "my.skylights.listItem#" + key,
+      list: {
+        $type: "my.skylights.listItem#builtin",
+        type: {
+          $type: "my.skylights.listItem#builtin",
+          type: listItemKey,
+        },
+      },
       addedAt: new Date().toISOString(),
       position: "",
     });

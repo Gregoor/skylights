@@ -7,7 +7,7 @@ import { db } from "@/db";
 import { relsT } from "@/db/schema";
 import { BOOK_KEY } from "@/items/BookCard";
 import { RelsProvider } from "@/items/ctx";
-import { RelCard } from "@/items/RelCard";
+import { ItemCard } from "@/items/ItemCard";
 import { MOVIE_KEY, SHOW_KEY } from "@/items/tmdb";
 import {
   fetchItemsInfo,
@@ -126,7 +126,7 @@ export default async function RelPage({ params }: { params: Params }) {
   return (
     <>
       <RelsProvider initialRels={{ [rel.key!]: rel.value as RelRecordValue }}>
-        <RelCard
+        <ItemCard
           info={info}
           item={item}
           readonly={!agent}

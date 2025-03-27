@@ -31,3 +31,11 @@ export function timeSince(date: Date) {
   }
   return Math.floor(seconds) + "s";
 }
+
+export const BUILT_IN_LISTS = {
+  queue: "Queue",
+  inProgress: "In Progress",
+  abandoned: "Abandoned",
+  owned: "Owned",
+  wishlist: "Wishlist",
+};

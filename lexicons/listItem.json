@@ -23,10 +23,10 @@
           "type": "union",
           "refs": [
             "my.skylights.listItem#inProgress",
-            "my.skylights.listItem#todo",
+            "my.skylights.listItem#queue",
             "my.skylights.listItem#abandoned",
             "my.skylights.listItem#owned",
-            "my.skylights.listItem#wanted"
+            "my.skylights.listItem#wishlist"
           ]
         }
       }
@@ -35,7 +35,7 @@
       "type": "token",
       "description": "User is currently reading/watching/... the item"
     },
-    "todo": {
+    "queue": {
       "type": "token",
       "description": "User plans to read/watch/... the item"
     },
@@ -44,6 +44,6 @@
       "description": "User gave up on finishing the item"
     },
     "owned": { "type": "token", "description": "User owns the item" },
-    "wanted": { "type": "token", "description": "User wants to own the item" }
+    "wishlist": { "type": "token", "description": "User wants to own the item" }
   }
 }

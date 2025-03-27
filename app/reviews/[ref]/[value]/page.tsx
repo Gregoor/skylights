@@ -9,8 +9,8 @@ import { AvatarLink } from "@/AvatarLink";
 import { db } from "@/db";
 import { BOOK_KEY } from "@/items/BookCard";
 import { RelsProvider } from "@/items/ctx";
+import { ItemCard } from "@/items/ItemCard";
 import { RatingSlider } from "@/items/RatingSlider";
-import { RelCard } from "@/items/RelCard";
 import { MOVIE_KEY, SHOW_KEY } from "@/items/tmdb";
 import { fetchItemsInfo, Info, RelRecordValue } from "@/items/utils";
 import { Item } from "@/lexicon/types/my/skylights/defs";
@@ -115,7 +115,7 @@ export default async function RefPage({ params }: { params: Params }) {
           ownRels.map((r) => [r.key!, r.value as RelRecordValue]),
         )}
       >
-        <RelCard
+        <ItemCard
           info={info}
           item={item}
           readonly={!agent}
@@ -129,7 +129,7 @@ export default async function RefPage({ params }: { params: Params }) {
               to add your review
             </div>
           )}
-        </RelCard>
+        </ItemCard>
       </RelsProvider>
       {otherRels.map((rel) => {
         const profile = profilesByDid[rel.did!];

@@ -78,12 +78,15 @@ export const listItemsT = pgTable(
   },
   (t) => ({
     pk: primaryKey({ columns: [t.did, t.key] }),
-    listKeyIdx: index("list_items_list_key_idx").on(sql`(value->>'list')`),
+    listKeyIdx: index("list_items_list_key_idx").on(
+      sql`value->'list'->'type'->>'type'`,
+    ),
     itemValueIdx: index("list_items_item_value_idx").on(
       sql`(value->'item'->>'value')`,
     ),
     itemRefIdx: index("list_items_item_ref_idx").on(
       sql`(value->'item'->>'ref')`,
     ),
+    addedAtIdx: index("list_items_added_at_idx").on(sql`value->>'addedAt'`),
   }),
 );

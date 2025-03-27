@@ -2,11 +2,11 @@ import { count, eq, sql } from "drizzle-orm";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { cache, Fragment } from "react";
-import { prop, sortBy, sum } from "remeda";
+import { sortBy } from "remeda";
 
 import { getSessionAgent } from "@/auth";
 import { db } from "@/db";
-import { relsT } from "@/db/schema";
+import { listItemsT, relsT } from "@/db/schema";
 import { BOOK_KEY } from "@/items/BookCard";
 import { RelsProvider } from "@/items/ctx";
 import { MOVIE_KEY, SHOW_KEY } from "@/items/tmdb";
@@ -15,8 +15,8 @@ import { Card, LinkButton } from "@/ui";
 import { getPublicAgent } from "@/utils";
 
 import { RelsOrderBy } from "./actions";
-import { Avatar } from "./client";
-import { RelList } from "./RelList";
+import { Avatar, ListSelect } from "./client";
+import { ItemList } from "./ItemList";
 
 type Params = Promise<{ handle: string }>;
 
@@ -47,7 +47,7 @@ export default async function ProfilePage({
   searchParams,
 }: {
   params: Params;
-  searchParams: Promise<{ orderBy?: RelsOrderBy }>;
+  searchParams: Promise<{ list?: string; orderBy?: RelsOrderBy }>;
 }) {
   let { handle } = await params;
   handle = decodeURIComponent(handle);
@@ -64,12 +64,23 @@ export default async function ProfilePage({
 
   await importRepo(did);
 
-  const orderBy = (await searchParams).orderBy ?? "best";
-  const counts = await db
-    .select({ ref: sql`value->'item'->>'ref'`, count: count() })
-    .from(relsT)
-    .where(eq(relsT.did, did))
-    .groupBy(sql`value->'item'->>'ref'`);
+  const { orderBy, list } = await searchParams;
+
+  const [countsByMediaType, lists] = await Promise.all([
+    db
+      .select({ ref: sql`value->'item'->>'ref'`, count: count() })
+      .from(relsT)
+      .where(eq(relsT.did, did))
+      .groupBy(sql`value->'item'->>'ref'`),
+    db
+      .select({
+        key: sql<string>`value->'list'->'type'->>'type'`,
+        count: count(),
+      })
+      .from(listItemsT)
+      .where(eq(listItemsT.did, did))
+      .groupBy(sql`value->'list'->'type'->>'type'`),
+  ]);
 
   const isOwnProfile =
     agent &&
@@ -97,7 +108,7 @@ export default async function ProfilePage({
               {isOwnProfile ? "You" : (profile.displayName ?? profile.handle)}
             </a>{" "}
             {isOwnProfile ? "have" : "has"} reviewed{" "}
-            {sortBy(counts, (c) => -c.count).map((row, i) => (
+            {sortBy(countsByMediaType, (c) => -c.count).map((row, i) => (
               <Fragment key={row.ref as string}>
                 <span className="font-semibold">{row.count}</span>{" "}
                 {
@@ -108,30 +119,41 @@ export default async function ProfilePage({
                   }[row.ref as string]
                 }
                 {row.count > 1 && "s"}
-                {i < counts.length - 1 &&
-                  (i == counts.length - 2 ? " and " : ", ")}
+                {i < countsByMediaType.length - 1 &&
+                  (i == countsByMediaType.length - 2 ? " and " : ", ")}
               </Fragment>
             ))}
             .
           </div>
         </Card>
         <div className="flex flex-row items-center gap-2">
-          Order by
-          <LinkButton href="?orderBy=best" active={orderBy == "best"}>
-            Best
-          </LinkButton>
-          <LinkButton href="?orderBy=recent" active={orderBy == "recent"}>
-            Recent
-          </LinkButton>
+          <ListSelect value={list} lists={lists} />
+          {!list && (
+            <>
+              <span>ordered by</span>
+              <LinkButton
+                href={`?orderBy=best&list=${list ?? ""}`}
+                active={!orderBy || orderBy == "best"}
+              >
+                Best
+              </LinkButton>
+              <LinkButton
+                href={`?orderBy=recent&list=${list ?? ""}`}
+                active={orderBy == "recent"}
+              >
+                Recent
+              </LinkButton>
+            </>
+          )}
         </div>
-        <RelList
-          key={orderBy}
+        <ItemList
+          key={JSON.stringify({ list, orderBy })}
           did={did}
           handle={handle}
+          list={list}
           readonly={!isOwnProfile}
           info={{ books: {}, movies: {}, shows: {} }}
-          total={sum(counts.map(prop("count")))}
-          orderBy={orderBy}
+          orderBy={orderBy ?? "best"}
         />
       </div>
     </RelsProvider>

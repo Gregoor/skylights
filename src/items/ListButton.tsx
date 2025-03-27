@@ -1,41 +1,44 @@
+"use client";
+
 import cx from "classix";
 import { useEffect, useState } from "react";
 import ClickAwayListener from "react-click-away-listener";
 import { entries } from "remeda";
 
 import { Item } from "@/lexicon/types/my/skylights/defs";
+import { useHasSession } from "@/session-ctx";
+import { BUILT_IN_LISTS } from "@/utils";
 
 import { fetchListInclusions, toggleListInclusion } from "./actions";
 
-const BUILT_INS = {
-  todo: "To-Do",
-  inProgress: "In Progress",
-  abandoned: "Abandoned",
-  owned: "Owned",
-  wanted: "Want to",
-};
-
 export function ListButton({ item }: { item: Item }) {
-  return null;
   const [isOpen, setIsOpen] = useState(false);
-  const [inclusions, setInclusions] = useState(new Set());
+  const [isHovered, setIsHovered] = useState(false);
+  const [inclusions, setInclusions] = useState<Set<string> | null>(null);
   useEffect(() => {
-    if (isOpen) {
+    if ((isOpen || isHovered) && inclusions == null) {
       fetchListInclusions(item).then((i) => {
-        console.log("fetchListInclusions", i);
         setInclusions(new Set(i));
       });
     }
-  }, [isOpen]);
+  }, [inclusions, isOpen, isHovered, item]);
+
+  const hasSession = useHasSession();
+  if (!hasSession) {
+    return null;
+  }
+
   return (
     <div className="relative">
       <button
         type="button"
         className={cx(
-          "border border-gray-400 px-1.5 font-bold hover:border-white",
-          isOpen && "bg-white text-black !border-white",
+          "border border-white px-1.5 font-bold hover:opacity-100",
+          isOpen ? "bg-white text-black !border-white" : "opacity-30",
         )}
         onClick={() => setIsOpen((isOpen) => !isOpen)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         +
       </button>
@@ -47,16 +50,27 @@ export function ListButton({ item }: { item: Item }) {
           }}
         >
           <div className="z-10 absolute top-full left-0 w-fit bg-black border text-sm">
-            {entries(BUILT_INS).map(([key, label]) => (
+            {entries(BUILT_IN_LISTS).map(([key, label]) => (
               <label
                 key={key}
                 className="p-1 flex items-center gap-1 cursor-pointer"
               >
                 <input
                   type="checkbox"
-                  checked={inclusions.has(key)}
+                  disabled={inclusions === null}
+                  checked={inclusions?.has(key) ?? false}
                   onChange={() => {
                     toggleListInclusion(item, key);
+                    setInclusions((inclusions) => {
+                      if (inclusions === null) return inclusions;
+                      const newValue = new Set(inclusions);
+                      if (newValue.has(key)) {
+                        newValue.delete(key);
+                      } else {
+                        newValue.add(key);
+                      }
+                      return newValue;
+                    });
                   }}
                 />
                 {label}

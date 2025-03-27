@@ -12,10 +12,10 @@ import { schemas } from './lexicons.js'
 
 export const MY_SKYLIGHTS = {
   ListItemInProgress: 'my.skylights.listItem#inProgress',
-  ListItemTodo: 'my.skylights.listItem#todo',
+  ListItemQueue: 'my.skylights.listItem#queue',
   ListItemAbandoned: 'my.skylights.listItem#abandoned',
   ListItemOwned: 'my.skylights.listItem#owned',
-  ListItemWanted: 'my.skylights.listItem#wanted',
+  ListItemWishlist: 'my.skylights.listItem#wishlist',
 }
 
 export function createServer(options?: XrpcOptions): Server {
