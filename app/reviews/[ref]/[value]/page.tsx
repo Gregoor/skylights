@@ -138,7 +138,7 @@ export default async function RefPage({ params }: { params: Params }) {
           <SectionedCard key={rel.did! + rel.key!}>
             <CardSection className="flex flex-row items-center gap-2">
               <AvatarLink smol profile={profile} />
-              <div className="flex flex-row">
+              <div className="flex flex-row gap-1 flex-wrap">
                 <Link href={`/profile/${profile.handle}`} className="w-fit">
                   <span className="hover:underline">{profile.displayName}</span>{" "}
                   <span className="text-gray-400 inline-flex flex-row">
@@ -147,7 +147,7 @@ export default async function RefPage({ params }: { params: Params }) {
                 </Link>
                 <Link
                   href={`/profile/${profile.handle}/review/${item.ref}/${item.value}`}
-                  className="ml-1 inline-flex flex-row text-gray-400 hover:opacity-80"
+                  className="ml-auto inline-flex flex-row text-gray-400 hover:opacity-80"
                 >
                   {ago && " · " + ago}
                   {rel.value.rating && (
