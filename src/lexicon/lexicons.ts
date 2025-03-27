@@ -2,210 +2,211 @@
  * GENERATED CODE - DO NOT MODIFY
  */
 import {
-  type LexiconDoc,
   Lexicons,
   ValidationError,
+  type LexiconDoc,
   type ValidationResult,
-} from '@atproto/lexicon'
-import { type $Typed, is$typed, maybe$typed } from './util.js'
+} from "@atproto/lexicon";
+
+import { is$typed, maybe$typed, type $Typed } from "./util";
 
 export const schemaDict = {
   MySkylightsDefs: {
     lexicon: 1,
-    id: 'my.skylights.defs',
+    id: "my.skylights.defs",
     defs: {
       item: {
-        type: 'object',
+        type: "object",
         properties: {
           ref: {
-            type: 'string',
-            knownValues: ['open-library', 'tmdb:m', 'tmdb:s'],
+            type: "string",
+            knownValues: ["open-library", "tmdb:m", "tmdb:s"],
           },
           value: {
-            type: 'string',
+            type: "string",
           },
         },
-        required: ['ref', 'value'],
+        required: ["ref", "value"],
       },
     },
   },
   MySkylightsList: {
     lexicon: 1,
-    id: 'my.skylights.list',
+    id: "my.skylights.list",
     defs: {
       main: {
-        type: 'object',
+        type: "object",
         properties: {
           title: {
-            type: 'string',
+            type: "string",
           },
           createdAt: {
-            type: 'string',
-            format: 'datetime',
+            type: "string",
+            format: "datetime",
           },
           description: {
-            type: 'string',
+            type: "string",
           },
           sortBy: {
-            type: 'string',
-            knownValues: ['position', 'date'],
+            type: "string",
+            knownValues: ["position", "date"],
           },
         },
-        required: ['title'],
+        required: ["title"],
       },
     },
   },
   MySkylightsListItem: {
     lexicon: 1,
-    id: 'my.skylights.listItem',
+    id: "my.skylights.listItem",
     defs: {
       main: {
-        type: 'object',
+        type: "object",
         properties: {
           item: {
-            type: 'ref',
-            ref: 'lex:my.skylights.defs#item',
+            type: "ref",
+            ref: "lex:my.skylights.defs#item",
           },
           list: {
-            type: 'union',
+            type: "union",
             refs: [
-              'lex:my.skylights.list',
-              'lex:my.skylights.listItem#builtin',
+              "lex:my.skylights.list",
+              "lex:my.skylights.listItem#builtin",
             ],
           },
           addedAt: {
-            type: 'string',
-            format: 'datetime',
+            type: "string",
+            format: "datetime",
           },
           position: {
-            type: 'string',
+            type: "string",
           },
           note: {
-            type: 'string',
+            type: "string",
           },
         },
-        required: ['list', 'addedAt', 'position'],
+        required: ["list", "addedAt", "position"],
       },
       builtin: {
-        type: 'object',
+        type: "object",
         properties: {
           type: {
-            type: 'union',
+            type: "union",
             refs: [
-              'lex:my.skylights.listItem#inProgress',
-              'lex:my.skylights.listItem#queue',
-              'lex:my.skylights.listItem#abandoned',
-              'lex:my.skylights.listItem#owned',
-              'lex:my.skylights.listItem#wishlist',
+              "lex:my.skylights.listItem#inProgress",
+              "lex:my.skylights.listItem#queue",
+              "lex:my.skylights.listItem#abandoned",
+              "lex:my.skylights.listItem#owned",
+              "lex:my.skylights.listItem#wishlist",
             ],
           },
         },
       },
       inProgress: {
-        type: 'token',
-        description: 'User is currently reading/watching/... the item',
+        type: "token",
+        description: "User is currently reading/watching/... the item",
       },
       queue: {
-        type: 'token',
-        description: 'User plans to read/watch/... the item',
+        type: "token",
+        description: "User plans to read/watch/... the item",
       },
       abandoned: {
-        type: 'token',
-        description: 'User gave up on finishing the item',
+        type: "token",
+        description: "User gave up on finishing the item",
       },
       owned: {
-        type: 'token',
-        description: 'User owns the item',
+        type: "token",
+        description: "User owns the item",
       },
       wishlist: {
-        type: 'token',
-        description: 'User wants to own the item',
+        type: "token",
+        description: "User wants to own the item",
       },
     },
   },
   MySkylightsRel: {
     lexicon: 1,
-    id: 'my.skylights.rel',
+    id: "my.skylights.rel",
     defs: {
       main: {
-        type: 'record',
-        key: 'tid',
+        type: "record",
+        key: "tid",
         record: {
-          type: 'object',
+          type: "object",
           properties: {
             item: {
-              type: 'ref',
-              ref: 'lex:my.skylights.defs#item',
+              type: "ref",
+              ref: "lex:my.skylights.defs#item",
             },
             rating: {
-              type: 'ref',
-              ref: 'lex:my.skylights.rel#rating',
+              type: "ref",
+              ref: "lex:my.skylights.rel#rating",
             },
             note: {
-              type: 'ref',
-              ref: 'lex:my.skylights.rel#note',
+              type: "ref",
+              ref: "lex:my.skylights.rel#note",
             },
             finishedAt: {
-              type: 'array',
+              type: "array",
               items: {
-                type: 'string',
-                format: 'datetime',
+                type: "string",
+                format: "datetime",
               },
             },
           },
-          required: ['item'],
+          required: ["item"],
         },
       },
       rating: {
-        type: 'object',
+        type: "object",
         properties: {
           value: {
-            type: 'integer',
+            type: "integer",
             minimum: 1,
             maximum: 10,
           },
           createdAt: {
-            type: 'string',
-            format: 'datetime',
+            type: "string",
+            format: "datetime",
           },
         },
-        required: ['value', 'createdAt'],
+        required: ["value", "createdAt"],
       },
       note: {
-        type: 'object',
+        type: "object",
         properties: {
           value: {
-            type: 'string',
+            type: "string",
           },
           createdAt: {
-            type: 'string',
-            format: 'datetime',
+            type: "string",
+            format: "datetime",
           },
           updatedAt: {
-            type: 'string',
-            format: 'datetime',
+            type: "string",
+            format: "datetime",
           },
         },
-        required: ['value', 'createdAt', 'updatedAt'],
+        required: ["value", "createdAt", "updatedAt"],
       },
     },
   },
-} as const satisfies Record<string, LexiconDoc>
-export const schemas = Object.values(schemaDict) satisfies LexiconDoc[]
-export const lexicons: Lexicons = new Lexicons(schemas)
+} as const satisfies Record<string, LexiconDoc>;
+export const schemas = Object.values(schemaDict) satisfies LexiconDoc[];
+export const lexicons: Lexicons = new Lexicons(schemas);
 
 export function validate<T extends { $type: string }>(
   v: unknown,
   id: string,
   hash: string,
   requiredType: true,
-): ValidationResult<T>
+): ValidationResult<T>;
 export function validate<T extends { $type?: string }>(
   v: unknown,
   id: string,
   hash: string,
   requiredType?: false,
-): ValidationResult<T>
+): ValidationResult<T>;
 export function validate(
   v: unknown,
   id: string,
@@ -217,14 +218,14 @@ export function validate(
     : {
         success: false,
         error: new ValidationError(
-          `Must be an object with "${hash === 'main' ? id : `${id}#${hash}`}" $type property`,
+          `Must be an object with "${hash === "main" ? id : `${id}#${hash}`}" $type property`,
         ),
-      }
+      };
 }
 
 export const ids = {
-  MySkylightsDefs: 'my.skylights.defs',
-  MySkylightsList: 'my.skylights.list',
-  MySkylightsListItem: 'my.skylights.listItem',
-  MySkylightsRel: 'my.skylights.rel',
-} as const
+  MySkylightsDefs: "my.skylights.defs",
+  MySkylightsList: "my.skylights.list",
+  MySkylightsListItem: "my.skylights.listItem",
+  MySkylightsRel: "my.skylights.rel",
+} as const;
