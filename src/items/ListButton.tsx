@@ -49,7 +49,7 @@ export function ListButton({ item }: { item: Item }) {
             setIsOpen(false);
           }}
         >
-          <div className="z-10 absolute top-full left-0 w-fit bg-black border text-sm">
+          <div className="z-10 absolute top-full right-0 sm:left-0 w-fit bg-black border text-sm">
             {entries(BUILT_IN_LISTS).map(([key, label]) => (
               <label
                 key={key}
