@@ -1,4 +1,4 @@
-import { iterateAtpRepo, readCar } from "@atcute/car";
+import { iterateAtpRepo } from "@atcute/car";
 import { Agent } from "@atproto/api";
 import { DidResolver } from "@atproto/identity";
 import { and, eq, inArray, lt } from "drizzle-orm";
