@@ -13,4 +13,6 @@ const [privateKey, publicKey] = await Promise.all(
 
 console.log(`PRIVATE_KEY_ES256_B64='${btoa(JSON.stringify(privateKey))}'`);
 
-console.log(`SESSION_SECRET=${crypto.randomUUID().replaceAll("-", "")}`);
+console.log(
+  `SESSION_SECRET=${crypto.randomUUID().split("-").join("").slice(0, 256)}`,
+);

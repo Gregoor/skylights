@@ -1,28 +1,26 @@
 import "server-only";
 
-import { JWTPayload, jwtVerify, SignJWT } from "jose";
+import { EncryptJWT, jwtDecrypt, JWTPayload } from "jose";
 import { cookies } from "next/headers";
 
-const secretKey = process.env.SESSION_SECRET;
+const secretKey = process.env.SESSION_SECRET!.slice(0, 256);
 const encodedKey = new TextEncoder().encode(secretKey);
 
 const getExpiryFromNow = () =>
   new Date(Date.now() + 4 * 7 * 24 * 60 * 60 * 1000);
 
 export async function encrypt<Payload extends JWTPayload>(payload: Payload) {
-  return new SignJWT(payload)
-    .setProtectedHeader({ alg: "HS256" })
+  return new EncryptJWT(payload)
+    .setProtectedHeader({ enc: "A128CBC-HS256", alg: "dir" })
     .setIssuedAt()
     .setExpirationTime("4w")
-    .sign(encodedKey);
+    .encrypt(encodedKey);
 }
 
 export async function decrypt<Payload>(session?: string) {
   try {
     if (!session) return null;
-    const { payload } = await jwtVerify<Payload>(session, encodedKey, {
-      algorithms: ["HS256"],
-    });
+    const { payload } = await jwtDecrypt<Payload>(session, encodedKey);
     return payload;
   } catch (error) {
     console.error("Failed to verify session", error);
