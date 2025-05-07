@@ -1,6 +1,7 @@
 import { count, eq, sql } from "drizzle-orm";
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { cache, Fragment } from "react";
 import { sortBy } from "remeda";
 
@@ -62,7 +63,11 @@ export default async function ProfilePage({
     redirect(`/profile/${profile.handle}`);
   }
 
-  await importRepo(did);
+  if (agent && agent.did == did) {
+    await importRepo(did);
+  } else {
+    after(() => importRepo(did));
+  }
 
   const { orderBy, list } = await searchParams;
 

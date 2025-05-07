@@ -1,7 +1,7 @@
 import cx from "classix";
 import { desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { fromEntries } from "remeda";
 
