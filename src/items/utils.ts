@@ -40,7 +40,7 @@ export const importRepo = cache(async (did: string) => {
   await buildMutex(`import-repo-${did}`).withLock(async () => {
     await db.transaction(async (db) => {
       const recent = new Date();
-      recent.setMinutes(recent.getMinutes() - 30);
+      recent.setMinutes(recent.getMinutes() - 60);
 
       const jetskiTime = await db.query.jetskiTimeT.findFirst();
       const isJetksiBehind = !jetskiTime || jetskiTime.time < recent;
