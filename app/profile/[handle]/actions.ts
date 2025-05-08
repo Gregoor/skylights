@@ -4,12 +4,8 @@ import { and, desc, eq, inArray, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { listItemsT, relsT } from "@/db/schema";
-import {
-  fetchItemsInfo,
-  importRepo,
-  Info,
-  RelRecordValue,
-} from "@/items/utils";
+import { Info } from "@/items/info";
+import { fetchItemsInfo, importRepo, RelRecordValue } from "@/items/utils";
 import { Item } from "@/lexicon/types/my/skylights/defs";
 import { Main as ListItem } from "@/lexicon/types/my/skylights/listItem";
 

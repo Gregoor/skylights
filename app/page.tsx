@@ -3,18 +3,16 @@ import { desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { fromEntries } from "remeda";
+import { entries, fromEntries, groupBy } from "remeda";
 
 import { authClient, getSessionAgent } from "@/auth";
 import { db } from "@/db";
 import { relsT } from "@/db/schema";
-import { RelsProvider } from "@/items/ctx";
-import { ItemCard } from "@/items/ItemCard";
 import { fetchItemsInfo, RelRecordValue } from "@/items/utils";
 import { Card } from "@/ui";
-import { getPublicAgent, timeSince } from "@/utils";
+import { getPublicAgent } from "@/utils";
 
-import { Memput, SubmitButton } from "./client";
+import { Memput, ReviewCarousel, SubmitButton } from "./client";
 
 async function login(formData: FormData) {
   "use server";
@@ -78,23 +76,27 @@ function SignInCard() {
 }
 
 async function RecentReviews() {
-  const sessionAgent = await getSessionAgent(false);
   const agent = getPublicAgent();
 
-  const rows = await db.query.relsT.findMany({
-    orderBy: desc(relsT.reviewedAt),
-    limit: 20,
-  });
+  const rows = await db
+    .select()
+    .from(relsT)
+    .groupBy(relsT.did, relsT.key)
+    .orderBy(desc(relsT.reviewedAt))
+    .limit(100);
   const rels = rows.map((row) => ({
     ...row,
     key: row.key!,
     value: row.value as RelRecordValue,
   }));
 
+  const actors = new Set(
+    rels.map((r) => r.did?.trim()).filter((d): d is string => !!d),
+  );
   const {
     data: { profiles },
   } = await agent.getProfiles({
-    actors: rels.map((r) => r.did?.trim()).filter((d): d is string => !!d),
+    actors: [...actors],
   });
 
   const info = await fetchItemsInfo(
@@ -103,22 +105,20 @@ async function RecentReviews() {
   const profilesByDid = fromEntries(profiles.map((p) => [p.did, p]));
 
   return (
-    <RelsProvider initialRels={fromEntries(rels.map((r) => [r.key, r.value]))}>
-      {rels.map((rel) => {
-        const reviewer = rel.did && profilesByDid[rel.did];
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      {entries(groupBy(rels, (r) => r.did!)).map(([did, rels]) => {
+        const reviewer = profilesByDid[did];
         if (!reviewer) return null;
         return (
-          <ItemCard
-            key={rel.key}
-            item={rel.value.item}
-            readonly={reviewer.did != sessionAgent?.did}
-            ago={rel.reviewedAt ? timeSince(rel.reviewedAt) : undefined}
-            profileHandle={reviewer.handle}
-            {...{ info, reviewer }}
+          <ReviewCarousel
+            key={did}
+            profile={reviewer}
+            rels={rels}
+            info={info}
           />
         );
       })}
-    </RelsProvider>
+    </div>
   );
 }
 
@@ -131,26 +131,23 @@ export default async function LandingPage() {
 
       <Card>
         <div className="mb-2 text-center">
-          <h1 className="text-xl">💫 Skylights 💫</h1>
-          <h2 className="text-lg text-gray-200">
-            All your public reviews, in one place
-          </h2>
+          <h1 className="text-lg">All your public reviews, in one place</h1>
         </div>
-        <ul className="list-disc list-inside">
-          <li>
-            Your data is yours, and not locked into a silo like on other
-            platforms, thanks to ATProto (the protocol behind Bluesky)
-          </li>
-          <li>
-            One platform for all your reviews. At the moment that includes
-            books, movies and TV shows. Next up: Papers and URLs.
-          </li>
-        </ul>
+        <p>
+          One platform for all your reviews. At the moment that includes books,
+          movies and TV shows.
+          <br />
+          Next up: Papers and URLs.
+          <br />
+          <br />
+          Your data is yours, and not locked into a silo like on other
+          platforms, thanks to ATProto (the protocol behind Bluesky).
+        </p>
         <hr className="my-3 border-gray-700" />
         <div className="flex flex-row gap-2 justify-between text-sm">
           <a
             href="https://github.com/Gregoor/skylights"
-            className="hover:underline"
+            className="underline hover:no-underline"
           >
             View Source / Report Issues
           </a>
@@ -158,7 +155,7 @@ export default async function LandingPage() {
             Made by{" "}
             <a
               href="https://bsky.app/profile/watwa.re"
-              className="hover:underline"
+              className="underline hover:no-underline"
             >
               @watwa.re
             </a>

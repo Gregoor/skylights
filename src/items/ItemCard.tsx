@@ -4,8 +4,8 @@ import { Item } from "@/lexicon/types/my/skylights/defs";
 
 import { BaseCard } from "./BaseCard";
 import { BOOK_KEY, BookCard } from "./BookCard";
+import { Info } from "./info";
 import { MOVIE_KEY, MovieCard, SHOW_KEY, TVShowCard } from "./tmdb";
-import type { Info } from "./utils";
 
 export function ItemCard({
   item,

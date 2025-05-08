@@ -1,10 +1,18 @@
 "use client";
 
+import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import cx from "classix";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import ClickAwayListener from "react-click-away-listener";
 import { useFormStatus } from "react-dom";
+
+import { AvatarLink } from "@/AvatarLink";
+import { getBasicItemFields, Info } from "@/items/info";
+import { RatingSlider } from "@/items/RatingSlider";
+import { RelRecordValue } from "@/items/utils";
+import { timeSince } from "@/utils";
 
 export function SubmitButton() {
   const { pending } = useFormStatus();
@@ -64,5 +72,114 @@ export function Memput(
       value={value}
       onChange={(e) => setValue(e.target.value)}
     />
+  );
+}
+
+export function ReviewCarousel({
+  profile,
+  rels,
+  info,
+}: {
+  profile: ProfileViewDetailed;
+  rels: { key: string; value: RelRecordValue }[];
+  info: Info;
+}) {
+  const [index, setIndex] = useState(0);
+  const [expanded, setExpanded] = useState(false);
+  const relsWithFields = useMemo(
+    () =>
+      rels.filter(
+        ({ value: { item } }) => item && getBasicItemFields(item, info),
+      ),
+    [rels, info],
+  );
+  const rel = useMemo(() => relsWithFields.at(index), [relsWithFields, index]);
+  const item = rel?.value.item;
+  const fields = item ? getBasicItemFields(item, info) : null;
+  if (!fields) return null;
+  const ratedAt = rel?.value.rating?.createdAt ?? rel?.value.note?.createdAt;
+  return (
+    <div className="border border-gray-600/60 flex flex-col">
+      <ClickAwayListener onClickAway={() => setExpanded(false)}>
+        <div
+          className="relative w-full overflow-hidden"
+          style={{ aspectRatio: "2/3" }}
+          onClick={() => setExpanded(true)}
+          onMouseEnter={() => setExpanded(true)}
+          onMouseLeave={() => setExpanded(false)}
+        >
+          <img
+            key={index}
+            src={fields.imageURL}
+            alt={fields.title}
+            loading="lazy"
+          />
+          <div
+            className={cx(
+              "absolute left-0 top-0 p-2 w-full h-full overflow-hidden",
+              "bg-gray-700/70 transition-opacity",
+              !expanded && "pointer-events-none",
+            )}
+            style={{ opacity: +expanded * 100 }}
+          >
+            <Link
+              className="block text-center text-lg mb-2 hover:underline"
+              href={`/reviews/${item?.ref}/${item?.value}`}
+            >
+              {fields.title}
+            </Link>
+            <Link
+              className="hover:opacity-80"
+              href={`/profile/${profile.handle}/review/${item?.ref}/${item?.value}`}
+            >
+              <p>{rel?.value.note?.value}</p>
+            </Link>
+          </div>
+        </div>
+      </ClickAwayListener>
+      <div className="p-0.5 bg-gray-600/60">
+        <div className="flex flex-row justify-between gap-1">
+          <button
+            type="button"
+            className={cx(
+              "px-2 hover:bg-gray-200/20 font-mono font-semibold",
+              index == 0 && "invisible",
+            )}
+            onClick={() => setIndex((i) => i - 1)}
+          >
+            {"←"}
+          </button>
+          <div className="flex items-center">
+            <RatingSlider
+              value={rel?.value.rating?.value ?? null}
+              disabled
+              smol
+            />
+          </div>
+          <button
+            type="button"
+            className={cx(
+              "px-2 hover:bg-gray-200/20 font-mono font-semibold",
+              index + 1 == relsWithFields.length && "invisible",
+            )}
+            onClick={() => setIndex((i) => i + 1)}
+          >
+            {"→"}
+          </button>
+        </div>
+        <div className="flex flex-row items-center gap-2">
+          <AvatarLink profile={profile} className="!w-5 !h-5" />
+          <NavLink
+            href={`/profile/${profile.handle}`}
+            className="!text-white overflow-hidden whitespace-nowrap text-ellipsis"
+          >
+            {profile.displayName}
+          </NavLink>
+          <div className="ml-auto text-gray-400">
+            {ratedAt && timeSince(new Date(ratedAt))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

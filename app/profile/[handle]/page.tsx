@@ -151,15 +151,17 @@ export default async function ProfilePage({
             </>
           )}
         </div>
-        <ItemList
-          key={JSON.stringify({ list, orderBy })}
-          did={did}
-          handle={handle}
-          list={list}
-          readonly={!isOwnProfile}
-          info={{ books: {}, movies: {}, shows: {} }}
-          orderBy={orderBy ?? "best"}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <ItemList
+            key={JSON.stringify({ list, orderBy })}
+            did={did}
+            handle={handle}
+            list={list}
+            readonly={!isOwnProfile}
+            info={{ books: {}, movies: {}, shows: {} }}
+            orderBy={orderBy ?? "best"}
+          />
+        </div>
       </div>
     </RelsProvider>
   );

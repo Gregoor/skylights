@@ -9,11 +9,11 @@ import { AvatarLink } from "@/AvatarLink";
 import { db } from "@/db";
 import { BOOK_KEY } from "@/items/BookCard";
 import { RelsProvider } from "@/items/ctx";
+import { getBasicItemFields } from "@/items/info";
 import { ItemCard } from "@/items/ItemCard";
 import { RatingSlider } from "@/items/RatingSlider";
 import { MOVIE_KEY, SHOW_KEY } from "@/items/tmdb";
-import { fetchItemsInfo, Info, RelRecordValue } from "@/items/utils";
-import { Item } from "@/lexicon/types/my/skylights/defs";
+import { fetchItemsInfo, RelRecordValue } from "@/items/utils";
 import { CardSection, SectionedCard } from "@/ui";
 import { getPublicAgent, timeSince } from "@/utils";
 
@@ -22,40 +22,6 @@ type Params = Promise<{
   value: string;
 }>;
 
-function getOG_Fields(item: Item, info: Info) {
-  switch (item.ref) {
-    case BOOK_KEY: {
-      const book = info.books[item.value];
-      return book
-        ? {
-            title: book.title,
-            imageURL: `https://covers.openlibrary.org/b/olid/${book.editions.docs.at(0)?.key.split("/").at(2)}-L.jpg`,
-          }
-        : null;
-    }
-    case MOVIE_KEY: {
-      const movie = info.movies[Number(item.value)];
-      return movie
-        ? {
-            title: `${movie.title} (${new Date(movie.release_date).getFullYear()})`,
-            imageURL: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-          }
-        : null;
-    }
-    case SHOW_KEY: {
-      const show = info.shows[Number(item.value)];
-      return show
-        ? {
-            title: `${show.name} (${new Date(show.first_air_date).getFullYear()})`,
-            imageURL: `https://image.tmdb.org/t/p/w500${show.poster_path}`,
-          }
-        : null;
-    }
-    default:
-      return null;
-  }
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -63,7 +29,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const item = mapValues(await params, decodeURIComponent);
   const info = await fetchItemsInfo([item]);
-  const fields = getOG_Fields(item, info);
+  const fields = getBasicItemFields(item, info);
   if (!fields) return { title: "Skylights" };
   return {
     title: fields.title,

@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Image from "next/image";
 
 import { getSessionAgent } from "@/auth";
 import { AvatarLink } from "@/AvatarLink";
 import { ClientOnly } from "@/ClientOnly";
+import { HasSessionProvider } from "@/session-ctx";
 import { Stars } from "@/Stars";
 
-import "./globals.css";
-
-import { HasSessionProvider } from "@/session-ctx";
-
 import { NavLink } from "./client";
+import logo from "./logo.png";
+
+import "./globals.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -38,11 +39,19 @@ async function Header() {
         />
       )}
       <div className="mt-4 flex gap-6 justify-center items-center">
-        <NavLink href="/">{profile ? "Home" : "Login"}</NavLink>
+        {profile && <div className="hidden sm:block" />}
+        <NavLink href="/">
+          <Image src={logo} width={250} alt="Skylights" />
+        </NavLink>
         {profile && (
           <>
             <AvatarLink className="sm:hidden" profile={profile.data} />
-            <NavLink href="/search">Search</NavLink>
+            <NavLink
+              href="/search"
+              className="!no-underline hover:invert text-lg"
+            >
+              🔍
+            </NavLink>
           </>
         )}
       </div>
@@ -66,7 +75,7 @@ export default async function RootLayout({
           <Stars />
         </ClientOnly>
         <HasSessionProvider value={!!agent}>
-          <div className="max-w-xl mx-auto p-4 flex flex-col gap-4">
+          <div className="max-w-4xl mx-auto p-4 flex flex-col gap-4">
             {children}
           </div>
         </HasSessionProvider>

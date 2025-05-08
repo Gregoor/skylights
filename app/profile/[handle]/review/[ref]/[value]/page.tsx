@@ -7,12 +7,12 @@ import { db } from "@/db";
 import { relsT } from "@/db/schema";
 import { BOOK_KEY } from "@/items/BookCard";
 import { RelsProvider } from "@/items/ctx";
+import { Info } from "@/items/info";
 import { ItemCard } from "@/items/ItemCard";
 import { MOVIE_KEY, SHOW_KEY } from "@/items/tmdb";
 import {
   fetchItemsInfo,
   importRepo,
-  Info,
   RelRecordValue,
   resolveHandle,
 } from "@/items/utils";

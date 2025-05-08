@@ -19,6 +19,7 @@ import { Record as _RelRecord } from "@/lexicon/types/my/skylights/rel";
 import { getPublicAgent } from "@/utils";
 
 import { Book, BOOK_KEY } from "./BookCard";
+import { Info } from "./info";
 import { Movie, MOVIE_KEY, Show, SHOW_KEY } from "./tmdb";
 
 export type RelRecordValue = _RelRecord;
@@ -113,12 +114,6 @@ export async function fetchBooks(editionKeys: string[]) {
   );
   return (await response.json()).docs as Book[];
 }
-
-export type Info = {
-  books: Record<string, Book>;
-  movies: Record<number, Movie>;
-  shows: Record<number, Show>;
-};
 
 async function fetchDetailsTMDB(category: "movie" | "tv", id: string) {
   return fetch(`https://api.themoviedb.org/3/${category}/${id}`, {

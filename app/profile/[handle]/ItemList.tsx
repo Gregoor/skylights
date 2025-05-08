@@ -6,8 +6,8 @@ import useInfiniteScroll from "react-infinite-scroll-hook";
 import { mapValues } from "remeda";
 
 import { useRels } from "@/items/ctx";
+import { getBasicItemFields, Info } from "@/items/info";
 import { ItemCard } from "@/items/ItemCard";
-import { Info } from "@/items/utils";
 import { Item } from "@/lexicon/types/my/skylights/defs";
 
 import { findItemsWithInfo, RelsOrderBy } from "./actions";
@@ -66,22 +66,26 @@ export function ItemList({
 
   return (
     <>
-      {items.map((item, i) => (
-        <AnimatePresence key={i}>
-          <motion.div
-            initial={i < PAGE_SIZE ? undefined : { y: 16, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-          >
-            <ItemCard
-              key={i}
-              info={info}
-              item={item}
-              profileHandle={handle}
-              {...{ readonly }}
-            />
-          </motion.div>
-        </AnimatePresence>
-      ))}
+      {items.map((item, i) => {
+        const fields = getBasicItemFields(item, info);
+        if (!fields) return null;
+        return (
+          <AnimatePresence key={i}>
+            <motion.div
+              initial={i < PAGE_SIZE ? undefined : { y: 16, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+            >
+              <ItemCard
+                key={i}
+                info={info}
+                item={item}
+                profileHandle={handle}
+                {...{ readonly }}
+              />
+            </motion.div>
+          </AnimatePresence>
+        );
+      })}
       {hasNextPage && <div ref={sentryRef}>Loading...</div>}
     </>
   );
