@@ -175,8 +175,11 @@ export function ReviewCarousel({
           >
             {profile.displayName}
           </NavLink>
-          <div className="ml-auto text-gray-400">
+          <div className="ml-auto text-gray-400 flex flex-row gap-1">
             {ratedAt && timeSince(new Date(ratedAt))}
+            <span title={fields.type}>
+              {{ movie: "🎞️", show: "📺", book: "📕" }[fields.type]}
+            </span>
           </div>
         </div>
       </div>

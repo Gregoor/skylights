@@ -1,3 +1,5 @@
+"use cache";
+
 import cx from "classix";
 import { desc } from "drizzle-orm";
 import { redirect } from "next/navigation";
