@@ -10,6 +10,7 @@ import {
   importedDidsT,
   listItemsT,
   listsT,
+  olBooksT,
   relsT,
   tmdbMoviesT,
   tmdbShowsT,
@@ -137,7 +138,9 @@ export async function fetchItemsInfo(items: Item[]): Promise<Info> {
   const movieIds = idsByRefs[MOVIE_KEY];
   const showIds = idsByRefs[SHOW_KEY];
   const [books, movies, shows] = await Promise.all([
-    bookIds ? fetchBooks(bookIds) : ([] as Book[]),
+    bookIds
+      ? db.query.olBooksT.findMany({ where: inArray(olBooksT.id, bookIds) })
+      : ([] as { id: string; value: unknown }[]),
     movieIds
       ? db.query.tmdbMoviesT.findMany({
           where: inArray(tmdbMoviesT.id, movieIds.map(Number)),
@@ -149,6 +152,24 @@ export async function fetchItemsInfo(items: Item[]): Promise<Info> {
         })
       : ([] as { id: number; value: unknown }[]),
   ]);
+
+  const missingBookIds = bookIds.filter((id) => !books.some((b) => b.id == id));
+  if (missingBookIds.length > 0) {
+    const bookData = await fetchBooks(missingBookIds);
+    const missingBooks = await db
+      .insert(olBooksT)
+      .values(
+        bookData
+          .map((r) => ({
+            id: r.editions.docs.at(0)?.key.split("/").at(2),
+            value: r,
+          }))
+          .filter((r): r is { id: string; value: Book } => !!r.id),
+      )
+      .onConflictDoNothing()
+      .returning();
+    books.push(...missingBooks);
+  }
 
   const missingMovieIds = movieIds?.filter(
     (id) => !movies.some((m) => m.id == Number(id)),
@@ -182,10 +203,10 @@ export async function fetchItemsInfo(items: Item[]): Promise<Info> {
 
   return {
     books: fromEntries(
-      books.map((book) => [
-        book.editions.docs.at(0)?.key.split("/").at(2) ?? "",
-        book,
-      ]),
+      books.map((b) => {
+        const book = b.value as Book;
+        return [book.editions.docs.at(0)?.key.split("/").at(2) ?? "", book];
+      }),
     ),
     movies: fromEntries(movies.map((row) => [row.id, row.value as Movie])),
     shows: fromEntries(shows.map((row) => [row.id, row.value as Show])),

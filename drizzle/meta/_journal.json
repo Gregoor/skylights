@@ -43,6 +43,27 @@
       "when": 1741790158508,
       "tag": "0005_easy_master_mold",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1746722742150,
+      "tag": "0006_lumpy_virginia_dare",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1746787500106,
+      "tag": "0007_dapper_gabe_jones",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1746787702705,
+      "tag": "0008_groovy_old_lace",
+      "breakpoints": true
     }
   ]
 }

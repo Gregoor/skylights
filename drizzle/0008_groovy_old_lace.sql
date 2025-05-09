@@ -1,0 +1,1 @@
+DROP TABLE "ol_book_editions" CASCADE;

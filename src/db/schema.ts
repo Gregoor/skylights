@@ -6,6 +6,7 @@ import {
   jsonb,
   pgTable,
   primaryKey,
+  text,
   timestamp,
 } from "drizzle-orm/pg-core";
 
@@ -47,6 +48,11 @@ export const jetskiTimeT = pgTable("jetski_time", {
   time: timestamp().notNull(),
 });
 
+export const olBooksT = pgTable("ol_books", {
+  id: text().primaryKey(),
+  value: jsonb().notNull(),
+});
+
 export const tmdbMoviesT = pgTable("tmdb_movies", {
   id: integer().primaryKey(),
   value: jsonb().notNull(),
@@ -79,7 +85,7 @@ export const listItemsT = pgTable(
   (t) => ({
     pk: primaryKey({ columns: [t.did, t.key] }),
     listKeyIdx: index("list_items_list_key_idx").on(
-      sql`value->'list'->'type'->>'type'`,
+      sql`(value->'list'->'type'->>'type')`,
     ),
     itemValueIdx: index("list_items_item_value_idx").on(
       sql`(value->'item'->>'value')`,
@@ -87,6 +93,6 @@ export const listItemsT = pgTable(
     itemRefIdx: index("list_items_item_ref_idx").on(
       sql`(value->'item'->>'ref')`,
     ),
-    addedAtIdx: index("list_items_added_at_idx").on(sql`value->>'addedAt'`),
+    addedAtIdx: index("list_items_added_at_idx").on(sql`(value->>'addedAt')`),
   }),
 );
