@@ -30,7 +30,7 @@ function ImgWithDummy(props: React.ComponentProps<"img">) {
     setStatus("loading");
     if (!props.src) return;
     const img = new Image();
-    img.src = props.src;
+    img.src = props.src as string;
     img.onload = (event) => {
       setStatus(
         (event.target as HTMLImageElement).naturalWidth == 1 ? "error" : "done",
