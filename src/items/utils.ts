@@ -127,7 +127,9 @@ async function fetchDetailsTMDB(category: "movie" | "tv", id: string) {
 }
 
 export async function fetchItemsInfo(items: Item[]): Promise<Info> {
-  const idsByRefs = mapValues(
+  const idsByRefs: Partial<
+    Record<"open-library" | "tmdb:m" | "tmdb:s", string[]>
+  > = mapValues(
     groupBy(
       items.filter((i): i is Item => "ref" in i),
       (i) => i.ref,
@@ -156,7 +158,7 @@ export async function fetchItemsInfo(items: Item[]): Promise<Info> {
   const missingBookIds = bookIds?.filter(
     (id) => !books.some((b) => b.id == id),
   );
-  if (missingBookIds.length > 0) {
+  if (missingBookIds && missingBookIds.length > 0) {
     const bookData = await fetchBooks(missingBookIds);
     const missingBooks = await db
       .insert(olBooksT)
@@ -176,7 +178,7 @@ export async function fetchItemsInfo(items: Item[]): Promise<Info> {
   const missingMovieIds = movieIds?.filter(
     (id) => !movies.some((m) => m.id == Number(id)),
   );
-  if (missingMovieIds?.length > 0) {
+  if (missingMovieIds && missingMovieIds.length > 0) {
     const movieData = await Promise.all(
       missingMovieIds.map((id) => fetchDetailsTMDB("movie", id)),
     );
@@ -191,7 +193,7 @@ export async function fetchItemsInfo(items: Item[]): Promise<Info> {
   const missingShowIds = showIds?.filter(
     (id) => !shows.some((m) => m.id == Number(id)),
   );
-  if (missingShowIds?.length > 0) {
+  if (missingShowIds && missingShowIds.length > 0) {
     const showData = await Promise.all(
       missingShowIds.map((id) => fetchDetailsTMDB("tv", id)),
     );
