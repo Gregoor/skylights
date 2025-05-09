@@ -30,6 +30,7 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.40.0",
     "jose": "^6.0.10",
+    "lucide-react": "^0.509.0",
     "motion": "12.10.5",
     "multiformats": "^13.3.3",
     "next": "15.3.2",

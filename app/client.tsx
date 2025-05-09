@@ -2,9 +2,10 @@
 
 import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import cx from "classix";
+import { BookIcon, FilmIcon, TvMinimalIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ClickAwayListener from "react-click-away-listener";
 import { useFormStatus } from "react-dom";
 
@@ -175,10 +176,15 @@ export function ReviewCarousel({
           >
             {profile.displayName}
           </NavLink>
-          <div className="ml-auto text-gray-400 flex flex-row gap-1">
+          <div className="ml-auto text-gray-400 flex flex-row items-center gap-1">
             {ratedAt && timeSince(new Date(ratedAt))}
             <span title={fields.type}>
-              {{ movie: "🎞️", show: "📺", book: "📕" }[fields.type]}
+              {React.createElement(
+                { movie: FilmIcon, show: TvMinimalIcon, book: BookIcon }[
+                  fields.type
+                ]!,
+                { size: 16 },
+              )}
             </span>
           </div>
         </div>
