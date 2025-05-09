@@ -153,7 +153,9 @@ export async function fetchItemsInfo(items: Item[]): Promise<Info> {
       : ([] as { id: number; value: unknown }[]),
   ]);
 
-  const missingBookIds = bookIds.filter((id) => !books.some((b) => b.id == id));
+  const missingBookIds = bookIds?.filter(
+    (id) => !books.some((b) => b.id == id),
+  );
   if (missingBookIds.length > 0) {
     const bookData = await fetchBooks(missingBookIds);
     const missingBooks = await db

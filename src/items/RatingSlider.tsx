@@ -149,6 +149,7 @@ export function RatingSlider({
       <input
         ref={inputRef}
         type="range"
+        aria-label="star rating"
         className={cx(
           "absolute left-0 top-0 w-full h-full opacity-0",
           !disabled && "cursor-pointer",

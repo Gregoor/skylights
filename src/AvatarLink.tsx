@@ -26,7 +26,7 @@ export function AvatarLink({
       className={cx(
         "rounded-full block flex-shrink-0",
         className,
-        smol ? "w-8 h-8" : "w-12 h-12"
+        smol ? "w-8 h-8" : "w-12 h-12",
       )}
       style={{
         boxShadow: `0 0 ${smol ? 8 : 12}px ${hovered ? (smol ? 1 : 2) : 0}px white`,
@@ -37,7 +37,11 @@ export function AvatarLink({
       onMouseLeave={() => setHovered(false)}
       {...props}
     >
-      <img src={profile.avatar} className="rounded-full" />
+      <img
+        src={profile.avatar}
+        className="rounded-full"
+        alt={profile.displayName ?? profile.handle}
+      />
     </Link>
   );
 }
