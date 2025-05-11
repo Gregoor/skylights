@@ -1,5 +1,3 @@
-import "server-only";
-
 import { Pool } from "@neondatabase/serverless";
 import advisoryLock from "advisory-lock";
 import { drizzle } from "drizzle-orm/neon-serverless";

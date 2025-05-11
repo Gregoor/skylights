@@ -6,6 +6,7 @@ import {
   NodeSavedState,
 } from "@atproto/oauth-client-node";
 import { cache } from "react";
+import * as v from "valibot";
 
 import { buildMutex } from "./db";
 import { EncryptedCookie } from "./encrypted-cookie";
@@ -83,6 +84,11 @@ export const authClient = new NodeOAuthClient({
     return result!;
   },
 });
+
+export const AuthStateSchema = v.object({
+  returnTo: v.optional(v.pipe(v.string(), v.startsWith("/"))),
+});
+export type AuthState = v.InferInput<typeof AuthStateSchema>;
 
 export const getSessionAgent = cache(async (refresh?: boolean | "auto") => {
   const cookie = await sessionCookie.get();

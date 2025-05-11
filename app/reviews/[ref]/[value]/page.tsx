@@ -89,7 +89,10 @@ export default async function RefPage({ params }: { params: Params }) {
         >
           {!agent && (
             <div className="mt-4">
-              <Link href="/" className="underline hover:opacity-80">
+              <Link
+                href={`/?returnTo=/reviews/${item.ref}/${item.value}`}
+                className="underline hover:opacity-80"
+              >
                 Login
               </Link>{" "}
               to add your review

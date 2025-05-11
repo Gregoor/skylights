@@ -6,9 +6,6 @@ import { cookies } from "next/headers";
 const secretKey = process.env.SESSION_SECRET!.slice(0, 256);
 const encodedKey = new TextEncoder().encode(secretKey);
 
-const getExpiryFromNow = () =>
-  new Date(Date.now() + 4 * 7 * 24 * 60 * 60 * 1000);
-
 export async function encrypt<Payload extends JWTPayload>(payload: Payload) {
   return new EncryptJWT(payload)
     .setProtectedHeader({ enc: "A128CBC-HS256", alg: "dir" })
@@ -36,7 +33,7 @@ export class EncryptedCookie<D extends JWTPayload> {
     (await cookies()).set(this.key, session, {
       httpOnly: true,
       secure: true,
-      expires: getExpiryFromNow(),
+      expires: data.exp,
       sameSite: "lax",
     });
   }
@@ -53,7 +50,7 @@ export class EncryptedCookie<D extends JWTPayload> {
     cookieStore.set(this.key, session, {
       httpOnly: true,
       secure: true,
-      expires: getExpiryFromNow(),
+      expires: payload.exp,
       sameSite: "lax",
     });
   }

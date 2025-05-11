@@ -1,9 +1,12 @@
-import { NextRequest } from "next/server";
-
-import { authClient } from "@/auth";
 import { redirect } from "next/navigation";
+import { NextRequest } from "next/server";
+import * as v from "valibot";
+
+import { authClient, AuthStateSchema } from "@/auth";
 
 export async function GET({ nextUrl }: NextRequest) {
-  await authClient.callback(nextUrl.searchParams);
-  redirect("/");
+  const { state } = await authClient.callback(nextUrl.searchParams);
+  redirect(
+    state ? (v.parse(AuthStateSchema, JSON.parse(state)).returnTo ?? "/") : "/",
+  );
 }

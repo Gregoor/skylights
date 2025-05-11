@@ -4,35 +4,86 @@ import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/act
 import cx from "classix";
 import { BookIcon, FilmIcon, TvMinimalIcon } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import ClickAwayListener from "react-click-away-listener";
-import { useFormStatus } from "react-dom";
 
 import { AvatarLink } from "@/AvatarLink";
 import { getBasicItemFields, Info } from "@/items/info";
 import { RatingSlider } from "@/items/RatingSlider";
 import { RelRecordValue } from "@/items/utils";
+import { Card } from "@/ui";
 import { timeSince } from "@/utils";
 
-export function SubmitButton() {
-  const { pending } = useFormStatus();
+import { login } from "./actions";
+
+export function SignInCard() {
+  const searchParams = useSearchParams();
+  const [pending, setPending] = useState(false);
+  const [handle, setHandle] = useState(
+    typeof localStorage == "undefined"
+      ? ""
+      : (localStorage.getItem("handle") ?? ""),
+  );
+  useEffect(() => {
+    localStorage.setItem("handle", handle);
+  }, [handle]);
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className={[
-        "border rounded-full border-gray-400 m-0.5 py-1 px-2",
-        "hover:!filter-none hover:border-white transition-all",
-        pending ? "animate-pulse" : "",
-      ].join(" ")}
-      style={{
-        WebkitTransition: "-webkit-filter 200ms linear",
-        filter: pending ? undefined : "brightness(50%) invert(70%)",
-      }}
+    <Card
+      className="mx-auto w-full max-w-sm"
+      sectionClassName="flex flex-col gap-2"
     >
-      💫
-    </button>
+      <h1 className="text-lg">Sign-in with Bluesky</h1>
+      <form
+        className="flex flex-row gap-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          setPending(true);
+          login(handle, searchParams.get("returnTo"));
+        }}
+      >
+        <label
+          className={cx(
+            "group border rounded-lg border-gray-400 focus-within:border-white",
+            "transition-all w-full flex flex-row bg-black",
+          )}
+        >
+          <div
+            className={cx(
+              "border-r border-gray-400 px-2 flex items-center text-gray-400",
+              "group-focus-within:border-white group-focus-within:text-white",
+              "transition-all text-sm",
+            )}
+          >
+            @
+          </div>
+          <input
+            type="text"
+            placeholder="Handle"
+            autoCorrect="off"
+            autoComplete="off"
+            className="outline-none p-2 w-full bg-transparent"
+            value={handle}
+            onChange={(e) => setHandle(e.target.value)}
+          />
+        </label>
+        <button
+          type="submit"
+          disabled={pending}
+          className={[
+            "border rounded-full border-gray-400 m-0.5 py-1 px-2",
+            "hover:!filter-none hover:border-white transition-all",
+            pending ? "animate-pulse" : "",
+          ].join(" ")}
+          style={{
+            WebkitTransition: "-webkit-filter 200ms linear",
+            filter: pending ? undefined : "brightness(50%) invert(70%)",
+          }}
+        >
+          💫
+        </button>
+      </form>
+    </Card>
   );
 }
 
@@ -54,27 +105,6 @@ export const NavLink = ({
     </Link>
   );
 };
-
-export function Memput(
-  props: { name: string } & React.ComponentProps<"input">,
-) {
-  const [value, setValue] = useState(
-    props.value ??
-      (typeof localStorage == "undefined"
-        ? ""
-        : (localStorage.getItem(props.name) ?? "")),
-  );
-  useEffect(() => {
-    localStorage.setItem(props.name, value?.toString());
-  }, [props.name, value]);
-  return (
-    <input
-      {...props}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-    />
-  );
-}
 
 export function ReviewCarousel({
   profile,
