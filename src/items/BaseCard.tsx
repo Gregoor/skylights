@@ -167,7 +167,7 @@ export function BaseCard({
           </div>
         </CardSection>
       )}
-      <CardSection className="relative flex flex-row gap-4 overflow-hidden">
+      <CardSection className="relative flex flex-row gap-4">
         {!pathname.startsWith("/search") && <Badge type={type} />}
 
         <Link href={itemPathname}>
