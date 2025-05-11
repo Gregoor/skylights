@@ -13,6 +13,8 @@ import logo from "./logo.png";
 
 import "./globals.css";
 
+import Link from "next/link";
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -41,17 +43,17 @@ async function Header() {
       <div className="mt-4 flex gap-6 justify-center items-center">
         {profile && <div className="hidden sm:block" />}
         <NavLink href="/">
-          <Image src={logo} width={250} alt="Skylights" />
+          <Image src={logo} alt="Skylights" className="w-44 sm:w-64" />
         </NavLink>
         {profile && (
           <>
             <AvatarLink className="sm:hidden" profile={profile.data} />
-            <NavLink
+            <Link
               href="/search"
-              className="!no-underline hover:invert text-lg"
+              className="text-xl hover:scale-150 transition-transform"
             >
-              🔍
-            </NavLink>
+              🔭
+            </Link>
           </>
         )}
       </div>
