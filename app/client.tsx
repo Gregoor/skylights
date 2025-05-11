@@ -2,7 +2,6 @@
 
 import { ProfileViewDetailed } from "@atproto/api/dist/client/types/app/bsky/actor/defs";
 import cx from "classix";
-import { BookIcon, FilmIcon, TvMinimalIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
@@ -11,6 +10,7 @@ import ClickAwayListener from "react-click-away-listener";
 import { AvatarLink } from "@/AvatarLink";
 import { getBasicItemFields, Info } from "@/items/info";
 import { RatingSlider } from "@/items/RatingSlider";
+import { TypeIcon } from "@/items/TypeIcon";
 import { RelRecordValue } from "@/items/utils";
 import { Card } from "@/ui";
 import { timeSince } from "@/utils";
@@ -208,14 +208,7 @@ export function ReviewCarousel({
           </NavLink>
           <div className="ml-auto text-gray-400 flex flex-row items-center gap-1">
             {ratedAt && timeSince(new Date(ratedAt))}
-            <span title={fields.type}>
-              {React.createElement(
-                { movie: FilmIcon, show: TvMinimalIcon, book: BookIcon }[
-                  fields.type
-                ]!,
-                { size: 16 },
-              )}
-            </span>
+            <TypeIcon value={fields.type} />
           </div>
         </div>
       </div>

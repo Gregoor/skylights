@@ -25,7 +25,7 @@ export function getBasicItemFields(item: Item, info: Info) {
       const movie = info.movies[Number(item.value)];
       return movie
         ? {
-            type: "movie",
+            type: "film",
             title: `${movie.title} (${new Date(movie.release_date).getFullYear()})`,
             imageURL: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
           }

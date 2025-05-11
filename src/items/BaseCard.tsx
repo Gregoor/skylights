@@ -18,6 +18,7 @@ import { now } from "@/utils";
 import { getNextTID, useRels, useRelsLoading } from "./ctx";
 import { ListButton } from "./ListButton";
 import { RatingSlider } from "./RatingSlider";
+import { TypeIcon } from "./TypeIcon";
 import { Badge } from "./ui";
 import { RelRecordValue } from "./utils";
 
@@ -168,7 +169,12 @@ export function BaseCard({
         </CardSection>
       )}
       <CardSection className="relative flex flex-row gap-4">
-        {!pathname.startsWith("/search") && <Badge type={type} />}
+        <div
+          className="absolute top-0 right-0 p-1 bg-gray-700"
+          style={{ borderBottomLeftRadius: 6 }}
+        >
+          <TypeIcon value={type} />
+        </div>
 
         <Link href={itemPathname}>
           <div className="border border-gray-600/50 flex-shrink-0 w-32 h-48 sm:w-40 sm:h-60 flex justify-center">
@@ -179,13 +185,15 @@ export function BaseCard({
           </div>
         </Link>
         <div className="w-full flex flex-col gap-2">
-          {pathname == itemPathname ? (
-            <div>{children}</div>
-          ) : (
-            <Link href={itemPathname} className="hover:opacity-80">
-              {children}
-            </Link>
-          )}
+          <div className="pr-0.5">
+            {pathname == itemPathname ? (
+              <div>{children}</div>
+            ) : (
+              <Link href={itemPathname} className="hover:opacity-80">
+                {children}
+              </Link>
+            )}
+          </div>
 
           <div className="flex flex-row gap-3 items-center">
             {(!readonly || ratingValue) && (
