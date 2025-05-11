@@ -19,7 +19,6 @@ import { getNextTID, useRels, useRelsLoading } from "./ctx";
 import { ListButton } from "./ListButton";
 import { RatingSlider } from "./RatingSlider";
 import { TypeIcon } from "./TypeIcon";
-import { Badge } from "./ui";
 import { RelRecordValue } from "./utils";
 
 function ImgWithDummy(props: React.ComponentProps<"img">) {
