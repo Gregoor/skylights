@@ -39,7 +39,12 @@ export function SignInCard() {
         onSubmit={(e) => {
           e.preventDefault();
           setPending(true);
-          login(handle, searchParams.get("returnTo"));
+          login(
+            handle.includes(".") ? handle : `${handle}.bsky.social`,
+            searchParams.get("returnTo"),
+          ).finally(() => {
+            setPending(false);
+          });
         }}
       >
         <label
