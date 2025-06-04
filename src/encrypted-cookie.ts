@@ -10,7 +10,7 @@ export async function encrypt<Payload extends JWTPayload>(payload: Payload) {
   return new EncryptJWT(payload)
     .setProtectedHeader({ enc: "A128CBC-HS256", alg: "dir" })
     .setIssuedAt()
-    .setExpirationTime("4w")
+    .setExpirationTime(payload.exp ?? "4w")
     .encrypt(encodedKey);
 }
 
@@ -25,15 +25,15 @@ export async function decrypt<Payload>(session?: string) {
   }
 }
 
-export class EncryptedCookie<D extends JWTPayload> {
+export class EncryptedCookie<D extends Omit<JWTPayload, "exp">> {
   constructor(public readonly key: string) {}
 
-  async create(data: D) {
+  async create(data: D & { expires?: Date }) {
     const session = await encrypt(data);
     (await cookies()).set(this.key, session, {
       httpOnly: true,
       secure: true,
-      expires: data.exp,
+      expires: data.expires,
       sameSite: "lax",
     });
   }

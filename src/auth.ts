@@ -66,7 +66,15 @@ export const authClient = new NodeOAuthClient({
   },
 
   sessionStore: {
-    set: (sub, session) => sessionCookie.create({ sub, session }),
+    set: (sub, session) => {
+      return sessionCookie.create({
+        sub,
+        session,
+        expires: session.tokenSet.expires_at
+          ? new Date(session.tokenSet.expires_at)
+          : undefined,
+      });
+    },
     async get(sub) {
       const payload = await sessionCookie.get();
       if (payload?.sub == sub) {
