@@ -1,0 +1,12 @@
+{
+  "name": "@sl/jetski",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "start": "pnpm dotenvx run --env-file=../.env -- tsx index.ts"
+  },
+  "dependencies": {
+    "@atcute/jetstream": "^1.0.2",
+    "@sl/shared": "workspace:*"
+  }
+}

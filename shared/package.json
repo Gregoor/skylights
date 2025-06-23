@@ -1,0 +1,21 @@
+{
+  "name": "@sl/shared",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "migrate:generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@atcute/car": "^3.0.4",
+    "@atproto/api": "^0.14.9",
+    "@atproto/identity": "^0.4.6",
+    "@neondatabase/serverless": "^0.10.4",
+    "advisory-lock": "^2.0.0",
+    "drizzle-orm": "^0.40.0",
+    "pg": "^8.15.6"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.30.5"
+  }
+}

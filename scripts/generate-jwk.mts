@@ -5,7 +5,7 @@ const keyPair = await crypto.subtle.generateKey(
   ["sign", "verify"],
 );
 
-const [privateKey, publicKey] = await Promise.all(
+const [privateKey] = await Promise.all(
   [keyPair.privateKey, keyPair.publicKey].map((key) =>
     crypto.subtle.exportKey("jwk", key),
   ),
