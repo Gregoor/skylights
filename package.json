@@ -6,6 +6,9 @@
     "lint": "eslint .",
     "type-check": "tsc --build"
   },
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.45.1"
   },
