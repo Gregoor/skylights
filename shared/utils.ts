@@ -14,13 +14,15 @@ export const getDidAgent = async (did: string) => {
   return new Agent(`${endpoint ?? "https://bsky.social"}/xrpc`);
 };
 
-export const checkIsRecentlyImported = async (did: string) => {
-  const recent = new Date();
-  recent.setMinutes(recent.getMinutes() - 60);
+export const checkIsRecentlyImported = async (did: string, recent?: Date) => {
+  if (!recent) {
+    recent = new Date();
+    recent.setMinutes(recent.getMinutes() - 60);
 
-  const jetskiTime = await db.query.jetskiTimeT.findFirst();
-  const isJetksiBehind = !jetskiTime || jetskiTime.time < recent;
-  if (!isJetksiBehind) return false;
+    const jetskiTime = await db.query.jetskiTimeT.findFirst();
+    const isJetksiBehind = !jetskiTime || jetskiTime.time < recent;
+    if (isJetksiBehind) return false;
+  }
 
   const importedDid = await db.query.importedDidsT.findFirst({
     where: (t) => and(eq(t.did, did), gt(t.importedAt, recent)),
@@ -86,10 +88,10 @@ export async function deleteRecordRow({
     .where(and(eq(table.did, did), eq(table.key, key)));
 }
 
-export const importRepo = async (did: string) => {
+export const importRepo = async (did: string, recent?: Date) => {
   await buildMutex(`import-repo-${did}`).withLock(async () => {
     await db.transaction(async (db) => {
-      if (await checkIsRecentlyImported(did)) {
+      if (await checkIsRecentlyImported(did, recent)) {
         console.log("⏭️ skipping import for", did);
         return;
       }

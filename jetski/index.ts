@@ -4,10 +4,12 @@ import { jetskiTimeT } from "@sl/shared/db/schema";
 import { deleteRecordRow, importRepo, upsertRecordRow } from "@sl/shared/utils";
 
 async function bumpJetskiTime() {
+  const time = new Date();
   await db.transaction(async (tx) => {
     await tx.delete(jetskiTimeT);
-    await tx.insert(jetskiTimeT).values({ time: new Date() });
+    await tx.insert(jetskiTimeT).values({ time });
   });
+  return time;
 }
 
 async function sync() {
@@ -17,7 +19,7 @@ async function sync() {
   });
   console.log("Listening to Jetstream...");
 
-  await bumpJetskiTime();
+  const time = await bumpJetskiTime();
   setInterval(bumpJetskiTime, 1000 * 60 * 30);
 
   for await (const event of subscription) {
@@ -28,7 +30,7 @@ async function sync() {
         continue;
       }
 
-      await importRepo(did);
+      await importRepo(did, time);
 
       const { collection, rkey: key } = commit;
       switch (commit.operation) {
