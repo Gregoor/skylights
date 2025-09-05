@@ -65,42 +65,36 @@ export default async function LandingPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      {!agent && <SignInCard />}
-
-      <Card>
-        <div className="mb-2 text-center">
-          <h1 className="text-lg">All your public reviews, in one place</h1>
-        </div>
-        <p>
-          One platform for all your reviews. At the moment that includes books,
-          movies and TV shows.
-          <br />
-          Next up: Papers and URLs.
-          <br />
-          <br />
-          Your data is yours, and not locked into a silo like on other
-          platforms, thanks to ATProto (the protocol behind Bluesky).
-        </p>
-        <hr className="my-3 border-gray-700" />
-        <div className="flex flex-row gap-2 justify-between text-sm">
-          <a
-            href="https://github.com/Gregoor/skylights"
-            className="underline hover:no-underline"
-          >
-            View Source / Report Issues
-          </a>
-          <div>
-            Made by{" "}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Card>
+          <div className="mb-2 text-center">
+            <h1 className="text-lg">All your public reviews, in one place</h1>
+          </div>
+          <p>
+            Your data is yours, and not locked into a silo like on other
+            platforms, thanks to ATProto (the protocol behind Bluesky).
+          </p>
+          <hr className="my-3 border-gray-700" />
+          <div className="flex flex-row gap-2 justify-between text-sm">
             <a
-              href="https://bsky.app/profile/watwa.re"
+              href="https://github.com/Gregoor/skylights"
               className="underline hover:no-underline"
             >
-              @watwa.re
+              View Source / Report Issues
             </a>
+            <div>
+              Made by{" "}
+              <a
+                href="https://bsky.app/profile/watwa.re"
+                className="underline hover:no-underline"
+              >
+                @watwa.re
+              </a>
+            </div>
           </div>
-        </div>
-      </Card>
-
+        </Card>
+        {!agent && <SignInCard />}
+      </div>
       <ErrorBoundary fallback={null}>
         <Suspense>
           <RecentReviews />
