@@ -30,7 +30,7 @@ export function SignInCard() {
   }, [handle]);
   return (
     <Card
-      className="mx-auto w-full max-w-sm"
+      className="mx-auto w-full h-fit max-w-sm"
       sectionClassName="flex flex-col gap-2"
     >
       <h1 className="text-lg">Sign-in with Bluesky</h1>
