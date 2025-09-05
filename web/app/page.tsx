@@ -34,7 +34,7 @@ async function RecentReviews() {
   const {
     data: { profiles },
   } = await agent.getProfiles({
-    actors: [...actors],
+    actors: [...actors].slice(0, 25),
   });
 
   const info = await fetchItemsInfo(
