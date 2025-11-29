@@ -10,7 +10,8 @@ import { fetchItemsInfo, RelRecordValue } from "@/items/utils";
 import { Card } from "@/ui";
 import { getPublicAgent } from "@/utils";
 
-import { MigrateToPopfeedCard, ReviewCarousel, SignInCard } from "./client";
+import { ReviewCarousel, SignInCard } from "./client";
+import { MigrateToPopFeedCard } from "./MigrateToPopFeedCard";
 
 async function RecentReviews() {
   "use cache";
@@ -96,7 +97,7 @@ export default async function LandingPage() {
         </Card>
         {!agent && <SignInCard />}
       </div>
-      {profile && <MigrateToPopfeedCard />}
+      {profile && <MigrateToPopFeedCard />}
       <ErrorBoundary fallback={null}>
         <Suspense>
           <RecentReviews />
