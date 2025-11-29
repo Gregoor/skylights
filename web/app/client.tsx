@@ -15,7 +15,7 @@ import { RelRecordValue } from "@/items/utils";
 import { Card } from "@/ui";
 import { timeSince } from "@/utils";
 
-import { login, migrateToPopfeed } from "./actions";
+import { login } from "./actions";
 
 type MigrationLog = {
   type: "info" | "success" | "error" | "warning";
@@ -36,8 +36,36 @@ export function MigrateToPopfeedCard() {
     setLogs([]);
 
     try {
-      const result = await migrateToPopfeed(shouldClear);
-      setLogs(result.logs);
+      const response = await fetch("/api/migrate-to-popfeed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clear: shouldClear }),
+      });
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        addLog("error", "Failed to start migration");
+        return;
+      }
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split("\n").filter(Boolean);
+
+        for (const line of lines) {
+          try {
+            const log = JSON.parse(line);
+            addLog(log.type, log.message);
+          } catch {
+            // Skip invalid JSON
+          }
+        }
+      }
     } catch (error) {
       addLog("error", `Migration failed: ${error}`);
     } finally {
