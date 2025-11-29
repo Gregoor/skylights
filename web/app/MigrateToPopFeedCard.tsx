@@ -426,7 +426,7 @@ export function MigrateToPopFeedCard() {
               disabled={isRunning}
               className="w-4 h-4"
             />
-            <span>Clear existing Popfeed data first (recommended for clean migration)</span>
+            <span>Clear existing Popfeed data first (DANGER: deletes all your pre-existing popfeed data, if there is any)</span>
           </label>
 
           <div className="flex flex-row gap-2">
