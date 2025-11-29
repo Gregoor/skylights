@@ -82,17 +82,28 @@ type MigrationLog = {
   message: string;
 };
 
-export async function* migrateToPopfeed(clear: boolean): AsyncGenerator<MigrationLog> {
+type MigrationResult = {
+  success: boolean;
+  logs: MigrationLog[];
+};
+
+export async function migrateToPopfeed(clear: boolean): Promise<MigrationResult> {
+  const logs: MigrationLog[] = [];
+
+  const log = (type: MigrationLog["type"], message: string) => {
+    logs.push({ type, message });
+  };
+
   try {
     const agent = await assertSessionAgent();
     const did = agent.assertDid;
 
-    yield { type: "info", message: "🔐 Using authenticated session..." };
-    yield { type: "success", message: `✅ Authenticated` };
+    log("info", "🔐 Using authenticated session...");
+    log("success", `✅ Authenticated`);
 
     // Clear existing Popfeed data if requested
     if (clear) {
-      yield { type: "info", message: "🗑️  Clearing existing Popfeed data..." };
+      log("info", "🗑️  Clearing existing Popfeed data...");
 
       const collections = [
         "social.popfeed.feed.list",
@@ -126,13 +137,13 @@ export async function* migrateToPopfeed(clear: boolean): AsyncGenerator<Migratio
         } while (cursor);
 
         if (deletedCount > 0) {
-          yield { type: "success", message: `  ✅ Deleted ${deletedCount} records from ${collection}` };
+          log("success", `  ✅ Deleted ${deletedCount} records from ${collection}`);
         }
       }
     }
 
     // Fetch existing Skylights data from PDS
-    yield { type: "info", message: "📥 Fetching Skylights data from PDS..." };
+    log("info", "📥 Fetching Skylights data from PDS...");
 
     const listItems = [];
     let cursor: string | undefined;
@@ -160,11 +171,11 @@ export async function* migrateToPopfeed(clear: boolean): AsyncGenerator<Migratio
       cursor = response.data.cursor;
     } while (cursor);
 
-    yield { type: "info", message: `  Found ${listItems.length} list items` };
-    yield { type: "info", message: `  Found ${rels.length} rel records` };
+    log("info", `  Found ${listItems.length} list items`);
+    log("info", `  Found ${rels.length} rel records`);
 
     // Create Popfeed lists
-    yield { type: "info", message: "📋 Creating Popfeed lists..." };
+    log("info", "📋 Creating Popfeed lists...");
     const lists = new Map<string, string>();
 
     for (const [token, { name, type }] of Object.entries(LIST_MAPPINGS)) {
@@ -181,11 +192,11 @@ export async function* migrateToPopfeed(clear: boolean): AsyncGenerator<Migratio
         },
       });
       lists.set(token, response.data.uri);
-      yield { type: "success", message: `  ✅ ${name}` };
+      log("success", `  ✅ ${name}`);
     }
 
     // Migrate list items
-    yield { type: "info", message: "📦 Migrating list items..." };
+    log("info", "📦 Migrating list items...");
     let migrated = 0, skipped = 0;
     const skipReasons: Record<string, number> = {};
 
@@ -215,7 +226,7 @@ export async function* migrateToPopfeed(clear: boolean): AsyncGenerator<Migratio
         const olid = parsed.identifiers.openLibraryId as string;
         const isbns = await fetchISBNFromOpenLibrary(olid);
         if (!isbns || (!isbns.isbn10 && !isbns.isbn13)) {
-          yield { type: "warning", message: `  ⚠️  No ISBN found for book: ${olid} (likely self-published or very old)` };
+          log("warning", `  ⚠️  No ISBN found for book: ${olid} (likely self-published or very old)`);
           skipReasons['books without ISBN (self-published/old)'] = (skipReasons['books without ISBN (self-published/old)'] || 0) + 1;
           skipped++;
           continue;
@@ -236,16 +247,16 @@ export async function* migrateToPopfeed(clear: boolean): AsyncGenerator<Migratio
       });
       migrated++;
     }
-    yield { type: "success", message: `  ✅ ${migrated} migrated, ${skipped} skipped` };
+    log("success", `  ✅ ${migrated} migrated, ${skipped} skipped`);
     if (Object.keys(skipReasons).length > 0) {
-      yield { type: "info", message: `  Skip reasons:` };
+      log("info", `  Skip reasons:`);
       for (const [reason, count] of Object.entries(skipReasons)) {
-        yield { type: "info", message: `    - ${reason}: ${count}` };
+        log("info", `    - ${reason}: ${count}`);
       }
     }
 
     // Migrate reviews
-    yield { type: "info", message: "⭐ Migrating reviews..." };
+    log("info", "⭐ Migrating reviews...");
     migrated = 0;
     skipped = 0;
 
@@ -268,7 +279,7 @@ export async function* migrateToPopfeed(clear: boolean): AsyncGenerator<Migratio
         const olid = parsed.identifiers.openLibraryId as string;
         const isbns = await fetchISBNFromOpenLibrary(olid);
         if (!isbns || (!isbns.isbn10 && !isbns.isbn13)) {
-          yield { type: "warning", message: `  ⚠️  No ISBN found for review: ${olid} (likely self-published or very old)` };
+          log("warning", `  ⚠️  No ISBN found for review: ${olid} (likely self-published or very old)`);
           skipped++;
           continue;
         }
@@ -291,10 +302,13 @@ export async function* migrateToPopfeed(clear: boolean): AsyncGenerator<Migratio
       });
       migrated++;
     }
-    yield { type: "success", message: `  ✅ ${migrated} migrated, ${skipped} skipped` };
+    log("success", `  ✅ ${migrated} migrated, ${skipped} skipped`);
 
-    yield { type: "success", message: "🎉 Migration complete!" };
+    log("success", "🎉 Migration complete!");
+
+    return { success: true, logs };
   } catch (error) {
-    yield { type: "error", message: `❌ Error: ${error instanceof Error ? error.message : String(error)}` };
+    log("error", `❌ Error: ${error instanceof Error ? error.message : String(error)}`);
+    return { success: false, logs };
   }
 }

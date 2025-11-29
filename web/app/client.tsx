@@ -36,9 +36,8 @@ export function MigrateToPopfeedCard() {
     setLogs([]);
 
     try {
-      for await (const log of migrateToPopfeed(shouldClear)) {
-        addLog(log.type, log.message);
-      }
+      const result = await migrateToPopfeed(shouldClear);
+      setLogs(result.logs);
     } catch (error) {
       addLog("error", `Migration failed: ${error}`);
     } finally {
