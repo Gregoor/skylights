@@ -10,7 +10,7 @@ import { fetchItemsInfo, RelRecordValue } from "@/items/utils";
 import { Card } from "@/ui";
 import { getPublicAgent } from "@/utils";
 
-import { ReviewCarousel, SignInCard } from "./client";
+import { MigrateToPopfeedCard, ReviewCarousel, SignInCard } from "./client";
 
 async function RecentReviews() {
   "use cache";
@@ -62,6 +62,7 @@ async function RecentReviews() {
 
 export default async function LandingPage() {
   const agent = await getSessionAgent(false);
+  const profile = agent ? await agent.getProfile({ actor: agent.did! }) : null;
 
   return (
     <div className="flex flex-col gap-4">
@@ -95,6 +96,7 @@ export default async function LandingPage() {
         </Card>
         {!agent && <SignInCard />}
       </div>
+      {profile?.data.handle && <MigrateToPopfeedCard handle={profile.data.handle} />}
       <ErrorBoundary fallback={null}>
         <Suspense>
           <RecentReviews />
