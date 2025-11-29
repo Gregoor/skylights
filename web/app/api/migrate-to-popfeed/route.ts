@@ -47,6 +47,7 @@ async function fetchISBNFromOpenLibrary(olid: string): Promise<{ isbn10?: string
 
     return null;
   } catch (error) {
+    console.error("Error fetching ISBN from OpenLibrary:", error);
     return null;
   }
 }
