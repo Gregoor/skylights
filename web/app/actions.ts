@@ -71,7 +71,7 @@ async function fetchISBNFromOpenLibrary(olid: string): Promise<{ isbn10?: string
     }
 
     return null;
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }
@@ -189,6 +189,7 @@ export async function* migrateToPopfeed(clear: boolean): AsyncGenerator<Migratio
     const skipReasons: Record<string, number> = {};
 
     for (const record of listItems) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const value = record.value as any;
 
       let listToken = value.list?.$type;
@@ -248,6 +249,7 @@ export async function* migrateToPopfeed(clear: boolean): AsyncGenerator<Migratio
     skipped = 0;
 
     for (const record of rels) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const value = record.value as any;
 
       if (!value.rating && !value.note) {

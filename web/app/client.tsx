@@ -22,7 +22,7 @@ type MigrationLog = {
   message: string;
 };
 
-export function MigrateToPopfeedCard({ handle }: { handle: string }) {
+export function MigrateToPopfeedCard() {
   const [logs, setLogs] = useState<MigrationLog[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [shouldClear, setShouldClear] = useState(false);
