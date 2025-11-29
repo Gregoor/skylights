@@ -356,7 +356,7 @@ export function MigrateToPopFeedCard() {
             . The migration runs entirely in your browser, so there are no timeout limits.
           </p>
           <p className="text-sm text-gray-400">
-            You{'&apos;'}ll need an{" "}
+            {"You'll need an "}
             <a
               href="https://bsky.app/settings/app-passwords"
               target="_blank"
