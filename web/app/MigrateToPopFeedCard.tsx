@@ -344,7 +344,10 @@ export function MigrateToPopFeedCard() {
         <div className="flex flex-col gap-3">
           <h2 className="text-lg font-semibold">Migrate to Popfeed</h2>
           <p className="text-sm text-gray-400">
-            Migrate your Skylights data (lists, ratings, and reviews) to{" "}
+            <a href="https://bsky.app/profile/watwa.re/post/3m6ruq5no5c25" target="_blank" rel="noopener noreferrer" className="underline hover:no-underline">
+              I have stopped working on skylights.
+            </a> You are of course free to continue using it via this page until the API expires or the DB outruns my nimble subscription plan. You can also host it yourself (see source). Alternatively, join me
+            and migrate your Skylights data (lists, ratings, and reviews) to{" "}
             <a
               href="https://popfeed.social"
               target="_blank"
