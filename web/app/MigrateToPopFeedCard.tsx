@@ -285,6 +285,7 @@ export function MigrateToPopFeedCard() {
   const [shouldClear, setShouldClear] = useState(false);
   const [handle, setHandle] = useState("");
   const [password, setPassword] = useState("");
+  const [serviceUrl, setServiceUrl] = useState("https://bsky.social");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [agent, setAgent] = useState<AtpAgent | null>(null);
 
@@ -295,9 +296,9 @@ export function MigrateToPopFeedCard() {
   const authenticate = async () => {
     try {
       addLog("info", "🔐 Authenticating...");
-      const newAgent = new AtpAgent({ service: "https://bsky.social" });
+      const newAgent = new AtpAgent({ service: serviceUrl });
       await newAgent.login({
-        identifier: handle.includes(".") ? handle : `${handle}.bsky.social`,
+        identifier: handle,
         password,
       });
       setAgent(newAgent);
@@ -335,6 +336,7 @@ export function MigrateToPopFeedCard() {
     setIsAuthenticated(false);
     setHandle("");
     setPassword("");
+    setServiceUrl("https://bsky.social");
     addLog("info", "Logged out");
   };
 
@@ -371,6 +373,17 @@ export function MigrateToPopFeedCard() {
             {" "}to run the migration. Your credentials are used only in your browser and never sent to our servers.
           </p>
           <div className="flex flex-col gap-2">
+            <label className="flex flex-col gap-1">
+              <span className="text-sm text-gray-400">PDS Service URL</span>
+              <input
+                type="text"
+                value={serviceUrl}
+                onChange={(e) => setServiceUrl(e.target.value)}
+                placeholder="https://bsky.social"
+                className="border rounded-lg border-gray-400 px-3 py-2 bg-black focus:border-white outline-none"
+                onKeyDown={(e) => e.key === "Enter" && authenticate()}
+              />
+            </label>
             <label className="flex flex-col gap-1">
               <span className="text-sm text-gray-400">Handle</span>
               <input
