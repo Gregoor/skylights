@@ -97,7 +97,7 @@ export default async function LandingPage() {
         </Card>
         {!agent && <SignInCard />}
       </div>
-      {profile && <MigrateToPopFeedCard />}
+      <MigrateToPopFeedCard />
       <ErrorBoundary fallback={null}>
         <Suspense>
           <RecentReviews />
