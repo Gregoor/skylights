@@ -63,8 +63,6 @@ async function RecentReviews() {
 
 export default async function LandingPage() {
   const agent = await getSessionAgent(false);
-  const profile = agent ? await agent.getProfile({ actor: agent.did! }) : null;
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col sm:flex-row gap-4">
